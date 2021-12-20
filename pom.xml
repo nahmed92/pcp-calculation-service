@@ -9,7 +9,7 @@
 		<version>2.3.3.RELEASE</version>
 		<relativePath />
 	</parent>
-	<groupId>com.deltadental.pcp.calculation.service</groupId>
+	<groupId>com.deltadental.pcp.calculation.application.service</groupId>
 	<artifactId>pcp-calculation-service</artifactId>
 	<version>3.0.0</version>
 	<name>pcp-calculation-service</name>
