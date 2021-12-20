@@ -1,0 +1,624 @@
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI (http://jax-ws.java.net). RI's version is JAX-WS RI 2.3.0-b170407.2038 svn-revision#2eaca54d17a59d265c6fe886b7fd0027836c766c. --><wsdl:definitions xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:tns="http://interfaces.services.pcp.delta.org" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="pcpAssignmentWS" targetNamespace="http://interfaces.services.pcp.delta.org">
+    <wsdl:types>
+        <xsd:schema xmlns:ns0="http://interfaces.services.pcp.delta.org/types" targetNamespace="http://interfaces.services.pcp.delta.org/types">
+            <xsd:complexType name="blServiceRequest">
+                <xsd:sequence>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="pcpEnrollee" nillable="true" type="ns0:pcpblEnrollee"/>
+                    <xsd:element minOccurs="0" name="routing" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="sourceSystem" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="facilitySearchRequest">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="benefitpackageID" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="businesslevel" type="ns0:businessLevels"/>
+                    <xsd:element minOccurs="0" name="divisionNumber" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="enrolleeZipCode" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="facilityType" type="ns0:facilityType"/>
+                    <xsd:element minOccurs="0" name="facilityregion" type="ns0:facilityregion"/>
+                    <xsd:element minOccurs="0" name="facilitystatus" type="ns0:facilitystatus"/>
+                    <xsd:element minOccurs="0" name="groupNumber" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="mtvPersonID" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="product" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="pcpAssignmentRequest">
+                <xsd:sequence>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="pcpRequests" type="ns0:pcpRequest"/>
+                    <xsd:element minOccurs="0" name="product" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="sourceSystem" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="pcpSearchRequest">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="contractID" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="memberId" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="pcpEffectiveDate" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="zipcode" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="statePcpAssignmentRequest">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="dependentStateCode" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="divisionNumber" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="enrolleeNumber" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="groupNumber" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="sourceSystem" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="blResolutionResponse">
+                <xsd:sequence>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="enrollee" nillable="true" type="ns0:enrolleeBLRespose"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="bpblResolutionResponse">
+                <xsd:sequence>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="enrollee" nillable="true" type="ns0:enrolleeBPBLResponse"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="facilityResponse">
+                <xsd:sequence>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="facility" nillable="true" type="ns0:facility"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="pcpAssignmentResponse">
+                <xsd:sequence>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="pcpResponses" nillable="true" type="ns0:pcpResponse"/>
+                    <xsd:element minOccurs="0" name="processStatusCode" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="processStatusDescription" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="sourceSystem" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="statePcpAssignmentResponse">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="divisionNumber" type="xsd:string"/>
+                    <xsd:element name="groupDivEligibleforAutoPcp" type="xsd:boolean"/>
+                    <xsd:element minOccurs="0" name="groupNumber" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="returnCode" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="returnDescription" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="state" type="xsd:string"/>
+                    <xsd:element name="stateEligibleforPcp" type="xsd:boolean"/>
+                    <xsd:element name="unlimitedSplitFamilyFlag" type="xsd:boolean"/>
+                    <xsd:element name="unlimitedSplitFamily_INDV_Flag" type="xsd:boolean"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="pcpblEnrollee">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="divisionNumber" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="groupNumber" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="memberAddress" type="ns0:address"/>
+                    <xsd:element minOccurs="0" name="memberLanguage" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="memberType" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="mtvPersonID" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="pcpEffectiveDate" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="pcpEndDate" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="pcpIdentifier" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="practiceLocation" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="recordIdentifier" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="address">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="addressLine1" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="addressLine2" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="city" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="state" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="zipCode" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="businessLevels">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="businessLevel4" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="businessLevel5" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="businessLevel6" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="businessLevel7" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="classCode" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="effectiveDate" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="endDate" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="networkId" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="facilityType">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="providerType" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="providerspcialityDesc" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="providerspecialityCode" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="facilityregion">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="facilityCity" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="facilityState" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="facilityZip" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="facilitystatus">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="enrollStatus" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="facilityType" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="facilitystatusType" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="status" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="pcpRequest">
+                <xsd:sequence>
+                    <xsd:element name="autoAssignmentFlag" type="xsd:boolean"/>
+                    <xsd:element minOccurs="0" name="contractID" type="xsd:string"/>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="enrollees" type="ns0:pcpEnrollee"/>
+                    <xsd:element minOccurs="0" name="pcpRefineSearch" type="ns0:pcpRefineSearch"/>
+                    <xsd:element minOccurs="0" name="primaryEnrolleePCPInfo" type="ns0:primaryEnrolleePCPInfo"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="pcpEnrollee">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="autoAssignmentState" type="xsd:string"/>
+                    <xsd:element name="batchAutoAssignFlag" type="xsd:boolean"/>
+                    <xsd:element minOccurs="0" name="benefitPackageID" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="businessLevel7" type="xsd:string"/>
+                    <xsd:element name="ccaOverrideFlag" type="xsd:boolean"/>
+                    <xsd:element minOccurs="0" name="dateofBirth" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="divisionNumber" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="enrolleeBusinessLevels" type="ns0:businessLevels"/>
+                    <xsd:element minOccurs="0" name="groupInclusion" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="groupNumber" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="massTransfer" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="memberAddress" type="ns0:address"/>
+                    <xsd:element minOccurs="0" name="memberLanguage" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="memberType" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="mtvPersonID" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="networkId" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="newMember" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="overRideFlag" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="pcpEffectiveDate" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="pcpEndDate" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="pcpIdentifier" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="practiceLocation" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="randomSelection" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="recordIdentifier" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="sourceSystem" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="pcpRefineSearch">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="city" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="distance" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="gender" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="keyword" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="language" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="location" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="officeAccess" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="officeHours" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="others" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="patientConsideration" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="sortND" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="state" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="workMode" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="zipCode" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="primaryEnrolleePCPInfo">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="peAddress" type="ns0:address"/>
+                    <xsd:element minOccurs="0" name="peBusinessLevels" type="ns0:businessLevels"/>
+                    <xsd:element minOccurs="0" name="pePCPIdentifier" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="enrolleeBLRespose">
+                <xsd:sequence>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="benPkgList" nillable="true" type="ns0:benefitPackage"/>
+                    <xsd:element name="businessLevelCount" type="xsd:int"/>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="businessLevels" nillable="true" type="ns0:businessLevels"/>
+                    <xsd:element minOccurs="0" name="divisionNumber" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="errorMessage" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="groupNumber" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="memberType" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="providerId" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="statusCode" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="benefitPackage">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="benefitPackageId" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="bpideffectiveDate" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="bpidendDate" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="enrolleeBPBLResponse">
+                <xsd:sequence>
+                    <xsd:element name="businessLevelCount" type="xsd:int"/>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="businessLevels" nillable="true" type="ns0:bpBusinessLevels"/>
+                    <xsd:element minOccurs="0" name="divisionNumber" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="errorMessage" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="groupNumber" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="memberType" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="providerId" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="recordIdentifier" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="statusCode" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="bpBusinessLevels">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="benPkg" type="ns0:benefitPackage"/>
+                    <xsd:element minOccurs="0" name="businessLevel4" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="businessLevel5" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="businessLevel6" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="businessLevel7" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="effectiveDate" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="endDate" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="networkId" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="facility">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="addressLine1" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="addressLine2" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="addressLine3" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="city" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="contracted" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="effectiveDate" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="enrollStatus" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="facilityID" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="facilityName" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="facilitystatus" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="phoneNumber" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="specility" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="state" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="zip" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="pcpResponse">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="contractID" type="xsd:string"/>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="enrollees" nillable="true" type="ns0:enrolleeDetail"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="enrolleeDetail">
+                <xsd:sequence>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="benefitpackages" nillable="true" type="ns0:benefitPackage"/>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="businesslevels" nillable="true" type="ns0:businessLevels"/>
+                    <xsd:element minOccurs="0" name="divisionNumber" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="enrolleeStatusCode" type="xsd:string"/>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="errorMessages" nillable="true" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="groupNumber" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="memberType" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="numberOfFacilities" type="xsd:string"/>
+                    <xsd:element name="pcpValidationFlag" type="xsd:boolean"/>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="pcpproviders" nillable="true" type="ns0:pcpProvider"/>
+                    <xsd:element minOccurs="0" name="recordIdentifier" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="pcpProvider">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="band" type="xsd:string"/>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="businesslevels" nillable="true" type="ns0:businessLevels"/>
+                    <xsd:element minOccurs="0" name="distance" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="facilityLatitude" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="facilityLongitude" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="groupPracticeNumber" type="xsd:string"/>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="languages" nillable="true" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="maxAge" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="maxMemberCount" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="minAge" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="mtvNetworkId" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="officeHours" type="ns0:officeHour"/>
+                    <xsd:element minOccurs="0" name="patientCount" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="practiceLocationNumber" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="practiceLocationPhone" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="providerAccessibleFacility" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="providerAddress" type="ns0:address"/>
+                    <xsd:element minOccurs="0" name="providerFacilityId" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="providerFacilityName" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="providerType" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="providerWorkMode" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="specialtyCode" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="specialtyDescription" type="xsd:string"/>
+                    <xsd:element minOccurs="0" name="tier" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="officeHour">
+                <xsd:sequence>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="officeHours" nillable="true" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="PCPService" type="ns0:pcpAssignmentRequest"/>
+            <xsd:element name="address" type="ns0:address"/>
+            <xsd:element name="businessLevels" type="ns0:businessLevels"/>
+            <xsd:element name="pcpRequest" type="ns0:pcpRequest"/>
+            <xsd:element name="pcpEnrollee" type="ns0:pcpEnrollee"/>
+            <xsd:element name="pcpRefineSearch" type="ns0:pcpRefineSearch"/>
+            <xsd:element name="primaryEnrolleePCPInfo" type="ns0:primaryEnrolleePCPInfo"/>
+        </xsd:schema>
+        <xsd:schema xmlns:ns1="http://interfaces.services.pcp.delta.org/types" targetNamespace="http://interfaces.services.pcp.delta.org">
+            <xsd:import namespace="http://interfaces.services.pcp.delta.org/types"/>
+            <xsd:complexType name="providerValidate">
+                <xsd:sequence>
+                    <xsd:element name="arg0" type="ns1:pcpAssignmentRequest"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="providerValidate" type="tns:providerValidate"/>
+            <xsd:complexType name="providerValidateResponse">
+                <xsd:sequence>
+                    <xsd:element name="return" type="ns1:pcpAssignmentResponse"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="providerValidateResponse" type="tns:providerValidateResponse"/>
+            <xsd:complexType name="getStatePCPAssignment">
+                <xsd:sequence>
+                    <xsd:element name="arg0" type="ns1:statePcpAssignmentRequest"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="getStatePCPAssignment" type="tns:getStatePCPAssignment"/>
+            <xsd:complexType name="getStatePCPAssignmentResponse">
+                <xsd:sequence>
+                    <xsd:element name="return" type="ns1:statePcpAssignmentResponse"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="getStatePCPAssignmentResponse" type="tns:getStatePCPAssignmentResponse"/>
+            <xsd:complexType name="getProviders">
+                <xsd:sequence>
+                    <xsd:element name="arg0" type="ns1:pcpAssignmentRequest"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="getProviders" type="tns:getProviders"/>
+            <xsd:complexType name="getProvidersResponse">
+                <xsd:sequence>
+                    <xsd:element name="return" type="ns1:pcpAssignmentResponse"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="getProvidersResponse" type="tns:getProvidersResponse"/>
+            <xsd:complexType name="providers">
+                <xsd:sequence>
+                    <xsd:element name="arg0" type="ns1:pcpSearchRequest"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="providers" type="tns:providers"/>
+            <xsd:complexType name="providersResponse">
+                <xsd:sequence>
+                    <xsd:element name="return" type="ns1:pcpAssignmentResponse"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="providersResponse" type="tns:providersResponse"/>
+            <xsd:complexType name="groupBenefitPackBussinessLevel">
+                <xsd:sequence>
+                    <xsd:element name="arg0" type="ns1:blServiceRequest"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="groupBenefitPackBussinessLevel" type="tns:groupBenefitPackBussinessLevel"/>
+            <xsd:complexType name="groupBenefitPackBussinessLevelResponse">
+                <xsd:sequence>
+                    <xsd:element name="return" type="ns1:bpblResolutionResponse"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="groupBenefitPackBussinessLevelResponse" type="tns:groupBenefitPackBussinessLevelResponse"/>
+            <xsd:complexType name="getBPsAndBussinessLevels">
+                <xsd:sequence>
+                    <xsd:element name="arg0" type="ns1:blServiceRequest"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="getBPsAndBussinessLevels" type="tns:getBPsAndBussinessLevels"/>
+            <xsd:complexType name="getBPsAndBussinessLevelsResponse">
+                <xsd:sequence>
+                    <xsd:element name="return" type="ns1:bpblResolutionResponse"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="getBPsAndBussinessLevelsResponse" type="tns:getBPsAndBussinessLevelsResponse"/>
+            <xsd:complexType name="retrieveDistinctExceptionGroups">
+                <xsd:sequence>
+                    <xsd:element name="arg0" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="retrieveDistinctExceptionGroups" type="tns:retrieveDistinctExceptionGroups"/>
+            <xsd:complexType name="retrieveDistinctExceptionGroupsResponse">
+                <xsd:sequence>
+                    <xsd:element name="return" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="retrieveDistinctExceptionGroupsResponse" type="tns:retrieveDistinctExceptionGroupsResponse"/>
+            <xsd:complexType name="getBussinessLevels">
+                <xsd:sequence>
+                    <xsd:element name="arg0" type="ns1:blServiceRequest"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="getBussinessLevels" type="tns:getBussinessLevels"/>
+            <xsd:complexType name="getBussinessLevelsResponse">
+                <xsd:sequence>
+                    <xsd:element name="return" type="ns1:blResolutionResponse"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="getBussinessLevelsResponse" type="tns:getBussinessLevelsResponse"/>
+            <xsd:complexType name="facilitySearch">
+                <xsd:sequence>
+                    <xsd:element name="arg0" type="ns1:facilitySearchRequest"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="facilitySearch" type="tns:facilitySearch"/>
+            <xsd:complexType name="facilitySearchResponse">
+                <xsd:sequence>
+                    <xsd:element name="return" type="ns1:facilityResponse"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="facilitySearchResponse" type="tns:facilitySearchResponse"/>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="providerValidateInput">
+        <wsdl:part element="tns:providerValidate" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="providerValidateOutput">
+        <wsdl:part element="tns:providerValidateResponse" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="getStatePCPAssignmentInput">
+        <wsdl:part element="tns:getStatePCPAssignment" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="getStatePCPAssignmentOutput">
+        <wsdl:part element="tns:getStatePCPAssignmentResponse" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="getProvidersInput">
+        <wsdl:part element="tns:getProviders" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="getProvidersOutput">
+        <wsdl:part element="tns:getProvidersResponse" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="providersInput">
+        <wsdl:part element="tns:providers" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="providersOutput">
+        <wsdl:part element="tns:providersResponse" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="groupBenefitPackBussinessLevelInput">
+        <wsdl:part element="tns:groupBenefitPackBussinessLevel" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="groupBenefitPackBussinessLevelOutput">
+        <wsdl:part element="tns:groupBenefitPackBussinessLevelResponse" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="getBPsAndBussinessLevelsInput">
+        <wsdl:part element="tns:getBPsAndBussinessLevels" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="getBPsAndBussinessLevelsOutput">
+        <wsdl:part element="tns:getBPsAndBussinessLevelsResponse" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="retrieveDistinctExceptionGroupsInput">
+        <wsdl:part element="tns:retrieveDistinctExceptionGroups" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="retrieveDistinctExceptionGroupsOutput">
+        <wsdl:part element="tns:retrieveDistinctExceptionGroupsResponse" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="getBussinessLevelsInput">
+        <wsdl:part element="tns:getBussinessLevels" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="getBussinessLevelsOutput">
+        <wsdl:part element="tns:getBussinessLevelsResponse" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="facilitySearchInput">
+        <wsdl:part element="tns:facilitySearch" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="facilitySearchOutput">
+        <wsdl:part element="tns:facilitySearchResponse" name="parameters"/>
+    </wsdl:message>
+    <wsdl:portType name="IpcpAssignment">
+        <wsdl:operation name="providerValidate">
+            <wsdl:input xmlns:ns1="http://www.w3.org/2006/05/addressing/wsdl" message="tns:providerValidateInput" ns1:Action=""/>
+            <wsdl:output xmlns:ns1="http://www.w3.org/2006/05/addressing/wsdl" message="tns:providerValidateOutput" ns1:Action=""/>
+        </wsdl:operation>
+        <wsdl:operation name="getStatePCPAssignment">
+            <wsdl:input xmlns:ns1="http://www.w3.org/2006/05/addressing/wsdl" message="tns:getStatePCPAssignmentInput" ns1:Action=""/>
+            <wsdl:output xmlns:ns1="http://www.w3.org/2006/05/addressing/wsdl" message="tns:getStatePCPAssignmentOutput" ns1:Action=""/>
+        </wsdl:operation>
+        <wsdl:operation name="getProviders">
+            <wsdl:input xmlns:ns1="http://www.w3.org/2006/05/addressing/wsdl" message="tns:getProvidersInput" ns1:Action=""/>
+            <wsdl:output xmlns:ns1="http://www.w3.org/2006/05/addressing/wsdl" message="tns:getProvidersOutput" ns1:Action=""/>
+        </wsdl:operation>
+        <wsdl:operation name="providers">
+            <wsdl:input xmlns:ns1="http://www.w3.org/2006/05/addressing/wsdl" message="tns:providersInput" ns1:Action=""/>
+            <wsdl:output xmlns:ns1="http://www.w3.org/2006/05/addressing/wsdl" message="tns:providersOutput" ns1:Action=""/>
+        </wsdl:operation>
+        <wsdl:operation name="groupBenefitPackBussinessLevel">
+            <wsdl:input xmlns:ns1="http://www.w3.org/2006/05/addressing/wsdl" message="tns:groupBenefitPackBussinessLevelInput" ns1:Action=""/>
+            <wsdl:output xmlns:ns1="http://www.w3.org/2006/05/addressing/wsdl" message="tns:groupBenefitPackBussinessLevelOutput" ns1:Action=""/>
+        </wsdl:operation>
+        <wsdl:operation name="getBPsAndBussinessLevels">
+            <wsdl:input xmlns:ns1="http://www.w3.org/2006/05/addressing/wsdl" message="tns:getBPsAndBussinessLevelsInput" ns1:Action=""/>
+            <wsdl:output xmlns:ns1="http://www.w3.org/2006/05/addressing/wsdl" message="tns:getBPsAndBussinessLevelsOutput" ns1:Action=""/>
+        </wsdl:operation>
+        <wsdl:operation name="retrieveDistinctExceptionGroups">
+            <wsdl:input xmlns:ns1="http://www.w3.org/2006/05/addressing/wsdl" message="tns:retrieveDistinctExceptionGroupsInput" ns1:Action=""/>
+            <wsdl:output xmlns:ns1="http://www.w3.org/2006/05/addressing/wsdl" message="tns:retrieveDistinctExceptionGroupsOutput" ns1:Action=""/>
+        </wsdl:operation>
+        <wsdl:operation name="getBussinessLevels">
+            <wsdl:input xmlns:ns1="http://www.w3.org/2006/05/addressing/wsdl" message="tns:getBussinessLevelsInput" ns1:Action=""/>
+            <wsdl:output xmlns:ns1="http://www.w3.org/2006/05/addressing/wsdl" message="tns:getBussinessLevelsOutput" ns1:Action=""/>
+        </wsdl:operation>
+        <wsdl:operation name="facilitySearch">
+            <wsdl:input xmlns:ns1="http://www.w3.org/2006/05/addressing/wsdl" message="tns:facilitySearchInput" ns1:Action=""/>
+            <wsdl:output xmlns:ns1="http://www.w3.org/2006/05/addressing/wsdl" message="tns:facilitySearchOutput" ns1:Action=""/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="IpcpAssignmentSoapHttp" type="tns:IpcpAssignment">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="providerValidate">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getStatePCPAssignment">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getProviders">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="providers">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="groupBenefitPackBussinessLevel">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getBPsAndBussinessLevels">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="retrieveDistinctExceptionGroups">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getBussinessLevels">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="facilitySearch">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="pcpAssignmentWS">
+        <wsdl:port binding="tns:IpcpAssignmentSoapHttp" name="pcpAssignmentPORT">
+            <soap:address location="http://aw-lx0558.deltadev.ent:24011/pcpservices/assignment"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
