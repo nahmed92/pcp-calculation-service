@@ -15,7 +15,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping(value = "/pcp-calculation", produces = {MediaType.APPLICATION_JSON_VALUE})
+@RequestMapping(value = "/pcp-calculation")
 @Api(value = "/pcp-calculation")
 @Slf4j
 @Data
@@ -24,7 +24,7 @@ public class PCPCalculationServiceController {
 	
 	@ResponseBody
 	@MethodExecutionTime
-    @GetMapping(value = "/hello", consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @GetMapping(value = "/hello", consumes = {MediaType.ALL_VALUE})
 	public ResponseEntity<String> sayHello() {
 		log.info("START PCPCalculationServiceController.sayHello");
 		ResponseEntity<String> responseEntity = new ResponseEntity<>("Hello PCP Calculation Service!", HttpStatus.OK); 
