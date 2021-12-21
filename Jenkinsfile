@@ -540,7 +540,7 @@ pipeline {
 	ApplicationArea=""
     APP=""
     //team Dl and Release Management Team
-    SEND_MAIL = "ITSSReleaseTeam@delta.org,CX-Core-Tech@delta.org, KBasireddy@delta.org,akosana@delta.org,pkumar2@delta.org"
+    SEND_MAIL = "ITSSReleaseTeam@delta.org, KBasireddy@delta.org,akosana@delta.org,pkumar2@delta.org"
 
     //Application type
 		SERVICE_TYPE="JAVA"
