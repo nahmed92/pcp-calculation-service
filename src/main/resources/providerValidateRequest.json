@@ -1,0 +1,32 @@
+{
+	"pcpRequests": [
+		{
+			"autoAssignmentFlag": "false",
+			"enrollees": [
+				{
+					"batchAutoAssignFlag": "false",
+					"benefitPackageID": "DCAA5400",
+					"ccaOverrideFlag": "false",
+					"dateofBirth": "1988-01-10",
+					"divisionNumber": "00007",
+					"pcpIdentifier": "DC228101",
+					"pcpEffectiveDate": "06-01-2020",
+					"pcpEndDate": "12-31-9999",
+					"enrolleeBusinessLevels": {
+						"businessLevel4": "INDIVIDUL",
+						"businessLevel5": "DDIC DHMO",
+						"businessLevel6": "CA",
+						"businessLevel7": "DLTACARE USA",
+						"networkId": "DELTACARE"
+					},
+					"groupNumber": "70116",
+					"memberAddress": {
+						"zipCode": "94538"
+					},
+					"memberType": "01"
+				}
+			]
+		}
+	],
+	"sourceSystem": "EEP"
+}
