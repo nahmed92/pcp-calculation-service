@@ -41,8 +41,8 @@ ENTRYPOINT java $JAVA_OPTS \
 	-Dspring.jpa.hibernate.ddl-auto=${JPA_HIBERNATE_DLL_AUTO} \
 	-Dspring.jpa.properties.hibernate.dialect=${JPA_PROPERTIES_DIALECT} \
 	-Dspring.jpa.hibernate.c3p0.min.size=${JPA_MIN_SIZE} \
-        -Dspring.jpa.hibernate.c3p0.max.size=${JPA_MAX_SIZE} \
-        -Dspring.jpa.hibernate.c3p0.timeout=${JPA_TIMEOUT} \
+    -Dspring.jpa.hibernate.c3p0.max.size=${JPA_MAX_SIZE} \
+    -Dspring.jpa.hibernate.c3p0.timeout=${JPA_TIMEOUT} \
 	-Dspring.datasource.driverClassName=${DATASOURCE_DRIVER_CLASS} \
 	-Dpcp.search.service.endpoint=${PCP_SEARCH_SERVICE_ENDPOINT} \
 	-Dmanagement.endpoints.enabled-by-default=${MANAGEMENT_ENDPOINTS_ENABLED_BY_DEFAULT} \
