@@ -2,13 +2,17 @@ package com.deltadental.pcp.calculation.entities;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Date;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.Immutable;
 
@@ -44,9 +48,13 @@ public class ProviderValidateEntity implements Serializable {
 	@Column(name = "provider_validation", nullable = false)
 	private String providerValidation;
 
-	@Column(name = "creation_ts")
-	private Timestamp crationTs;
+	@Basic(optional = false)
+	@Column(name = "creation_ts", insertable = false, updatable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date crationTs;
 
-	@Column(name = "last_maint_ts")
-	private Timestamp lastMaintTs;
+	@Basic(optional = false)
+	@Column(name = "last_maint_ts", insertable = false, updatable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date lastMaintTs;
 }
