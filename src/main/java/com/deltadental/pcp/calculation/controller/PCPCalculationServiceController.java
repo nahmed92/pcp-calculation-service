@@ -1,10 +1,13 @@
 package com.deltadental.pcp.calculation.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,6 +57,27 @@ public class PCPCalculationServiceController {
 		validateProviderResponse.setStatus(pcpCalculationService.validateProvider());
 		ResponseEntity<ValidateProviderResponse> responseEntity = new ResponseEntity<>(validateProviderResponse, HttpStatus.OK); 
 		log.info("END PCPCalculationServiceController.validateProvider");
+		return responseEntity;
+	}
+	
+	
+	@ApiOperation(
+			value = PCPCalculationServiceConstants.PROCESS_PCP_MEMBER_CONTRACT, 
+			notes = PCPCalculationServiceConstants.SPROCESS_PCP_MEMBER_CONTRACT_NOTES, 
+			response = Contract.class)
+    @ApiResponses({ @ApiResponse(code = 200, message = "Successfully validated provider.", response = Contract.class),
+                    @ApiResponse(code = 400, message = "Bad request.", response = ServiceError.class),
+                    @ApiResponse(code = 403, message = "Unauthorized", response = ServiceError.class),
+                    @ApiResponse(code = 404, message = "Contracts Processor not found.", response = ServiceError.class),
+                    @ApiResponse(code = 500, message = "Internal server error.", response = ServiceError.class) })
+	@ResponseBody
+	@MethodExecutionTime
+    @PostMapping(value = PCPCalculationServiceConstants.PROCESS_PCP_MEMBER_CONTRACT_URI, produces = {MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<List<Contract>> processPcpMemberContract(@RequestBody final List<Contract> contracts) {
+		log.info("Contracts Receive Pcp Calculation service ");
+		pcpCalculationService.setAssginmentDate(contracts);
+		ResponseEntity<List<Contract>> responseEntity = new ResponseEntity<>(contracts, HttpStatus.OK); 
+		log.info("END PCPCalculationServiceController.processPcpMemberContract");
 		return responseEntity;
 	}
 }
