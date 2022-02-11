@@ -21,8 +21,8 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @Immutable
-@Table(name = "provider_validate", schema = "dbo")
-public class ProviderValidateEntity implements Serializable {
+@Table(name = "MEMBER_PROVIDER", schema = "dbo")
+public class MemberProviderEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -31,20 +31,38 @@ public class ProviderValidateEntity implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	@Column(name = "pcp_identifier", nullable = false)
+	@Column(name = "pcp_identifier")
 	private String pcpIdentifier;
 
-	@Column(name = "zip_code", nullable = false)
+	@Column(name = "zip_code")
 	private String zipCode;
 
-	@Column(name = "member_type", nullable = false)
+	@Column(name = "member_id")
+	private String memberId;
+	
+	@Column(name = "member_type")
 	private String memberType;
-
-	@Column(name = "source_system", nullable = false)
+	
+	@Column(name = "contract_id")
+	private String contractId;
+	
+	@Column(name = "source_system")
 	private String sourceSystem;
 
-	@Column(name = "provider_validation", nullable = false)
-	private String providerValidation;
+	@Column(name = "status")
+	private String status;
+
+	@Column(name = "reason_cd")
+	private String reasonCd;
+	
+	@Column(name = "pcp_effective_date")
+	private String pcpEffectiveDate;
+
+	@Column(name = "claim_id")
+	private String claimId;
+	
+	@Column(name = "claim_status")
+	private String claimStatus;
 
 	@Column(name = "creation_ts")
 	@CreationTimestamp

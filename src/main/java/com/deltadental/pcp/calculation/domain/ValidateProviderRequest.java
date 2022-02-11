@@ -11,8 +11,11 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class ValidateProviderResponse {
+public class ValidateProviderRequest {
 
-	private String status;
-	private String pcpEffectiveDate;
+	private String providerId;
+	private String memberId;
+	private String memberType;
+	private String contractId;
+	private String zipCode;
 }
