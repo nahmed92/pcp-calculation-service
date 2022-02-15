@@ -23,6 +23,8 @@ import com.deltadental.mtv.sync.service.BenefitPackage;
 import com.deltadental.mtv.sync.service.CoverageSpan;
 import com.deltadental.mtv.sync.service.GroupProdNetwork;
 import com.deltadental.mtv.sync.service.MTVSyncService;
+import com.deltadental.mtv.sync.service.MemberClaimRequest;
+import com.deltadental.mtv.sync.service.MemberClaimResponse;
 import com.deltadental.mtv.sync.service.PcpEligbility;
 import com.deltadental.mtv.sync.service.RetrieveContract;
 import com.deltadental.mtv.sync.service.RetrieveContractResponse;
@@ -129,12 +131,17 @@ public class PCPCalculationService {
 				RetrieveContractResponse retrieveContractResponse =  mtvSyncService.retrieveContract(retrieveContract);
 				Return myReturn = retrieveContractResponse.getMyreturn();
 				//Step# 3 : step 3 - retrive member claim information in member_claim_service table
-				MemberClaimServiceEntity memberClaimServiceEntity = getAllMemberClaimServiceEntities(contractMemberClaim.getContractId(), contractMemberClaim.getMemberId(), contractMemberClaim.getProviderId(), contractMemberClaim.getClaimId());
+				
+				MemberClaimRequest memberClaimRequest = MemberClaimRequest.builder().memberClaimId(contractMemberClaim.getContractId()).build();
+				MemberClaimResponse memberClaimResponse = mtvSyncService.memberClaim(memberClaimRequest);
+				
+				MemberClaimServiceEntity memberClaimServiceEntity = MemberClaimServiceEntity.builder()
+						.build();
+				memberClaimServiceRepo.save(memberClaimServiceEntity);				
+				String validateProviderMessage = null;
 				
 				// TODO : step 4 - read pcp config service -- read only place holder
 				
-				
-				String validateProviderMessage = null;
 				// TODO : step 5 - validate procedure, claim status and explanation code
 				if(!StringUtils.equals(memberClaimServiceEntity.getProcedureCode(), "D0131") && StringUtils.equals(memberClaimServiceEntity.getExplanationCode(), "120") && StringUtils.equals(memberClaimServiceEntity.getClaimStatus(), "N")) {
 					
@@ -143,7 +150,7 @@ public class PCPCalculationService {
 							.contractId(contractMemberClaim.getContractId())
 							.lookAheadDays("90")
 							.memberType(contractMemberClaim.getMemberId())
-							.mtvPersonId(myReturn.getPrimaryEnrollee().getPerson().getPersonIdentfier())
+							.mtvPersonId(myReturn.getPrimaryEnrollee().getPerson().getPersonIdentfier()) // TODO : get the correct value
 							.pcpEffDate(calculatePCPEffectiveDate())
 							.pcpEndDate(null)
 							.product(DC_PRODUCT)
@@ -152,7 +159,7 @@ public class PCPCalculationService {
 							.sourceSystem(DCM_SOURCESYSTEM)
 							.build();
 					PCPValidateResponse pcpValidateResponse = validatePcp(pcpValidateRequest);
-					
+					// Retrive the error message from pcpValidateResponse and validate the error messages
 					// TODO : step 7 - if provider is validated successfully make a call to mtv sync to update pcp
 					UpdatePCP updatePCP = buildUpdatePCP(myReturn, memberClaimServiceEntity);
 					UpdatePCPResponse updatePCPResponse = mtvSyncService.updatePCPMember(updatePCP);
@@ -175,7 +182,7 @@ public class PCPCalculationService {
 	
 	private int random() {
 		Random rand = new Random();
-		int maxNumber = 10;
+		int maxNumber = 2;
 
 		int randomNumber = rand.nextInt(maxNumber) + 1;
 		return randomNumber;

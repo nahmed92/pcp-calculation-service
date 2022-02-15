@@ -17,5 +17,4 @@ public class ValidateProviderRequest {
 	private String memberId;
 	private String memberType;
 	private String contractId;
-	private String zipCode;
 }
