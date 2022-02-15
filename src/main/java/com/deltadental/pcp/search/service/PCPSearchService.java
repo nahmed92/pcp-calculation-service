@@ -62,6 +62,31 @@ public class PCPSearchService {
 		return null;
 	}
 	
+	
+	public PCPValidateResponse pvpValidate(PcpValidateRequest pcpValidateRequest) {
+		log.info("START PCPSearchService.validateProvider");
+		String providerValidateEndPoint = pcpSearchServiceEndpoint.concat(PCPSearchServiceConstants.PROVIDER_VALIDATION);
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(providerValidateEndPoint);
+		String uriBuilder = builder.build().encode().toUriString();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		ResponseEntity<PCPValidateResponse> responseEntity = null;
+		try {
+			setMessageConverter(restTemplate);
+			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.POST,  new HttpEntity<>(pcpValidateRequest, headers), PCPValidateResponse.class);
+		} catch (RestClientException e) {
+			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+		} catch (URISyntaxException e) {
+			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+		}
+		if(responseEntity.getStatusCode() == HttpStatus.OK) {
+			return responseEntity.getBody();
+		} 
+		log.info("END PCPSearchService.validateProvider");
+		return null;
+	}
+	
+	
 	private static void setMessageConverter(RestTemplate restTemplate) {
 		List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();        
 		MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();

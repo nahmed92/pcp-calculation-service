@@ -105,6 +105,49 @@ public class MTVSyncService {
 	}
 	
 
+	public MemberClaimResponse memberClaim(MemberClaimRequest memberClaimRequest) {
+		log.info("START MTVSyncService.updatePCPMember");
+		String updatePCPMemberEndPoint = pcpMtvSyncServiceEndpoint.concat(MTVSyncServiceConstants.MEMBER_CLAIM);
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(updatePCPMemberEndPoint);
+		String uriBuilder = builder.build().encode().toUriString();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<MemberClaimRequest> request = new HttpEntity<MemberClaimRequest>(memberClaimRequest, headers);
+		MemberClaimResponse responseEntity = null;
+		try {
+			setMessageConverter(restTemplate);
+			responseEntity = restTemplate.postForObject(new URI(uriBuilder), request, MemberClaimResponse.class);
+		} catch (RestClientException e) {
+			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+		} catch (URISyntaxException e) {
+			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+		}
+		log.info("END MTVSyncService.updatePCPMember");
+		return responseEntity;
+	}
+	
+
+	public ProviderAssignmentResponse providerAssignment(ProviderAssignmentRequest providerAssignmentRequest) {
+		log.info("START MTVSyncService.updatePCPMember");
+		String updatePCPMemberEndPoint = pcpMtvSyncServiceEndpoint.concat(MTVSyncServiceConstants.PROVIDER_ASSIGNMENT);
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(updatePCPMemberEndPoint);
+		String uriBuilder = builder.build().encode().toUriString();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<ProviderAssignmentRequest> request = new HttpEntity<ProviderAssignmentRequest>(providerAssignmentRequest, headers);
+		ProviderAssignmentResponse responseEntity = null;
+		try {
+			setMessageConverter(restTemplate);
+			responseEntity = restTemplate.postForObject(new URI(uriBuilder), request, ProviderAssignmentResponse.class);
+		} catch (RestClientException e) {
+			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+		} catch (URISyntaxException e) {
+			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+		}
+		log.info("END MTVSyncService.updatePCPMember");
+		return responseEntity;
+	}
+
 	private static void setMessageConverter(RestTemplate restTemplate) {
 		List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();        
 		MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();

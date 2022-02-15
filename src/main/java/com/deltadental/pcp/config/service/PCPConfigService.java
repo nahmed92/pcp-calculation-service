@@ -70,16 +70,16 @@ public class PCPConfigService {
 		restTemplate.setMessageConverters(messageConverters); 
 	}
 //	
-//	public PCPAssignmentResponse claimStatus(PcpAssignmentRequest pcpAssignmentRequest) {
+//	public PCPValidateResponse claimStatus(PcpAssignmentRequest pcpAssignmentRequest) {
 //		log.info("START PCPSearchService.validateProvider");
 //		String providerValidateEndPoint = pcpSearchServiceEndpoint.concat(PCPSearchServiceConstants.PROVIDER_VALIDATION);
 //		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(providerValidateEndPoint);
 //		String uriBuilder = builder.build().encode().toUriString();
 //		HttpHeaders headers = new HttpHeaders();
 //		headers.setContentType(MediaType.APPLICATION_JSON);
-//		ResponseEntity<PCPAssignmentResponse> responseEntity = null;
+//		ResponseEntity<PCPValidateResponse> responseEntity = null;
 //		try {
-//			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.POST,  new HttpEntity<>(pcpAssignmentRequest, headers), PCPAssignmentResponse.class);
+//			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.POST,  new HttpEntity<>(pcpAssignmentRequest, headers), PCPValidateResponse.class);
 //		} catch (RestClientException e) {
 //			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
 //		} catch (URISyntaxException e) {
@@ -93,16 +93,16 @@ public class PCPConfigService {
 //	}
 //	
 //	
-//	public PCPAssignmentResponse explanationCode(PcpAssignmentRequest pcpAssignmentRequest) {
+//	public PCPValidateResponse explanationCode(PcpAssignmentRequest pcpAssignmentRequest) {
 //		log.info("START PCPSearchService.validateProvider");
 //		String providerValidateEndPoint = pcpSearchServiceEndpoint.concat(PCPSearchServiceConstants.PROVIDER_VALIDATION);
 //		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(providerValidateEndPoint);
 //		String uriBuilder = builder.build().encode().toUriString();
 //		HttpHeaders headers = new HttpHeaders();
 //		headers.setContentType(MediaType.APPLICATION_JSON);
-//		ResponseEntity<PCPAssignmentResponse> responseEntity = null;
+//		ResponseEntity<PCPValidateResponse> responseEntity = null;
 //		try {
-//			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.POST,  new HttpEntity<>(pcpAssignmentRequest, headers), PCPAssignmentResponse.class);
+//			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.POST,  new HttpEntity<>(pcpAssignmentRequest, headers), PCPValidateResponse.class);
 //		} catch (RestClientException e) {
 //			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
 //		} catch (URISyntaxException e) {

@@ -10,6 +10,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import javax.transaction.Transactional;
 
@@ -43,6 +44,10 @@ import com.deltadental.pcp.calculation.repos.MemberClaimServiceRepo;
 import com.deltadental.pcp.calculation.repos.MemberProviderRepo;
 import com.deltadental.pcp.config.service.PCPConfigService;
 import com.deltadental.pcp.search.service.PCPSearchService;
+import com.deltadental.pcp.search.service.PCPValidateResponse;
+import com.deltadental.pcp.search.service.PcpValidateRequest;
+import com.deltadental.pcp.search.service.pojos.EnrolleeDetail;
+import com.deltadental.pcp.search.service.pojos.PCPResponse;
 
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +57,10 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 @Slf4j
 public class PCPCalculationService {
+
+	private static final String DCM_SOURCESYSTEM = "DCM";
+
+	private static final String DC_PRODUCT = "DC";
 
 	@Autowired
 	private PCPSearchService pcpSearchService;
@@ -123,11 +132,26 @@ public class PCPCalculationService {
 				MemberClaimServiceEntity memberClaimServiceEntity = getAllMemberClaimServiceEntities(contractMemberClaim.getContractId(), contractMemberClaim.getMemberId(), contractMemberClaim.getProviderId(), contractMemberClaim.getClaimId());
 				
 				// TODO : step 4 - read pcp config service -- read only place holder
+				
+				
 				String validateProviderMessage = null;
 				// TODO : step 5 - validate procedure, claim status and explanation code
 				if(!StringUtils.equals(memberClaimServiceEntity.getProcedureCode(), "D0131") && StringUtils.equals(memberClaimServiceEntity.getExplanationCode(), "120") && StringUtils.equals(memberClaimServiceEntity.getClaimStatus(), "N")) {
 					
 					// TODO : step 6 - vaidate provider - new end point from pcp search service
+					PcpValidateRequest pcpValidateRequest = PcpValidateRequest.builder()
+							.contractId(contractMemberClaim.getContractId())
+							.lookAheadDays("90")
+							.memberType(contractMemberClaim.getMemberId())
+							.mtvPersonId(myReturn.getPrimaryEnrollee().getPerson().getPersonIdentfier())
+							.pcpEffDate(calculatePCPEffectiveDate())
+							.pcpEndDate(null)
+							.product(DC_PRODUCT)
+							.providerId(contractMemberClaim.getProviderId())
+							.recordIdentifier(String.valueOf(random()))
+							.sourceSystem(DCM_SOURCESYSTEM)
+							.build();
+					PCPValidateResponse pcpValidateResponse = validatePcp(pcpValidateRequest);
 					
 					// TODO : step 7 - if provider is validated successfully make a call to mtv sync to update pcp
 					UpdatePCP updatePCP = buildUpdatePCP(myReturn, memberClaimServiceEntity);
@@ -146,10 +170,31 @@ public class PCPCalculationService {
 				// TODO : step 8 - update contract_member_claims table back with status processed/unprocessed
 			});
 		}
-		return null;
-		
-		
+		return null;		
 	}
+	
+	private int random() {
+		Random rand = new Random();
+		int maxNumber = 10;
+
+		int randomNumber = rand.nextInt(maxNumber) + 1;
+		return randomNumber;
+	}
+	
+	private PCPValidateResponse validatePcp(PcpValidateRequest pcpValidateRequest) {
+		PCPValidateResponse pcpValidateResponse = pcpSearchService.pvpValidate(pcpValidateRequest);
+		List<PCPResponse> pcpResponses = pcpValidateResponse.getPcpResponses();
+		if(pcpResponses != null && !pcpResponses.isEmpty()) {
+			for (PCPResponse pcpResponse : pcpResponses) {
+				List<EnrolleeDetail> enrollees = pcpResponse.getEnrollees();
+				for(EnrolleeDetail enrollee : enrollees) {
+					List<String> errorMessages = enrollee.getErrorMessages();
+				}
+			}
+		}
+		return pcpValidateResponse;
+	}
+	
 	
 	private UpdatePCP buildUpdatePCP(Return myReturn, MemberClaimServiceEntity memberClaimServiceEntity) {
 		List<BenefitPackage> bpList = new ArrayList<BenefitPackage>();
