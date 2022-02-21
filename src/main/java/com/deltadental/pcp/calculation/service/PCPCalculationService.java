@@ -14,6 +14,7 @@ import java.util.Random;
 
 import javax.transaction.Transactional;
 
+import org.apache.catalina.mapper.Mapper;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,9 +31,6 @@ import com.deltadental.mtv.sync.service.RetrieveContract;
 import com.deltadental.mtv.sync.service.RetrieveContractResponse;
 import com.deltadental.mtv.sync.service.RetrieveEligibilitySummary;
 import com.deltadental.mtv.sync.service.RetrieveEligibilitySummaryResponse;
-import com.deltadental.mtv.sync.service.RetrieveEligibilitySummaryReturnResponse;
-import com.deltadental.mtv.sync.service.Return;
-import com.deltadental.mtv.sync.service.ReturnResponse;
 import com.deltadental.mtv.sync.service.UpdatePCP;
 import com.deltadental.mtv.sync.service.UpdatePCPRequest;
 import com.deltadental.mtv.sync.service.UpdatePCPResponse;
@@ -50,6 +48,8 @@ import com.deltadental.pcp.search.service.PCPValidateResponse;
 import com.deltadental.pcp.search.service.PcpValidateRequest;
 import com.deltadental.pcp.search.service.pojos.EnrolleeDetail;
 import com.deltadental.pcp.search.service.pojos.PCPResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -126,31 +126,58 @@ public class PCPCalculationService {
 		if(contractMemberClaimsEntities != null && !contractMemberClaimsEntities.isEmpty()) {
 			contractMemberClaimsEntities.forEach(contractMemberClaim -> {
 				RetrieveContract retrieveContract = new RetrieveContract();
-				retrieveContract.setArg0(contractMemberClaim.getContractId());
+				retrieveContract.setContractId(contractMemberClaim.getContractId());
 				// Step# 2 : call mtv sync service to retrieve contract from MTV sync service
 				RetrieveContractResponse retrieveContractResponse =  mtvSyncService.retrieveContract(retrieveContract);
-				Return myReturn = retrieveContractResponse.getMyreturn();
 				//Step# 3 : step 3 - retrive member claim information in member_claim_service table
 				
-				MemberClaimRequest memberClaimRequest = MemberClaimRequest.builder().memberClaimId(contractMemberClaim.getContractId()).build();
+				MemberClaimRequest memberClaimRequest = MemberClaimRequest.builder().memberClaimId(contractMemberClaim.getClaimId()).build();
 				MemberClaimResponse memberClaimResponse = mtvSyncService.memberClaim(memberClaimRequest);
 				
 				MemberClaimServiceEntity memberClaimServiceEntity = MemberClaimServiceEntity.builder()
+						.claimId(memberClaimResponse.getClaimId())
+						.claimStatus(memberClaimResponse.getClaimStatus())
+						.contractId(memberClaimResponse.getContractId())
+						// value set of contractMemberClaim
+						.crationTs(contractMemberClaim.getCrationTs())
+						.explanationCode(!memberClaimResponse.getServiceLines().isEmpty()?
+								memberClaimResponse.getServiceLines().get(0).getExplnCode():null)
+						// value set of contractMemberClaim
+						.lastMaintTs(contractMemberClaim.getLastMaintTs())
+						.memberId(memberClaimResponse.getMemberID())
+						// value set of contractMemberClaim
+						.operatorId(contractMemberClaim.getOperatorId())
+						.procedureCode(!memberClaimResponse.getServiceLines().isEmpty()?
+								memberClaimResponse.getServiceLines().get(0).getProcedureCode():null)
+						.procedureStatus(contractMemberClaim.getStatus())
+						.providerId(memberClaimResponse.getProviderId())
+						.receiveDate(memberClaimResponse.getReceivedTs().toString())						
+						.resolvedDate(memberClaimResponse.getResolvedTs().toString())
+						// value set of contractMemberClaim
+						.state(contractMemberClaim.getState())
 						.build();
 				memberClaimServiceRepo.save(memberClaimServiceEntity);				
 				String validateProviderMessage = null;
 				
 				// TODO : step 4 - read pcp config service -- read only place holder
+//				final String explanationCode = pcpConfigService.explanationCode();
+//				final String procedureCode = pcpConfigService.procedureCode();
+//				final String claimStatus = pcpConfigService.claimStatus();
 				
 				// TODO : step 5 - validate procedure, claim status and explanation code
-				if(!StringUtils.equals(memberClaimServiceEntity.getProcedureCode(), "D0131") && StringUtils.equals(memberClaimServiceEntity.getExplanationCode(), "120") && StringUtils.equals(memberClaimServiceEntity.getClaimStatus(), "N")) {
+//				if(!StringUtils.equals(memberClaimServiceEntity.getProcedureCode(), procedureCode) && 
+//						StringUtils.equals(memberClaimServiceEntity.getExplanationCode(), explanationCode) && 
+//						StringUtils.equals(memberClaimServiceEntity.getClaimStatus(), claimStatus)) {
 					
 					// TODO : step 6 - vaidate provider - new end point from pcp search service
 					PcpValidateRequest pcpValidateRequest = PcpValidateRequest.builder()
 							.contractId(contractMemberClaim.getContractId())
 							.lookAheadDays("90")
 							.memberType(contractMemberClaim.getMemberId())
-							.mtvPersonId(myReturn.getPrimaryEnrollee().getPerson().getPersonIdentfier()) // TODO : get the correct value
+							.mtvPersonId((retrieveContractResponse.getPrimaryEnrollee()!=null
+									&& retrieveContractResponse.getPrimaryEnrollee().getPerson()!=null)?
+									retrieveContractResponse.getPrimaryEnrollee().getPerson().getPersonIdentfier():null)
+							// TODO : get the correct value
 							.pcpEffDate(calculatePCPEffectiveDate())
 							.pcpEndDate(null)
 							.product(DC_PRODUCT)
@@ -158,21 +185,23 @@ public class PCPCalculationService {
 							.recordIdentifier(String.valueOf(random()))
 							.sourceSystem(DCM_SOURCESYSTEM)
 							.build();
-					PCPValidateResponse pcpValidateResponse = validatePcp(pcpValidateRequest);
-					// Retrive the error message from pcpValidateResponse and validate the error messages
+    				PCPValidateResponse pcpValidateResponse = validatePcp(pcpValidateRequest);
+    				// Retrieve the error message from pcpValidateResponse and validate the error messages
 					// TODO : step 7 - if provider is validated successfully make a call to mtv sync to update pcp
-					UpdatePCP updatePCP = buildUpdatePCP(myReturn, memberClaimServiceEntity);
+					if(pcpValidateResponse.getProcessStatusCode()!=null &&
+							pcpValidateResponse.getProcessStatusCode().equals("Success")) {
+    				UpdatePCPRequest updatePCP = buildUpdatePCP(retrieveContractResponse, memberClaimServiceEntity);
 					UpdatePCPResponse updatePCPResponse = mtvSyncService.updatePCPMember(updatePCP);
-					ReturnResponse myreturn = updatePCPResponse.getMyreturn();
-					if(StringUtils.equals(myreturn.getReturnCode(), "OK")) {
+					if(StringUtils.equals(updatePCPResponse.getReturnCode(), "OK")) {
 						validateProviderMessage = "PROCESSED";
 					} else {
-						validateProviderMessage = myreturn.getErrorMessage();
+						validateProviderMessage = updatePCPResponse.getErrorMessage();
 					}
 				}
+			//	}
 				ContractMemberClaimsEntity contractMemberClaimsEntity = contractMemberClaimsRepo.findByClaimId(contractMemberClaim.getClaimId());
 				contractMemberClaimsEntity.setStatus(validateProviderMessage);
-//				contractMemberClaimsRepo.save(contractMemberClaimsEntity);
+				contractMemberClaimsRepo.save(contractMemberClaimsEntity);
 				contractMemberClaimsRepo.setStatus(contractMemberClaimsEntity.getId(), validateProviderMessage);
 				// TODO : step 8 - update contract_member_claims table back with status processed/unprocessed
 			});
@@ -189,7 +218,7 @@ public class PCPCalculationService {
 	}
 	
 	private PCPValidateResponse validatePcp(PcpValidateRequest pcpValidateRequest) {
-		PCPValidateResponse pcpValidateResponse = pcpSearchService.pvpValidate(pcpValidateRequest);
+		PCPValidateResponse pcpValidateResponse = pcpSearchService.pcpValidate(pcpValidateRequest);
 		List<PCPResponse> pcpResponses = pcpValidateResponse.getPcpResponses();
 		if(pcpResponses != null && !pcpResponses.isEmpty()) {
 			for (PCPResponse pcpResponse : pcpResponses) {
@@ -203,17 +232,17 @@ public class PCPCalculationService {
 	}
 	
 	
-	private UpdatePCP buildUpdatePCP(Return myReturn, MemberClaimServiceEntity memberClaimServiceEntity) {
+	private UpdatePCPRequest buildUpdatePCP(RetrieveContractResponse retrieveContractResponse, MemberClaimServiceEntity memberClaimServiceEntity) {
 		List<BenefitPackage> bpList = new ArrayList<BenefitPackage>();
 		List<GroupProdNetwork> groupProdNetworks = new ArrayList<GroupProdNetwork>();
 		RetrieveEligibilitySummary retrieveEligibilitySummary = new RetrieveEligibilitySummary();
-		retrieveEligibilitySummary.setArg0(memberClaimServiceEntity.getContractId());
+		retrieveEligibilitySummary.setContractId(memberClaimServiceEntity.getContractId());
 		RetrieveEligibilitySummaryResponse retrieveEligibilitySummaryResponse =  mtvSyncService.retrieveEligibilitySummary(retrieveEligibilitySummary);
 		if(null != retrieveEligibilitySummaryResponse 
-				&& null != retrieveEligibilitySummaryResponse.get_return() 
-				&& null != retrieveEligibilitySummaryResponse.get_return().getPcpEligbility()) {
-			RetrieveEligibilitySummaryReturnResponse retrieveEligibilitySummaryReturnResponse = retrieveEligibilitySummaryResponse.get_return();
-			List<PcpEligbility> pcpEligbility = retrieveEligibilitySummaryReturnResponse.getPcpEligbility();
+				&& null != retrieveEligibilitySummaryResponse
+				&& null != retrieveEligibilitySummaryResponse.getPcpEligbility()) {
+			//RetrieveEligibilitySummaryReturnResponse retrieveEligibilitySummaryReturnResponse = retrieveEligibilitySummaryResponse.get_return();
+			List<PcpEligbility> pcpEligbility = retrieveEligibilitySummaryResponse.getPcpEligbility();
 			BenefitPackage bp = BenefitPackage.builder()
 					.benefitPackageId(pcpEligbility.get(0).getBenefitPackageId())
 					.bpEffectiveDate("01-01-2021")
@@ -230,7 +259,7 @@ public class PCPCalculationService {
 					.build();
 			groupProdNetworks.add(groupProdNetwork);
 		}
-		List<CoverageSpan> coverageSpans = myReturn.getCoverageSpans();
+		List<CoverageSpan> coverageSpans = retrieveContractResponse.getCoverageSpans();
 		String divsionNumber = null;
 		String groupNumber = null;
 		if(!coverageSpans.isEmpty()) {
@@ -239,7 +268,7 @@ public class PCPCalculationService {
 			groupNumber = coverageSpan.getGroupNumber();
 		}
 		UpdatePCPRequest updatePCPRequest = UpdatePCPRequest.builder()
-				.contractID(myReturn.getContractId())
+				.contractID(retrieveContractResponse.getContractId())
 				.actionIndicator("U")
 				.reasonCode("5NEW")
 				.pcpEffectiveDate(calculatePCPEffectiveDate())
@@ -253,10 +282,10 @@ public class PCPCalculationService {
 				.benefitPackage(bpList)
 				.groupProdNetwork(groupProdNetworks)
 				.build();
-		UpdatePCP updatePCP = UpdatePCP.builder()
-				.arg0(updatePCPRequest)
-				.build();
-		return updatePCP;
+//		UpdatePCP updatePCP = UpdatePCP.builder()
+//				.arg0(updatePCPRequest)
+//				.build();
+		return updatePCPRequest;
 		
 	}
 	

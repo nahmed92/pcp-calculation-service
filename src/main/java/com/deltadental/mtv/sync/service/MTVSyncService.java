@@ -81,14 +81,14 @@ public class MTVSyncService {
 	}
 	
 	
-	public UpdatePCPResponse updatePCPMember(UpdatePCP updatePCP) {
+	public UpdatePCPResponse updatePCPMember(UpdatePCPRequest updatePCP) {
 		log.info("START MTVSyncService.updatePCPMember");
 		String updatePCPMemberEndPoint = pcpMtvSyncServiceEndpoint.concat(MTVSyncServiceConstants.UPDATE_PCP_MEMBER);
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(updatePCPMemberEndPoint);
 		String uriBuilder = builder.build().encode().toUriString();
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<UpdatePCP> request = new HttpEntity<UpdatePCP>(updatePCP, headers);
+		HttpEntity<UpdatePCPRequest> request = new HttpEntity<UpdatePCPRequest>(updatePCP, headers);
 		UpdatePCPResponse responseEntity = null;
 		try {
 			setMessageConverter(restTemplate);
@@ -104,7 +104,7 @@ public class MTVSyncService {
 	
 
 	public MemberClaimResponse memberClaim(MemberClaimRequest memberClaimRequest) {
-		log.info("START MTVSyncService.updatePCPMember");
+		log.info("START MTVSyncService.MemberClaim");
 		String updatePCPMemberEndPoint = pcpMtvSyncServiceEndpoint.concat(MTVSyncServiceConstants.MEMBER_CLAIM);
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(updatePCPMemberEndPoint);
 		String uriBuilder = builder.build().encode().toUriString();

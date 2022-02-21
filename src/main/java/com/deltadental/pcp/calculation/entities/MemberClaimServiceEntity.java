@@ -11,32 +11,22 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Data
-@Getter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Entity
-@Immutable
-@Table(name = "MEMBER_CLAIM_SERVICE", schema = "dbo")
+@Builder
+@Table(name = "member_claim_service", schema = "dbo")
 public class MemberClaimServiceEntity implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2757500429236458720L;
 
 	@Id
-	@Column(name = "id", nullable = false, unique = true)
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	@GeneratedValue
 	private Integer id;
 	
 	@Column(name = "contract_id")

@@ -63,9 +63,9 @@ public class PCPSearchService {
 	}
 	
 	
-	public PCPValidateResponse pvpValidate(PcpValidateRequest pcpValidateRequest) {
+	public PCPValidateResponse pcpValidate(PcpValidateRequest pcpValidateRequest) {
 		log.info("START PCPSearchService.validateProvider");
-		String providerValidateEndPoint = pcpSearchServiceEndpoint.concat(PCPSearchServiceConstants.PROVIDER_VALIDATION);
+		String providerValidateEndPoint = pcpSearchServiceEndpoint.concat(PCPSearchServiceConstants.PCP_VALIDATION);
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(providerValidateEndPoint);
 		String uriBuilder = builder.build().encode().toUriString();
 		HttpHeaders headers = new HttpHeaders();

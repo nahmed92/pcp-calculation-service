@@ -20,6 +20,6 @@ import lombok.ToString;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RetrieveEligibilitySummary {
 
-	private String arg0;
+	private String contractId;
 	
 }

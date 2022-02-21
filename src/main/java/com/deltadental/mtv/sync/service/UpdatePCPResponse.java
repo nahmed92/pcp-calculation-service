@@ -20,7 +20,9 @@ import lombok.ToString;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UpdatePCPResponse {
-
-	@JsonProperty("return") 
-    private ReturnResponse myreturn;
+	private String contractId;
+    private String errorCode;
+    private String errorMessage;
+    private String personId;
+    private String returnCode;
 }

@@ -57,8 +57,78 @@ public class PCPConfigService {
 			return responseEntity.getBody();
 		} 
 		log.info("END PCPConfigService.providerLookaheadDays");
-		return null;
+		return responseEntity.getBody();
 	}
+	
+	public String explanationCode() {
+		log.info("START PCPConfigService.explanationcode");
+		final String explanationCode = pcpConfigServiceEndpoint.concat(PCPConfigServiceConstants.EXPLANATION_CODE);
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(explanationCode);
+		String uriBuilder = builder.build().encode().toUriString();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		ResponseEntity<String> responseEntity = null;
+		try {
+			setMessageConverter(restTemplate);
+			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
+		} catch (RestClientException e) {
+			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+		} catch (URISyntaxException e) {
+			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+		}
+		if(responseEntity.getStatusCode() == HttpStatus.OK) {
+			return responseEntity.getBody();
+		} 
+		log.info("END PCPConfigService.explanationcode");
+		return responseEntity.getBody();
+	}
+	
+	public String procedureCode() {
+		log.info("START PCPConfigService.explanationcode");
+		final String procedureCode = pcpConfigServiceEndpoint.concat(PCPConfigServiceConstants.PROCEDURE_CODE);
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(procedureCode);
+		String uriBuilder = builder.build().encode().toUriString();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		ResponseEntity<String> responseEntity = null;
+		try {
+			setMessageConverter(restTemplate);
+			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
+		} catch (RestClientException e) {
+			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+		} catch (URISyntaxException e) {
+			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+		}
+		if(responseEntity.getStatusCode() == HttpStatus.OK) {
+			return responseEntity.getBody();
+		} 
+		log.info("END PCPConfigService.explanationcode");
+		return responseEntity.getBody();
+	}
+	
+	public String claimStatus() {
+		log.info("START PCPConfigService.claimStatus");
+		final String claimStatusUrl = pcpConfigServiceEndpoint.concat(PCPConfigServiceConstants.CLAIM_STATUS);
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(claimStatusUrl);
+		String uriBuilder = builder.build().encode().toUriString();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		ResponseEntity<String> responseEntity = null;
+		try {
+			setMessageConverter(restTemplate);
+			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
+		} catch (RestClientException e) {
+			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+		} catch (URISyntaxException e) {
+			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+		}
+		if(responseEntity.getStatusCode() == HttpStatus.OK) {
+			return responseEntity.getBody();
+		} 
+		log.info("END PCPConfigService.claimStatus");
+		return responseEntity.getBody();
+	}
+	
 	
 	private static void setMessageConverter(RestTemplate restTemplate) {
 		List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();        
