@@ -16,6 +16,7 @@ import javax.transaction.Transactional;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.deltadental.mtv.sync.service.MTVSyncService;
@@ -84,12 +85,8 @@ public class PCPCalculationService {
 	@Autowired
 	private ContractMemberClaimsRepo contractMemberClaimsRepo; 
 
-//	@Autowired
-//	private ObjectMapper mapper;
-
-	
-	
-	public ValidateProviderResponse validateProvider(ValidateProviderRequest validateProviderRequest) {
+	@Async
+	public ValidateProviderResponse assignPCPsToMembers() {
 		log.info("START PCPCalculationService.validateProvider");
 		ValidateProviderResponse validateProviderResponse = new ValidateProviderResponse();
 		// Step#1
@@ -102,19 +99,25 @@ public class PCPCalculationService {
 		return validateProviderResponse;
 	}
 	
-
+	@Async
 	public ValidateProviderResponse assignMemberPCP(ValidateProviderRequest validateProviderRequest) {
 		log.info("START PCPCalculationService.assignMemberPCP");
 		ValidateProviderResponse validateProviderResponse = new ValidateProviderResponse();
+		ContractMemberClaimsEntity contractMemberClaimsEntity = saveContractMemberClaims(validateProviderRequest);
+		processPCPAssignment(validateProviderResponse, contractMemberClaimsEntity);
+		log.info("END PCPCalculationService.assignMemberPCP");
+		return validateProviderResponse;
+	}
+
+	@Async
+	public ContractMemberClaimsEntity saveContractMemberClaims(ValidateProviderRequest validateProviderRequest) {
 		ContractMemberClaimsEntity contractMemberClaimsEntity = ContractMemberClaimsEntity.builder()
 				.claimId(validateProviderRequest.getClaimId()).contractId(validateProviderRequest.getContractId())
 				.memberId(validateProviderRequest.getMemberId()).providerId(validateProviderRequest.getProviderId())
 				.state(validateProviderRequest.getState()).operatorId("PCP-INGESTION-SERVICE").build();
 		contractMemberClaimsRepo.save(contractMemberClaimsEntity);
 		contractMemberClaimsRepo.flush();
-		processPCPAssignment(validateProviderResponse, contractMemberClaimsEntity);
-		log.info("END PCPCalculationService.assignMemberPCP");
-		return validateProviderResponse;
+		return contractMemberClaimsEntity;
 	}
 
 	private String getPCPValidationMessage(PCPValidateResponse pcpValidateResponse) {
@@ -316,8 +319,11 @@ public class PCPCalculationService {
 		}
 
 		contractMemberClaimsEntity.setStatus(validateProviderMessage);
-		// contractMemberClaimsRepo.save(contractMemberClaimsEntity);
 		contractMemberClaimsRepo.setStatus(contractMemberClaimsEntity.getId(), validateProviderMessage);
+		validateProviderResponse.setClaimId(contractMemberClaimsEntity.getClaimId());
+		validateProviderResponse.setContractId(contractMemberClaimsEntity.getContractId());
+		validateProviderResponse.setMemberId(contractMemberClaimsEntity.getMemberId());
+		validateProviderResponse.setProviderId(contractMemberClaimsEntity.getProviderId());;
 		validateProviderResponse.setPcpEffectiveDate(calculatePCPEffectiveDate());
 		validateProviderResponse.setStatus(validateProviderMessage);
 	}
