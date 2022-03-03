@@ -43,7 +43,7 @@ ENTRYPOINT java $JAVA_OPTS \
 	-Dspring.jpa.hibernate.c3p0.min.size=${JPA_MIN_SIZE} \
     -Dspring.jpa.hibernate.c3p0.max.size=${JPA_MAX_SIZE} \
     -Dspring.jpa.hibernate.c3p0.timeout=${JPA_TIMEOUT} \
-	-Dspring.datasource.driverClassName=${DATASOURCE_DRIVER_CLASS} \
+    -Dspring.jpa.show-sql=${JPA_SHOW_SQL} \
 	-Dpcp.search.service.endpoint=${PCP_SEARCH_SERVICE_ENDPOINT} \
 	-Dpcp.config.service.endpoint=${PCP_CONFIG_SERVICE_ENDPOINT} \
 	-Dpcp.mtv.sync.service.endpoint=${PCP_MTV_SYNC_SERVICE_ENDPOINT} \

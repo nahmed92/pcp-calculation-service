@@ -96,49 +96,24 @@ public class PCPCalculationService {
 		List<ContractMemberClaimsEntity> contractMemberClaimsEntities = contractMemberClaimsRepo.findByStatus(null);
 		if (contractMemberClaimsEntities != null && !contractMemberClaimsEntities.isEmpty()) {
 			contractMemberClaimsEntities.forEach(contractMemberClaim -> {
-				// Step# 3 : Retrive member claim information in member_claim_service table
-				MemberClaimRequest memberClaimRequest = MemberClaimRequest.builder()
-						.memberClaimId(contractMemberClaim.getClaimId())
-						.build();
-				MemberClaimResponse memberClaimResponse = mtvSyncService.memberClaim(memberClaimRequest);
-				MemberClaimEntity memberClaimEntity = null;
-				if(null != memberClaimResponse && (memberClaimResponse.getErrorCode() == null || memberClaimResponse.getErrorMessage() == null )) {
-					memberClaimEntity = saveMemberClaimEntity(memberClaimResponse);
-					if(!memberClaimResponse.getServiceLines().isEmpty()) {
-						saveMemberClaimServices(memberClaimEntity, memberClaimResponse.getServiceLines());
-					}					
-				}
-
-//				// TODO : Step# 4 : Read pcp config service -- read only place holder
-				
-				// Step# 6 : Validate provider - new end point from pcp search service
-				PCPValidateResponse pcpValidateResponse = callPCPValidate(memberClaimEntity);
-				String pcpValidationMessage = getPCPValidationMessage(pcpValidateResponse);
-				// Retrieve the error message from pcpValidateResponse and validate the error messages
-				// Step# 7 : If provider is validated successfully make a call to mtv sync to update pcp
-				String validateProviderMessage = null;
-				if (StringUtils.equals(pcpValidateResponse.getProcessStatusCode(), "Success") && StringUtils.equals(StringUtils.trimToEmpty(pcpValidationMessage), StringUtils.trimToEmpty(PCP_VALID_FOR_ENROLLEE))) {
-					MemberProviderEntity memberProviderEntity = saveMemberProvider(memberClaimEntity);
-					ProviderAssignmentRequest providerAssignmentRequest = buildProviderAssignment(memberClaimEntity);
-					ProviderAssignmentResponse providerAssignmentResponse = mtvSyncService.providerAssignment(providerAssignmentRequest);
-					if (StringUtils.equals(providerAssignmentResponse.getReturnCode(), "OK")) {
-						validateProviderMessage = "PROCESSED";
-						memberProviderRepo.setStatus(memberProviderEntity.getId(), "PCP ASSIGNED");
-					} else {
-						validateProviderMessage = providerAssignmentResponse.getErrorMessage();
-						memberProviderRepo.setStatus(memberProviderEntity.getId(), "PCP ASSIGNMENT FAILED");
-					}
-				} else {
-					validateProviderMessage = pcpValidationMessage;
-				}
-				// Step# 8 - update contract_member_claims table back with status
-				// processed/unprocessed
-				ContractMemberClaimsEntity contractMemberClaimsEntity = contractMemberClaimsRepo.findByClaimId(contractMemberClaim.getClaimId());
-				contractMemberClaimsEntity.setStatus(validateProviderMessage);
-				contractMemberClaimsRepo.save(contractMemberClaimsEntity);
-				contractMemberClaimsRepo.setStatus(contractMemberClaimsEntity.getId(), validateProviderMessage);				
+				processPCPAssignment(validateProviderResponse, contractMemberClaim);
 			});
 		}
+		return validateProviderResponse;
+	}
+	
+
+	public ValidateProviderResponse assignMemberPCP(ValidateProviderRequest validateProviderRequest) {
+		log.info("START PCPCalculationService.assignMemberPCP");
+		ValidateProviderResponse validateProviderResponse = new ValidateProviderResponse();
+		ContractMemberClaimsEntity contractMemberClaimsEntity = ContractMemberClaimsEntity.builder()
+				.claimId(validateProviderRequest.getClaimId()).contractId(validateProviderRequest.getContractId())
+				.memberId(validateProviderRequest.getMemberId()).providerId(validateProviderRequest.getProviderId())
+				.state(validateProviderRequest.getState()).operatorId("PCP-INGESTION-SERVICE").build();
+		contractMemberClaimsRepo.save(contractMemberClaimsEntity);
+		contractMemberClaimsRepo.flush();
+		processPCPAssignment(validateProviderResponse, contractMemberClaimsEntity);
+		log.info("END PCPCalculationService.assignMemberPCP");
 		return validateProviderResponse;
 	}
 
@@ -156,8 +131,7 @@ public class PCPCalculationService {
 							pcpValidationMessage = StringUtils.trimToEmpty(PCP_VALID_FOR_ENROLLEE);
 							break;
 						} else {
-//							pcpValidationMessage = errorMessages.get(0);
-							pcpValidationMessage = StringUtils.trimToEmpty(PCP_VALID_FOR_ENROLLEE);
+							pcpValidationMessage = errorMessages.get(0);
 						}
 					}
 				}
@@ -306,15 +280,8 @@ public class PCPCalculationService {
 		return contracts;
 	}
 
-	public ValidateProviderResponse assignMemberPCP(ValidateProviderRequest validateProviderRequest) {
-		log.info("START PCPCalculationService.assignMemberPCP");
-		ValidateProviderResponse validateProviderResponse = new ValidateProviderResponse();
-		ContractMemberClaimsEntity contractMemberClaimsEntity = ContractMemberClaimsEntity.builder()
-				.claimId(validateProviderRequest.getClaimId()).contractId(validateProviderRequest.getContractId())
-				.memberId(validateProviderRequest.getMemberId()).providerId(validateProviderRequest.getProviderId())
-				.state(validateProviderRequest.getState()).operatorId("PCP-INGESTION-SERVICE").build();
-		contractMemberClaimsRepo.save(contractMemberClaimsEntity);
-		contractMemberClaimsRepo.flush();
+
+	private void processPCPAssignment(ValidateProviderResponse validateProviderResponse, ContractMemberClaimsEntity contractMemberClaimsEntity) {
 		MemberClaimRequest memberClaimRequest = MemberClaimRequest.builder()
 				.memberClaimId(contractMemberClaimsEntity.getClaimId()).build();
 		MemberClaimResponse memberClaimResponse = mtvSyncService.memberClaim(memberClaimRequest);
@@ -353,7 +320,5 @@ public class PCPCalculationService {
 		contractMemberClaimsRepo.setStatus(contractMemberClaimsEntity.getId(), validateProviderMessage);
 		validateProviderResponse.setPcpEffectiveDate(calculatePCPEffectiveDate());
 		validateProviderResponse.setStatus(validateProviderMessage);
-		log.info("END PCPCalculationService.assignMemberPCP");
-		return validateProviderResponse;
 	}
 }
