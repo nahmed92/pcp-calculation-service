@@ -60,17 +60,17 @@ public class PCPConfigService {
 		return responseEntity.getBody();
 	}
 	
-	public String explanationCode() {
+	public String[] explanationCode() {
 		log.info("START PCPConfigService.explanationcode");
 		final String explanationCode = pcpConfigServiceEndpoint.concat(PCPConfigServiceConstants.EXPLANATION_CODE);
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(explanationCode);
 		String uriBuilder = builder.build().encode().toUriString();
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		ResponseEntity<String> responseEntity = null;
+		ResponseEntity<String[]> responseEntity = null;
 		try {
 			setMessageConverter(restTemplate);
-			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
+			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String[].class);
 		} catch (RestClientException e) {
 			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
 		} catch (URISyntaxException e) {
@@ -106,17 +106,17 @@ public class PCPConfigService {
 		return responseEntity.getBody();
 	}
 	
-	public String claimStatus() {
+	public String[] claimStatus() {
 		log.info("START PCPConfigService.claimStatus");
 		final String claimStatusUrl = pcpConfigServiceEndpoint.concat(PCPConfigServiceConstants.CLAIM_STATUS);
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(claimStatusUrl);
 		String uriBuilder = builder.build().encode().toUriString();
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		ResponseEntity<String> responseEntity = null;
+		ResponseEntity<String[]> responseEntity = null;
 		try {
 			setMessageConverter(restTemplate);
-			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
+			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String[].class);
 		} catch (RestClientException e) {
 			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
 		} catch (URISyntaxException e) {

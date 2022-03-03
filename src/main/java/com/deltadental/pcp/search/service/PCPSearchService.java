@@ -75,8 +75,10 @@ public class PCPSearchService {
 			setMessageConverter(restTemplate);
 			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.POST,  new HttpEntity<>(pcpValidateRequest, headers), PCPValidateResponse.class);
 		} catch (RestClientException e) {
+			e.printStackTrace();
 			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
 		} catch (URISyntaxException e) {
+			e.printStackTrace();
 			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
 		}
 		if(responseEntity.getStatusCode() == HttpStatus.OK) {

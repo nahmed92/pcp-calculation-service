@@ -116,6 +116,7 @@ public class MTVSyncService {
 			setMessageConverter(restTemplate);
 			responseEntity = restTemplate.postForObject(new URI(uriBuilder), request, MemberClaimResponse.class);
 		} catch (RestClientException e) {
+			e.printStackTrace();
 			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
 		} catch (URISyntaxException e) {
 			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());

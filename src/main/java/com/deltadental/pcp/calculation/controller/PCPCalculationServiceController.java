@@ -60,6 +60,25 @@ public class PCPCalculationServiceController {
 		return responseEntity;
 	}
 	
+	@ApiOperation(
+			value = PCPCalculationServiceConstants.SUMMARY_ASSIGN_MEMBER_PCP, 
+			notes = PCPCalculationServiceConstants.SUMMARY_ASSIGN_MEMBER_PCP_NOTES, 
+			response = PCPAssignmentResponse.class)
+    @ApiResponses({ @ApiResponse(code = 200, message = "Successfully assigned primary care provider for member.", response = ValidateProviderResponse.class),
+                    @ApiResponse(code = 400, message = "Bad request.", response = ServiceError.class),
+//                    @ApiResponse(code = 403, message = "Unauthorized", response = ServiceError.class),
+                    @ApiResponse(code = 404, message = "Unable assign primary care provider for member.", response = ServiceError.class),
+                    @ApiResponse(code = 500, message = "Internal server error.", response = ServiceError.class) })
+	@ResponseBody
+	@MethodExecutionTime
+    @PostMapping(value = PCPCalculationServiceConstants.ASSIGN_MEMBER_PCP_URI, produces = {MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<ValidateProviderResponse> assignMemberPCP(@RequestBody ValidateProviderRequest validateProviderRequest) {
+		log.info("START PCPCalculationServiceController.assignMemberPCP");
+		ValidateProviderResponse validateProviderResponse = pcpCalculationService.assignMemberPCP(validateProviderRequest); 
+		ResponseEntity<ValidateProviderResponse> responseEntity = new ResponseEntity<>(validateProviderResponse, HttpStatus.OK); 
+		log.info("END PCPCalculationServiceController.assignMemberPCP");
+		return responseEntity;
+	}
 	
 	@ApiOperation(
 			value = PCPCalculationServiceConstants.PROCESS_PCP_MEMBER_CONTRACT, 

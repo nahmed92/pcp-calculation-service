@@ -14,11 +14,19 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-@NoArgsConstructor
 @Data
+@Getter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Immutable
 @Table(name = "MEMBER_PROVIDER", schema = "dbo")
@@ -31,38 +39,38 @@ public class MemberProviderEntity implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	@Column(name = "pcp_identifier")
-	private String pcpIdentifier;
-
-	@Column(name = "zip_code")
-	private String zipCode;
-
-	@Column(name = "member_id")
-	private String memberId;
-	
-	@Column(name = "member_type")
-	private String memberType;
-	
-	@Column(name = "contract_id")
-	private String contractId;
-	
-	@Column(name = "source_system")
-	private String sourceSystem;
-
-	@Column(name = "status")
-	private String status;
-
-	@Column(name = "reason_cd")
-	private String reasonCd;
-	
-	@Column(name = "pcp_effective_date")
-	private String pcpEffectiveDate;
-
 	@Column(name = "claim_id")
 	private String claimId;
 	
 	@Column(name = "claim_status")
 	private String claimStatus;
+	
+	@Column(name = "contract_id")
+	private String contractId;
+	
+	@Column(name = "zip_code")
+	private String zipCode;
+
+	@Column(name = "member_id")
+	private String memberId; 
+
+	@Column(name = "pcp_effective_date")
+	private String pcpEffectiveDate;
+	
+	@Column(name = "pcp_end_date")
+	private String pcpEndDate;
+
+	@Column(name = "pcp_identifier")
+	private String pcpIdentifier;
+	
+	@Column(name = "reason_cd")
+	private String reasonCd;
+
+	@Column(name = "source_system")
+	private String sourceSystem;
+
+	@Column(name = "status")
+	private String status;
 
 	@Column(name = "creation_ts")
 	@CreationTimestamp
@@ -71,4 +79,7 @@ public class MemberProviderEntity implements Serializable {
 	@Column(name = "last_maint_ts")
 	@UpdateTimestamp
 	private Date lastMaintTs;
+	
+	@Column(name = "operator_id")
+	private String operatorId;
 }

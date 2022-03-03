@@ -15,9 +15,12 @@ import com.deltadental.pcp.calculation.entities.ContractMemberClaimsEntity;
 @Repository
 @Transactional
 public interface ContractMemberClaimsRepo extends JpaRepository<ContractMemberClaimsEntity, Integer> {
-	List<ContractMemberClaimsEntity> findByStatus(String status);
 
 	ContractMemberClaimsEntity findByClaimId(String claimId);
+	
+	List<ContractMemberClaimsEntity> findByStatus(String status);
+	
+//	List<ContractMemberClaimsEntity> findByStatusOnIsNull(String status);
 	
 	@Modifying
 	@Query("update ContractMemberClaimsEntity cmc set cmc.status = :status WHERE cmc.id = :id")

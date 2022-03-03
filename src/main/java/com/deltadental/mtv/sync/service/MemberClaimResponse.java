@@ -1,19 +1,25 @@
 package com.deltadental.mtv.sync.service;
 
-import java.time.LocalDate;
+import java.sql.Timestamp;
 import java.util.List;
 
-
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 
 @Data
+@Getter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MemberClaimResponse {
 
     private String billingProvId;
@@ -33,11 +39,11 @@ public class MemberClaimResponse {
     private String memberFirstName;
     private String memberID;
     private String memberLastName;
-    private Timestamp paidTs;
+    private PaidTs paidTs;
     private String personId;
     private String providerId;
-    private Timestamp receivedTs;
-    private Timestamp resolvedTs;
+    private ReceivedTs receivedTs;
+    private ResolvedTs resolvedTs;
     private String returnCode;
     private List<ServiceLine> serviceLines;
     private String servicesNumber;

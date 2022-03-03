@@ -18,13 +18,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
-import lombok.extern.slf4j.Slf4j;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
 @SpringBootApplication
 @ComponentScan(basePackages = { "com.deltadental.*" })
-@EnableSwagger2
-@Slf4j
 public class PCPCalculationServiceApplication {
 
 	public static void main(String[] args) {
