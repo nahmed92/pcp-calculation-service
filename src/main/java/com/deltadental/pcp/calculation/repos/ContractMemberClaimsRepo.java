@@ -18,6 +18,8 @@ public interface ContractMemberClaimsRepo extends JpaRepository<ContractMemberCl
 
 	ContractMemberClaimsEntity findByClaimId(String claimId);
 	
+	List<ContractMemberClaimsEntity> findByClaimIdAndContractIdAndMemberIdAndProviderId(String claimId, String contrctId, String memberId, String providerId);
+	
 	List<ContractMemberClaimsEntity> findByStatus(String status);
 	
 //	List<ContractMemberClaimsEntity> findByStatusOnIsNull(String status);
@@ -25,4 +27,6 @@ public interface ContractMemberClaimsRepo extends JpaRepository<ContractMemberCl
 	@Modifying
 	@Query("update ContractMemberClaimsEntity cmc set cmc.status = :status WHERE cmc.id = :id")
 	void setStatus(@Param("id") Integer id, @Param("status") String status);
+	
+	
 }

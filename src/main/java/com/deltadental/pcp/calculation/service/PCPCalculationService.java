@@ -51,6 +51,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PCPCalculationService {
 
+	private static final String PCP_END_DATE_12_31_999 = "12-31-999";
+
 	private static final String PCP_STATUS_INITIAL = "INITIAL";
 
 	private static final String REASON_CODE_5NEW = "5NEW";
@@ -103,8 +105,23 @@ public class PCPCalculationService {
 	public ValidateProviderResponse assignMemberPCP(ValidateProviderRequest validateProviderRequest) {
 		log.info("START PCPCalculationService.assignMemberPCP");
 		ValidateProviderResponse validateProviderResponse = new ValidateProviderResponse();
-		ContractMemberClaimsEntity contractMemberClaimsEntity = saveContractMemberClaims(validateProviderRequest);
-		processPCPAssignment(validateProviderResponse, contractMemberClaimsEntity);
+		List<ContractMemberClaimsEntity> memberClaimsEntities = contractMemberClaimsRepo.findByClaimIdAndContractIdAndMemberIdAndProviderId(
+				StringUtils.trimToNull(validateProviderRequest.getClaimId()), 
+				StringUtils.trimToNull(validateProviderRequest.getContractId()), 
+				StringUtils.trimToNull(validateProviderRequest.getMemberId()), 
+				StringUtils.trimToNull(validateProviderRequest.getProviderId()));
+		if(null != memberClaimsEntities && !memberClaimsEntities.isEmpty()) {
+			validateProviderResponse.setClaimId(validateProviderRequest.getClaimId());
+			validateProviderResponse.setContractId(validateProviderRequest.getContractId());
+			validateProviderResponse.setMemberId(validateProviderRequest.getMemberId());
+			validateProviderResponse.setProviderId(validateProviderRequest.getProviderId());
+			validateProviderResponse.setStatus("Claim Id and Contract Id with Provider Id for Member Id is already processed!");
+			log.info("Claim Id and Contract Id with Provider Id for Member Id is already processed!");
+		} else {
+			ContractMemberClaimsEntity contractMemberClaimsEntity = saveContractMemberClaims(validateProviderRequest);
+			processPCPAssignment(validateProviderResponse, contractMemberClaimsEntity);
+		}
+		
 		log.info("END PCPCalculationService.assignMemberPCP");
 		return validateProviderResponse;
 	}
@@ -112,12 +129,26 @@ public class PCPCalculationService {
 	@Async
 	public ContractMemberClaimsEntity saveContractMemberClaims(ValidateProviderRequest validateProviderRequest) {
 		ContractMemberClaimsEntity contractMemberClaimsEntity = ContractMemberClaimsEntity.builder()
-				.claimId(validateProviderRequest.getClaimId()).contractId(validateProviderRequest.getContractId())
-				.memberId(validateProviderRequest.getMemberId()).providerId(validateProviderRequest.getProviderId())
-				.state(validateProviderRequest.getState()).operatorId("PCP-INGESTION-SERVICE").build();
-		contractMemberClaimsRepo.save(contractMemberClaimsEntity);
-		contractMemberClaimsRepo.flush();
+				.claimId(StringUtils.trimToNull(validateProviderRequest.getClaimId()))
+				.contractId(StringUtils.trimToNull(validateProviderRequest.getContractId()))
+				.memberId(StringUtils.trimToNull(validateProviderRequest.getMemberId()))
+				.providerId(StringUtils.trimToNull(validateProviderRequest.getProviderId()))
+				.state(StringUtils.trimToNull(validateProviderRequest.getState()))
+				.operatorId("PCP-INGESTION-SERVICE")
+				.build();
+		if(isRecordExistsForClaimIdAndContractIdAndMemberIdAndProviderId(contractMemberClaimsEntity)) {
+			contractMemberClaimsRepo.save(contractMemberClaimsEntity);
+			contractMemberClaimsRepo.flush();
+		}
 		return contractMemberClaimsEntity;
+	}
+	
+	public boolean isRecordExistsForClaimIdAndContractIdAndMemberIdAndProviderId(ContractMemberClaimsEntity contractMemberClaimsEntity) {
+		List<ContractMemberClaimsEntity> memberClaimsEntities = contractMemberClaimsRepo.findByClaimIdAndContractIdAndMemberIdAndProviderId(contractMemberClaimsEntity.getClaimId(), contractMemberClaimsEntity.getContractId(), contractMemberClaimsEntity.getMemberId(), contractMemberClaimsEntity.getProviderId());
+		if(null != memberClaimsEntities && !memberClaimsEntities.isEmpty()) {
+			return false;
+		}
+		return true;
 	}
 
 	private String getPCPValidationMessage(PCPValidateResponse pcpValidateResponse) {
@@ -165,7 +196,7 @@ public class PCPCalculationService {
 																.contractID(memberClaimEntity.getContractId())
 																.enrolleeNumber(memberClaimEntity.getMemberID())
 																.pcpEffectiveDate(calculatePCPEffectiveDate())
-																.pcpEndDate(null)
+																.pcpEndDate(PCP_END_DATE_12_31_999)
 																.personID(memberClaimEntity.getPersonId())
 //																.practiceLocation(memberClaimServiceEntity.getPracticeLocationNumber())
 																.providerContFlag("N")
@@ -286,7 +317,8 @@ public class PCPCalculationService {
 
 	private void processPCPAssignment(ValidateProviderResponse validateProviderResponse, ContractMemberClaimsEntity contractMemberClaimsEntity) {
 		MemberClaimRequest memberClaimRequest = MemberClaimRequest.builder()
-				.memberClaimId(contractMemberClaimsEntity.getClaimId()).build();
+				.memberClaimId(contractMemberClaimsEntity.getClaimId())
+				.build();
 		MemberClaimResponse memberClaimResponse = mtvSyncService.memberClaim(memberClaimRequest);
 		MemberClaimEntity memberClaimEntity = null;
 		if (null != memberClaimResponse
@@ -305,8 +337,7 @@ public class PCPCalculationService {
 				StringUtils.trimToEmpty(pcpValidationMessage), StringUtils.trimToEmpty(PCP_VALID_FOR_ENROLLEE))) {
 			MemberProviderEntity memberProviderEntity = saveMemberProvider(memberClaimEntity);
 			ProviderAssignmentRequest providerAssignmentRequest = buildProviderAssignment(memberClaimEntity);
-			ProviderAssignmentResponse providerAssignmentResponse = mtvSyncService
-					.providerAssignment(providerAssignmentRequest);
+			ProviderAssignmentResponse providerAssignmentResponse = mtvSyncService.providerAssignment(providerAssignmentRequest);
 			if (StringUtils.equals(providerAssignmentResponse.getReturnCode(), "OK")) {
 				validateProviderMessage = "PROCESSED";
 				memberProviderRepo.setStatus(memberProviderEntity.getId(), "PCP ASSIGNED");
