@@ -51,7 +51,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PCPCalculationService {
 
-	private static final String PCP_END_DATE_12_31_999 = "12-31-999";
+	private static final String PCP_END_DATE_12_31_999 = "12-31-9999";
 
 	private static final String PCP_STATUS_INITIAL = "INITIAL";
 
