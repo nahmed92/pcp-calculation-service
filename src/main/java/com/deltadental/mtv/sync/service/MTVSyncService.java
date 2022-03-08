@@ -127,7 +127,7 @@ public class MTVSyncService {
 	
 
 	public ProviderAssignmentResponse providerAssignment(ProviderAssignmentRequest providerAssignmentRequest) {
-		log.info("START MTVSyncService.updatePCPMember");
+		log.info("START MTVSyncService.providerAssignment");
 		String updatePCPMemberEndPoint = pcpMtvSyncServiceEndpoint.concat(MTVSyncServiceConstants.PROVIDER_ASSIGNMENT);
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(updatePCPMemberEndPoint);
 		String uriBuilder = builder.build().encode().toUriString();
@@ -143,7 +143,7 @@ public class MTVSyncService {
 		} catch (URISyntaxException e) {
 			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
 		}
-		log.info("END MTVSyncService.updatePCPMember");
+		log.info("END MTVSyncService.providerAssignment");
 		return responseEntity;
 	}
 
