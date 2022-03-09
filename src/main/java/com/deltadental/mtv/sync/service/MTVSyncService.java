@@ -104,7 +104,7 @@ public class MTVSyncService {
 	
 
 	public MemberClaimResponse memberClaim(MemberClaimRequest memberClaimRequest) {
-		log.info("START MTVSyncService.MemberClaim");
+		log.info("START MTVSyncService.memberClaim");
 		String updatePCPMemberEndPoint = pcpMtvSyncServiceEndpoint.concat(MTVSyncServiceConstants.MEMBER_CLAIM);
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(updatePCPMemberEndPoint);
 		String uriBuilder = builder.build().encode().toUriString();
@@ -121,7 +121,7 @@ public class MTVSyncService {
 		} catch (URISyntaxException e) {
 			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
 		}
-		log.info("END MTVSyncService.updatePCPMember");
+		log.info("END MTVSyncService.memberClaim");
 		return responseEntity;
 	}
 	
@@ -139,6 +139,7 @@ public class MTVSyncService {
 			setMessageConverter(restTemplate);
 			responseEntity = restTemplate.postForObject(new URI(uriBuilder), request, ProviderAssignmentResponse.class);
 		} catch (RestClientException e) {
+			e.printStackTrace();
 			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
 		} catch (URISyntaxException e) {
 			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
