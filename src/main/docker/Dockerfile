@@ -37,7 +37,6 @@ ENTRYPOINT java $JAVA_OPTS \
 	-Dspring.datasource.username=${DATASOURCE_USERNAME} \
 	-Dspring.datasource.password=${DATASOURCE_PASSWORD} \
 	-Dspring.datasource.driver-class=${DATASOURCE_DRIVER_CLASS} \
-	-Dspring.datasource.hikari.connection-timeout=${DATASOURCE_CONNECTION_TIMEOUT} \
 	-Dspring.jpa.hibernate.ddl-auto=${JPA_HIBERNATE_DLL_AUTO} \
 	-Dspring.jpa.properties.hibernate.dialect=${JPA_PROPERTIES_DIALECT} \
 	-Dspring.jpa.hibernate.c3p0.min.size=${JPA_MIN_SIZE} \
