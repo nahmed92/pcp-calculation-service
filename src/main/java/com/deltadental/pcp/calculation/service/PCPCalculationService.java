@@ -17,7 +17,6 @@ import javax.transaction.Transactional;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.deltadental.mtv.sync.service.MTVSyncService;
@@ -106,7 +105,6 @@ public class PCPCalculationService {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	@Async
 	public ValidateProviderResponse assignPCPsToMembers() {
 		log.info("START PCPCalculationService.validateProvider");
 		ValidateProviderResponse validateProviderResponse = new ValidateProviderResponse();
@@ -120,32 +118,15 @@ public class PCPCalculationService {
 		return validateProviderResponse;
 	}
 	
-	@Async
 	public ValidateProviderResponse assignMemberPCP(ValidateProviderRequest validateProviderRequest) {
 		log.info("START PCPCalculationService.assignMemberPCP");
 		ValidateProviderResponse validateProviderResponse = new ValidateProviderResponse();
-		List<ContractMemberClaimsEntity> memberClaimsEntities = contractMemberClaimsRepo.findByClaimIdAndContractIdAndMemberIdAndProviderId(
-				StringUtils.trimToNull(validateProviderRequest.getClaimId()), 
-				StringUtils.trimToNull(validateProviderRequest.getContractId()), 
-				StringUtils.trimToNull(validateProviderRequest.getMemberId()), 
-				StringUtils.trimToNull(validateProviderRequest.getProviderId()));
-		if(null != memberClaimsEntities && !memberClaimsEntities.isEmpty()) {
-			validateProviderResponse.setClaimId(validateProviderRequest.getClaimId());
-			validateProviderResponse.setContractId(validateProviderRequest.getContractId());
-			validateProviderResponse.setMemberId(validateProviderRequest.getMemberId());
-			validateProviderResponse.setProviderId(validateProviderRequest.getProviderId());
-			validateProviderResponse.setStatus("Claim Id and Contract Id with Provider Id for Member Id is already processed!");
-			log.info("Claim Id and Contract Id with Provider Id for Member Id is already processed!");
-		} else {
-			ContractMemberClaimsEntity contractMemberClaimsEntity = saveContractMemberClaims(validateProviderRequest);
-			processPCPAssignment(validateProviderResponse, contractMemberClaimsEntity);
-		}
-		
+		ContractMemberClaimsEntity contractMemberClaimsEntity = saveContractMemberClaims(validateProviderRequest);
+		processPCPAssignment(validateProviderResponse, contractMemberClaimsEntity);
 		log.info("END PCPCalculationService.assignMemberPCP");
 		return validateProviderResponse;
 	}
 
-	@Async
 	public ContractMemberClaimsEntity saveContractMemberClaims(ValidateProviderRequest validateProviderRequest) {
 		ContractMemberClaimsEntity contractMemberClaimsEntity = ContractMemberClaimsEntity.builder()
 				.claimId(StringUtils.trimToNull(validateProviderRequest.getClaimId()))
@@ -155,10 +136,8 @@ public class PCPCalculationService {
 				.state(StringUtils.trimToNull(validateProviderRequest.getState()))
 				.operatorId("DCM_OPERATOR")
 				.build();
-		if(isRecordExistsForClaimIdAndContractIdAndMemberIdAndProviderId(contractMemberClaimsEntity)) {
-			contractMemberClaimsRepo.save(contractMemberClaimsEntity);
-			contractMemberClaimsRepo.flush();
-		}
+		contractMemberClaimsRepo.save(contractMemberClaimsEntity);
+		contractMemberClaimsRepo.flush();
 		return contractMemberClaimsEntity;
 	}
 	
