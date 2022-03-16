@@ -14,7 +14,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.deltadental.pcp.calculation.domain.ValidateProviderRequest;
+import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
 
 public class ExcelHelper {
 
@@ -27,8 +27,8 @@ public class ExcelHelper {
 		return true;
 	}
 
-	public static List<ValidateProviderRequest> extractPCPMemberClaimsData(MultipartFile pcpMemberClaimsDataFile) {
-		List<ValidateProviderRequest> validateProviderRequests = new ArrayList<ValidateProviderRequest>();
+	public static List<MemberContractClaimRequest> extractPCPMemberClaimsData(MultipartFile pcpMemberClaimsDataFile) {
+		List<MemberContractClaimRequest> validateProviderRequests = new ArrayList<MemberContractClaimRequest>();
 		try {
 			InputStream is = pcpMemberClaimsDataFile.getInputStream();
 			Workbook workbook = new XSSFWorkbook(is);
@@ -40,7 +40,7 @@ public class ExcelHelper {
 				if (currentRow.getRowNum() == 0) {
 					continue; // just skip the rows if row number is 0 or 1
 				}
-				ValidateProviderRequest validateProviderRequest = new ValidateProviderRequest();
+				MemberContractClaimRequest validateProviderRequest = new MemberContractClaimRequest();
 				Iterator<Cell> cellsInRow = currentRow.iterator();
 				int cellIdx = 0;
 				while (cellsInRow.hasNext()) {

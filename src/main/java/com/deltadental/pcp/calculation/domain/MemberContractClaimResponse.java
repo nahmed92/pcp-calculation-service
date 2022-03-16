@@ -1,7 +1,6 @@
 package com.deltadental.pcp.calculation.domain;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,15 +8,15 @@ import lombok.ToString;
 
 @Data
 @Getter
-@Builder
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class ValidateProviderRequest {
+public class MemberContractClaimResponse {
 
 	private String claimId;
 	private String contractId;
 	private String memberId;
 	private String providerId;
-	private String state;
+	private String status;
+	private String pcpEffectiveDate;
 }

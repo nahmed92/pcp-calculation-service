@@ -17,8 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.deltadental.pcp.calculation.constants.PCPCalculationServiceConstants;
 import com.deltadental.pcp.calculation.domain.MessageResponse;
-import com.deltadental.pcp.calculation.domain.ValidateProviderRequest;
-import com.deltadental.pcp.calculation.domain.ValidateProviderResponse;
+import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
+import com.deltadental.pcp.calculation.domain.MemberContractClaimResponse;
 import com.deltadental.pcp.calculation.service.ExcelHelper;
 import com.deltadental.pcp.calculation.service.PCPCalculationService;
 import com.deltadental.pcp.search.service.pojos.PCPAssignmentResponse;
@@ -46,27 +46,28 @@ public class PCPCalculationServiceController {
 	PCPCalculationService pcpCalculationService;
 
 	@ApiOperation(
-			value = PCPCalculationServiceConstants.SUMMARY_ASSIGN_MEMBER_PCP, 
-			notes = PCPCalculationServiceConstants.SUMMARY_ASSIGN_MEMBER_PCP_NOTES, 
+			value = PCPCalculationServiceConstants.SUMMARY_MEMBER_CONTRACT_CLAIM, 
+			notes = PCPCalculationServiceConstants.SUMMARY_MEMBER_CONTRACT_CLAIM_NOTES, 
 			response = PCPAssignmentResponse.class)
-    @ApiResponses({ @ApiResponse(code = 200, message = "Successfully assigned primary care provider for member.", response = ValidateProviderResponse.class),
+    @ApiResponses({ @ApiResponse(code = 200, message = "Successfully assigned primary care provider for member.", response = MemberContractClaimResponse.class),
                     @ApiResponse(code = 400, message = "Bad request.", response = ServiceError.class),
                     @ApiResponse(code = 404, message = "Unable assign primary care provider for member.", response = ServiceError.class),
                     @ApiResponse(code = 500, message = "Internal server error.", response = ServiceError.class) })
 	@ResponseBody
 	@MethodExecutionTime
-    @PostMapping(value = PCPCalculationServiceConstants.ASSIGN_MEMBER_PCP_URI, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<ValidateProviderResponse> assignMemberPCP(@RequestBody ValidateProviderRequest validateProviderRequest) {
+    @PostMapping(value = PCPCalculationServiceConstants.MEMBER_CONTRACT_CLAIM_URI, produces = {MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<MessageResponse> assignMemberPCP(@RequestBody MemberContractClaimRequest validateProviderRequest) {
 		log.info("START PCPCalculationServiceController.assignMemberPCP");
-		ValidateProviderResponse validateProviderResponse = pcpCalculationService.assignMemberPCP(validateProviderRequest); 
-		ResponseEntity<ValidateProviderResponse> responseEntity = new ResponseEntity<>(validateProviderResponse, HttpStatus.OK); 
+		pcpCalculationService.stageMemberContractClaimRecord(validateProviderRequest); 
+		MessageResponse messageResponse = MessageResponse.builder().message("Successfully staged member contract request.").build();
+		ResponseEntity<MessageResponse> responseEntity = new ResponseEntity<>(messageResponse, HttpStatus.OK); 
 		log.info("END PCPCalculationServiceController.assignMemberPCP");
 		return responseEntity;
 	}
 	
 	@ApiOperation(
-			value = PCPCalculationServiceConstants.SUMMARY_ASSIGN_PCPS_TO_MEMBERS, 
-			notes = PCPCalculationServiceConstants.SUMMARY_ASSIGN_PCPS_TO_MEMBERS_NOTES, 
+			value = PCPCalculationServiceConstants.SUMMARY_MEMBERS_CONTRACTS_CLAIMS, 
+			notes = PCPCalculationServiceConstants.SUMMARY_MEMBERS_CONTRACTS_CLAIMS_NOTES, 
 			response = PCPAssignmentResponse.class)
     @ApiResponses({ @ApiResponse(code = 200, message = "Successfully assigned primary care providers to members.", response = MessageResponse.class),
                     @ApiResponse(code = 400, message = "Bad request.", response = ServiceError.class),
@@ -74,42 +75,45 @@ public class PCPCalculationServiceController {
                     @ApiResponse(code = 500, message = "Internal server error.", response = ServiceError.class) })
 	@ResponseBody
 	@MethodExecutionTime
-    @PostMapping(value = PCPCalculationServiceConstants.ASSIGN_PCPS_TO_MEMBERS_URI, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<MessageResponse> assignPCPsToMembers(@RequestBody List<ValidateProviderRequest> validateProviderRequestList) {
+    @PostMapping(value = PCPCalculationServiceConstants.ASSIGN_MEMBERS_CONTRACTS_CLAIMS_URI, produces = {MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<MessageResponse> assignPCPsToMembers(@RequestBody List<MemberContractClaimRequest> validateProviderRequestList) {
 		log.info("START PCPCalculationServiceController.assignMemberPCP");
+		MessageResponse messageResponse = MessageResponse.builder().build();
 		if(!validateProviderRequestList.isEmpty()) {
-			validateProviderRequestList.forEach(validateProviderRequest -> pcpCalculationService.saveContractMemberClaims(validateProviderRequest));
+			validateProviderRequestList.forEach(validateProviderRequest -> pcpCalculationService.stageMemberContractClaimRecord(validateProviderRequest));
+			messageResponse.setMessage("Successfully staged all the requests.");
+		} else {
+			messageResponse.setMessage("No records to stage for member contract claims!");
 		}
-		pcpCalculationService.assignPCPsToMembers();
-		MessageResponse messageResponse = MessageResponse.builder().message("Successfully assigned primary care providers to members.").build();
+		
 		ResponseEntity<MessageResponse> responseEntity = new ResponseEntity<>(messageResponse, HttpStatus.OK); 
 		log.info("END PCPCalculationServiceController.assignMemberPCP");
 		return responseEntity;
 	}
 	
-	@ApiOperation(
-			value = PCPCalculationServiceConstants.PROCESS_PCP_MEMBER_CONTRACT, 
-			notes = PCPCalculationServiceConstants.PROCESS_PCP_MEMBER_CONTRACT_NOTES, 
-			response = Contract.class)
-    @ApiResponses({ @ApiResponse(code = 200, message = "Successfully validated provider.", response = Contract.class),
-                    @ApiResponse(code = 400, message = "Bad request.", response = ServiceError.class),
-                    @ApiResponse(code = 403, message = "Unauthorized", response = ServiceError.class),
-                    @ApiResponse(code = 404, message = "Contracts Processor not found.", response = ServiceError.class),
-                    @ApiResponse(code = 500, message = "Internal server error.", response = ServiceError.class) })
-	@ResponseBody
-	@MethodExecutionTime
-    @PostMapping(value = PCPCalculationServiceConstants.PROCESS_PCP_MEMBER_CONTRACT_URI, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<List<Contract>> processPcpMemberContract(@RequestBody final List<Contract> contracts) {
-		log.info("START PCPCalculationServiceController.processPcpMemberContract");
-		pcpCalculationService.setAssginmentDate(contracts);
-		ResponseEntity<List<Contract>> responseEntity = new ResponseEntity<>(contracts, HttpStatus.OK); 
-		log.info("END PCPCalculationServiceController.processPcpMemberContract");
-		return responseEntity;
-	}
+//	@ApiOperation(
+//			value = PCPCalculationServiceConstants.PROCESS_PCP_MEMBER_CONTRACT, 
+//			notes = PCPCalculationServiceConstants.PROCESS_PCP_MEMBER_CONTRACT_NOTES, 
+//			response = Contract.class)
+//    @ApiResponses({ @ApiResponse(code = 200, message = "Successfully validated provider.", response = Contract.class),
+//                    @ApiResponse(code = 400, message = "Bad request.", response = ServiceError.class),
+//                    @ApiResponse(code = 403, message = "Unauthorized", response = ServiceError.class),
+//                    @ApiResponse(code = 404, message = "Contracts Processor not found.", response = ServiceError.class),
+//                    @ApiResponse(code = 500, message = "Internal server error.", response = ServiceError.class) })
+//	@ResponseBody
+//	@MethodExecutionTime
+//    @PostMapping(value = PCPCalculationServiceConstants.PROCESS_PCP_MEMBER_CONTRACT_URI, produces = {MediaType.APPLICATION_JSON_VALUE})
+//	public ResponseEntity<List<Contract>> processPcpMemberContract(@RequestBody final List<Contract> contracts) {
+//		log.info("START PCPCalculationServiceController.processPcpMemberContract");
+//		pcpCalculationService.setAssginmentDate(contracts);
+//		ResponseEntity<List<Contract>> responseEntity = new ResponseEntity<>(contracts, HttpStatus.OK); 
+//		log.info("END PCPCalculationServiceController.processPcpMemberContract");
+//		return responseEntity;
+//	}
 	
 	@ApiOperation(
-			value = PCPCalculationServiceConstants.UPLOAD_PCP_MEMBER_CLAIMS, 
-			notes = PCPCalculationServiceConstants.UPLOAD_PCP_MEMBER_CLAIMS_NOTES, 
+			value = PCPCalculationServiceConstants.SUMMARY_UPLOAD_MEMBERS_CONTRACTS_CLAIMS, 
+			notes = PCPCalculationServiceConstants.SUMMARY_UPLOAD_MEMBERS_CONTRACTS_CLAIMS_NOTES, 
 			response = String.class)
     @ApiResponses({ @ApiResponse(code = 200, message = "Successfully uploaded pcp member claims.", response = String.class),
                     @ApiResponse(code = 400, message = "Bad request.", response = ServiceError.class),
@@ -117,22 +121,27 @@ public class PCPCalculationServiceController {
                     @ApiResponse(code = 500, message = "Internal server error.", response = ServiceError.class) })
 	@ResponseBody
 	@MethodExecutionTime
-    @PostMapping(value = PCPCalculationServiceConstants.UPLOAD_PCP_MEMBER_CLAIMS_URI, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(value = PCPCalculationServiceConstants.UPLOAD_MEMBERS_CONTRACTS_CLAIMS_URI, produces = {MediaType.APPLICATION_JSON_VALUE})
 	public ResponseEntity<MessageResponse> uploadPCPMemberClaims(@RequestParam("pcpMemberClaimsDataFile") MultipartFile pcpMemberClaimsDataFile) {
 		log.info("START PCPCalculationServiceController.uploadPCPMemberClaims");
 		MessageResponse messageResponse = MessageResponse.builder().build();
 		if(ExcelHelper.hasExcelFormat(pcpMemberClaimsDataFile)) {
-			List<ValidateProviderRequest> validateProviderRequests = ExcelHelper.extractPCPMemberClaimsData(pcpMemberClaimsDataFile);
+			List<MemberContractClaimRequest> validateProviderRequests = ExcelHelper.extractPCPMemberClaimsData(pcpMemberClaimsDataFile);
 			if(!validateProviderRequests.isEmpty()) {
-				validateProviderRequests.forEach(validateProviderRequest -> pcpCalculationService.saveContractMemberClaims(validateProviderRequest));
+				validateProviderRequests.forEach(validateProviderRequest -> { 
+					validateProviderRequest.setOperatorId("FILE_UPLOAD");
+					pcpCalculationService.stageMemberContractClaimRecord(validateProviderRequest);
+				});
+				messageResponse.setMessage("Successfully uploaded member contract claims!");
+				log.info("Successfully uploaded member contract claims!");
+			} else {
+				messageResponse.setMessage("No member contract claims to upload in uploaded file.");
+				log.info("No member contract claims to upload in uploaded file.");
 			}
-			pcpCalculationService.assignPCPsToMembers();
-			log.info("Valid excel uploaded!");
 		} else {
-			log.info("Invalid excel uploaded!");
-			messageResponse.setMessage("Successfully assigned primary care providers to members.");
+			messageResponse.setMessage("Invalid excel data!");
+			log.info("Invalid excel data!");
 		}
-		messageResponse.setMessage("Successfully assigned primary care providers to members.");
 		ResponseEntity<MessageResponse> responseEntity = new ResponseEntity<>(messageResponse, HttpStatus.OK); 
 		log.info("END PCPCalculationServiceController.uploadPCPMemberClaims");
 		return responseEntity;

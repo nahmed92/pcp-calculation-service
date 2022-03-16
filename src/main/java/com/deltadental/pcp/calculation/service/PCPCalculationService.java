@@ -26,8 +26,8 @@ import com.deltadental.mtv.sync.service.ProviderAssignmentRequest;
 import com.deltadental.mtv.sync.service.ProviderAssignmentResponse;
 import com.deltadental.mtv.sync.service.ServiceLine;
 import com.deltadental.pcp.calculation.controller.Contract;
-import com.deltadental.pcp.calculation.domain.ValidateProviderRequest;
-import com.deltadental.pcp.calculation.domain.ValidateProviderResponse;
+import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
+import com.deltadental.pcp.calculation.domain.MemberContractClaimResponse;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimsEntity;
 import com.deltadental.pcp.calculation.entities.MemberClaimEntity;
 import com.deltadental.pcp.calculation.entities.MemberClaimServicesEntity;
@@ -105,9 +105,9 @@ public class PCPCalculationService {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	public ValidateProviderResponse assignPCPsToMembers() {
+	public MemberContractClaimResponse assignPCPsToMembers() {
 		log.info("START PCPCalculationService.validateProvider");
-		ValidateProviderResponse validateProviderResponse = new ValidateProviderResponse();
+		MemberContractClaimResponse validateProviderResponse = new MemberContractClaimResponse();
 		// Step#1
 		List<ContractMemberClaimsEntity> contractMemberClaimsEntities = contractMemberClaimsRepo.findByStatus(null);
 		if (contractMemberClaimsEntities != null && !contractMemberClaimsEntities.isEmpty()) {
@@ -118,35 +118,31 @@ public class PCPCalculationService {
 		return validateProviderResponse;
 	}
 	
-	public ValidateProviderResponse assignMemberPCP(ValidateProviderRequest validateProviderRequest) {
+	public void stageMemberContractClaimRecord(MemberContractClaimRequest validateProviderRequest) {
 		log.info("START PCPCalculationService.assignMemberPCP");
-		ValidateProviderResponse validateProviderResponse = new ValidateProviderResponse();
-		ContractMemberClaimsEntity contractMemberClaimsEntity = saveContractMemberClaims(validateProviderRequest);
-		processPCPAssignment(validateProviderResponse, contractMemberClaimsEntity);
+		saveContractMemberClaims(validateProviderRequest);
 		log.info("END PCPCalculationService.assignMemberPCP");
-		return validateProviderResponse;
 	}
 
-	public ContractMemberClaimsEntity saveContractMemberClaims(ValidateProviderRequest validateProviderRequest) {
+	public void stageMemberContractClaimRecords(List<MemberContractClaimRequest> validateProviderRequests) {
+		log.info("START PCPCalculationService.assignMemberPCP");
+		if(null != validateProviderRequests && !validateProviderRequests.isEmpty()) {
+			validateProviderRequests.forEach(validateProviderRequest -> saveContractMemberClaims(validateProviderRequest));
+		}
+		log.info("END PCPCalculationService.assignMemberPCP");
+	}
+
+	
+	private void saveContractMemberClaims(MemberContractClaimRequest validateProviderRequest) {
 		ContractMemberClaimsEntity contractMemberClaimsEntity = ContractMemberClaimsEntity.builder()
 				.claimId(StringUtils.trimToNull(validateProviderRequest.getClaimId()))
 				.contractId(StringUtils.trimToNull(validateProviderRequest.getContractId()))
 				.memberId(StringUtils.trimToNull(validateProviderRequest.getMemberId()))
 				.providerId(StringUtils.trimToNull(validateProviderRequest.getProviderId()))
 				.state(StringUtils.trimToNull(validateProviderRequest.getState()))
-				.operatorId("DCM_OPERATOR")
+				.operatorId(StringUtils.trimToNull(validateProviderRequest.getOperatorId()))
 				.build();
 		contractMemberClaimsRepo.save(contractMemberClaimsEntity);
-		contractMemberClaimsRepo.flush();
-		return contractMemberClaimsEntity;
-	}
-	
-	public boolean isRecordExistsForClaimIdAndContractIdAndMemberIdAndProviderId(ContractMemberClaimsEntity contractMemberClaimsEntity) {
-		List<ContractMemberClaimsEntity> memberClaimsEntities = contractMemberClaimsRepo.findByClaimIdAndContractIdAndMemberIdAndProviderId(contractMemberClaimsEntity.getClaimId(), contractMemberClaimsEntity.getContractId(), contractMemberClaimsEntity.getMemberId(), contractMemberClaimsEntity.getProviderId());
-		if(null != memberClaimsEntities && !memberClaimsEntities.isEmpty()) {
-			return false;
-		}
-		return true;
 	}
 
 	private String getPCPValidationMessage(PCPValidateResponse pcpValidateResponse) {
@@ -313,7 +309,7 @@ public class PCPCalculationService {
 	}
 
 
-	private void processPCPAssignment(ValidateProviderResponse validateProviderResponse, ContractMemberClaimsEntity contractMemberClaimsEntity) {
+	private void processPCPAssignment(MemberContractClaimResponse validateProviderResponse, ContractMemberClaimsEntity contractMemberClaimsEntity) {
 		MemberClaimRequest memberClaimRequest = MemberClaimRequest.builder().memberClaimId(contractMemberClaimsEntity.getClaimId()).build();
 		MemberClaimResponse memberClaimResponse = mtvSyncService.memberClaim(memberClaimRequest);
 		String pcpEffectiveDate = calculatePCPEffectiveDate();
