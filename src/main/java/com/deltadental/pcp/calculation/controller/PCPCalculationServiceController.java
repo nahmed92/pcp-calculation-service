@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.deltadental.pcp.calculation.constants.PCPCalculationServiceConstants;
-import com.deltadental.pcp.calculation.domain.MessageResponse;
 import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
 import com.deltadental.pcp.calculation.domain.MemberContractClaimResponse;
+import com.deltadental.pcp.calculation.domain.MessageResponse;
 import com.deltadental.pcp.calculation.service.ExcelHelper;
 import com.deltadental.pcp.calculation.service.PCPCalculationService;
 import com.deltadental.pcp.search.service.pojos.PCPAssignmentResponse;
@@ -91,25 +91,25 @@ public class PCPCalculationServiceController {
 		return responseEntity;
 	}
 	
-//	@ApiOperation(
-//			value = PCPCalculationServiceConstants.PROCESS_PCP_MEMBER_CONTRACT, 
-//			notes = PCPCalculationServiceConstants.PROCESS_PCP_MEMBER_CONTRACT_NOTES, 
-//			response = Contract.class)
-//    @ApiResponses({ @ApiResponse(code = 200, message = "Successfully validated provider.", response = Contract.class),
-//                    @ApiResponse(code = 400, message = "Bad request.", response = ServiceError.class),
-//                    @ApiResponse(code = 403, message = "Unauthorized", response = ServiceError.class),
-//                    @ApiResponse(code = 404, message = "Contracts Processor not found.", response = ServiceError.class),
-//                    @ApiResponse(code = 500, message = "Internal server error.", response = ServiceError.class) })
-//	@ResponseBody
-//	@MethodExecutionTime
-//    @PostMapping(value = PCPCalculationServiceConstants.PROCESS_PCP_MEMBER_CONTRACT_URI, produces = {MediaType.APPLICATION_JSON_VALUE})
-//	public ResponseEntity<List<Contract>> processPcpMemberContract(@RequestBody final List<Contract> contracts) {
-//		log.info("START PCPCalculationServiceController.processPcpMemberContract");
-//		pcpCalculationService.setAssginmentDate(contracts);
-//		ResponseEntity<List<Contract>> responseEntity = new ResponseEntity<>(contracts, HttpStatus.OK); 
-//		log.info("END PCPCalculationServiceController.processPcpMemberContract");
-//		return responseEntity;
-//	}
+	@ApiOperation(
+			value = PCPCalculationServiceConstants.PROCESS_PCP_MEMBER_CONTRACT, 
+			notes = PCPCalculationServiceConstants.PROCESS_PCP_MEMBER_CONTRACT_NOTES, 
+			response = Contract.class)
+    @ApiResponses({ @ApiResponse(code = 200, message = "Successfully validated provider.", response = Contract.class),
+                    @ApiResponse(code = 400, message = "Bad request.", response = ServiceError.class),
+                    @ApiResponse(code = 403, message = "Unauthorized", response = ServiceError.class),
+                    @ApiResponse(code = 404, message = "Contracts Processor not found.", response = ServiceError.class),
+                    @ApiResponse(code = 500, message = "Internal server error.", response = ServiceError.class) })
+	@ResponseBody
+	@MethodExecutionTime
+    @PostMapping(value = PCPCalculationServiceConstants.PROCESS_PCP_MEMBER_CONTRACT_URI, produces = {MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<String> processPcpMemberContract() {
+		log.info("START PCPCalculationServiceController.processPcpMemberContract");
+		pcpCalculationService.assignPCPsToMembers();
+		ResponseEntity<String> responseEntity = new ResponseEntity<>("PCP Assignment Completed!", HttpStatus.OK); 
+		log.info("END PCPCalculationServiceController.processPcpMemberContract");
+		return responseEntity;
+	}
 	
 	@ApiOperation(
 			value = PCPCalculationServiceConstants.SUMMARY_UPLOAD_MEMBERS_CONTRACTS_CLAIMS, 
