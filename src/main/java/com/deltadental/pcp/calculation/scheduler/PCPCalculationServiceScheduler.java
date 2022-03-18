@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PCPCalculationServiceScheduler {
 
-	@Scheduled(initialDelay = 1000, fixedRate = 10000)
+//	@Scheduled(initialDelay = 1000, fixedRate = 10000)
 	public void schedulePCPAssignments() {
 		log.info("Current time is :: " + Calendar.getInstance().getTime());
 	}

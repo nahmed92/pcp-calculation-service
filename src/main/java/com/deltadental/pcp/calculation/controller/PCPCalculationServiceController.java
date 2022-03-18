@@ -59,6 +59,7 @@ public class PCPCalculationServiceController {
 	public ResponseEntity<MessageResponse> assignMemberPCP(@RequestBody MemberContractClaimRequest validateProviderRequest) {
 		log.info("START PCPCalculationServiceController.assignMemberPCP");
 		pcpCalculationService.stageMemberContractClaimRecord(validateProviderRequest); 
+		pcpCalculationService.assignPCPsToMembers();
 		MessageResponse messageResponse = MessageResponse.builder().message("Successfully staged member contract request.").build();
 		ResponseEntity<MessageResponse> responseEntity = new ResponseEntity<>(messageResponse, HttpStatus.OK); 
 		log.info("END PCPCalculationServiceController.assignMemberPCP");
@@ -82,10 +83,10 @@ public class PCPCalculationServiceController {
 		if(!validateProviderRequestList.isEmpty()) {
 			validateProviderRequestList.forEach(validateProviderRequest -> pcpCalculationService.stageMemberContractClaimRecord(validateProviderRequest));
 			messageResponse.setMessage("Successfully staged all the requests.");
+			pcpCalculationService.assignPCPsToMembers();
 		} else {
 			messageResponse.setMessage("No records to stage for member contract claims!");
 		}
-		
 		ResponseEntity<MessageResponse> responseEntity = new ResponseEntity<>(messageResponse, HttpStatus.OK); 
 		log.info("END PCPCalculationServiceController.assignMemberPCP");
 		return responseEntity;
@@ -134,6 +135,7 @@ public class PCPCalculationServiceController {
 				});
 				messageResponse.setMessage("Successfully uploaded member contract claims!");
 				log.info("Successfully uploaded member contract claims!");
+				pcpCalculationService.assignPCPsToMembers();
 			} else {
 				messageResponse.setMessage("No member contract claims to upload in uploaded file.");
 				log.info("No member contract claims to upload in uploaded file.");

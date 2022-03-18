@@ -20,7 +20,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
-@EnableScheduling
+//@EnableScheduling
 @ComponentScan(basePackages = { "com.deltadental.*" })
 public class PCPCalculationServiceApplication {
 

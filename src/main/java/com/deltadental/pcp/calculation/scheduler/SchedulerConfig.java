@@ -6,10 +6,10 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
-@EnableScheduling
+//@EnableScheduling
 //@EnableSchedulerLock(defaultLockAtMostFor = "10m")
-@EnableAsync
-@ConditionalOnProperty(name="scheduler.enabled", matchIfMissing = true)
+//@EnableAsync
+//@ConditionalOnProperty(name="scheduler.enabled", matchIfMissing = true)
 public class SchedulerConfig {
 
 }
