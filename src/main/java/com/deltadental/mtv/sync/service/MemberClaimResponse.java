@@ -1,6 +1,5 @@
 package com.deltadental.mtv.sync.service;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

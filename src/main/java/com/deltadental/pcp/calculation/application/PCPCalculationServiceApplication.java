@@ -16,8 +16,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
+
+import com.deltadental.pcp.calculation.service.PCPConfigData;
 
 @SpringBootApplication
 //@EnableScheduling
@@ -41,4 +42,8 @@ public class PCPCalculationServiceApplication {
 		return restTemplate;
 	}
 	
+//	@Bean
+//	public PCPConfigData pcpConfigData() {
+//		return new PCPConfigData();
+//	}
 }

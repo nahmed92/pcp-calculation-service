@@ -32,7 +32,7 @@ public class ExcelHelper {
 		try {
 			InputStream is = pcpMemberClaimsDataFile.getInputStream();
 			Workbook workbook = new XSSFWorkbook(is);
-			Sheet firstSheet = (Sheet) workbook.getSheetAt(0);
+			Sheet firstSheet = workbook.getSheetAt(0);
 			Iterator<Row> rows = firstSheet.iterator();
 			while (rows.hasNext()) {
 				Row currentRow = rows.next();

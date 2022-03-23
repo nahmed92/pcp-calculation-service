@@ -35,57 +35,47 @@ public class MemberClaimServicesEntity implements Serializable {
 	private static final long serialVersionUID = 2757500429236458720L;
 
 	@Id
-	@Column(name = "id", nullable = false, unique = true)
+	@Column(name = "MEMBER_CLAIM_SERVICES_ID", nullable = false, unique = true)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
-	
-	@Column(name = "claim_id")
-	private String claimId;
-	
-	@Column(name = "claim_type")
+	private Integer memberClaimServicesId;
+
+	@Column(name = "CLAIM_TYPE")
 	private String claimType;
 	
-	@Column(name = "encounterFlag")
-	private String encounter_flag;
+	@Column(name = "ENCOUNTER_FLAG")
+	private String encounterFlag;
+
+	@Column(name = "EXPLN_CODE")
+	private String explnCode;
 	
-	@Column(name = "contract_id")
-	private String contractId;
-
-	@Column(name = "member_id")
-	private String memberId;
-
-	@Column(name = "provider_id")
-	private String providerId;
-
-	@Column(name = "explanation_code")
-	private String explanationCode;
-	
-	@Column(name = "procedure_code")
+	@Column(name = "PROCEDURE_CODE")
 	private String procedureCode;
 	
-	@Column(name = "sequence_number")
+	@Column(name = "SEQUENCE_NUMBER")
 	private String sequenceNumber;
 	
-	@Column(name = "service_number")
+	@Column(name = "SERVICE_NUMBER")
 	private String serviceNumber;
 	
-	@Column(name = "service_paid_ts")
+	@Column(name = "SERVICE_PAID_TS")
 	@CreationTimestamp
 	private Date servicePaidTs;
 
-	@Column(name = "service_resolution_ts")
+	@Column(name = "SERVICE_RESOLUTION_TS")
 	@UpdateTimestamp
 	private Date serviceResolutionTs;
 
-	@Column(name = "creation_ts")
+	@Column(name = "CREATION_TS")
 	@CreationTimestamp
 	private Date crationTs;
 
-	@Column(name = "last_maint_ts")
+	@Column(name = "LAST_MAINT_TS")
 	@UpdateTimestamp
 	private Date lastMaintTs;
 
-	@Column(name = "operator_id")
+	@Column(name = "OPERATOR_ID")
 	private String operatorId;
 	
+	@Column(name = "MEMBER_CLAIM_ID")
+	private Integer memberClaimId;
 }

@@ -12,6 +12,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.AllArgsConstructor;
@@ -35,51 +36,43 @@ public class MemberProviderEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name = "id", nullable = false, unique = true)
+	@Column(name = "MEMBER_PROVIDER_ID", nullable = false, unique = true)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
-
-	@Column(name = "claim_id")
-	private String claimId;
+	private Integer memberProviderId;
 	
-	@Column(name = "claim_status")
+	@Column(name = "CLAIM_STATUS")
 	private String claimStatus;
-	
-	@Column(name = "contract_id")
-	private String contractId;
-	
-	@Column(name = "zip_code")
-	private String zipCode;
 
-	@Column(name = "member_id")
-	private String memberId; 
-
-	@Column(name = "pcp_effective_date")
+	@Column(name = "PCP_EFFECTIVE_DATE")
 	private String pcpEffectiveDate;
 	
-	@Column(name = "pcp_end_date")
+	@Column(name = "PCP_END_DATE")
 	private String pcpEndDate;
 
-	@Column(name = "pcp_identifier")
-	private String pcpIdentifier;
-	
-	@Column(name = "reason_cd")
+	@Column(name = "REASON_CD")
 	private String reasonCd;
 
-	@Column(name = "source_system")
+	@Column(name = "SOURCE_SYSTEM")
 	private String sourceSystem;
 
-	@Column(name = "status")
+	@Column(name = "STATUS")
+//	@Type(type="org.hibernate.type.StringNVarcharType")
 	private String status;
 
-	@Column(name = "creation_ts")
+	@Column(name = "ZIP_CODE")
+	private String zipCode;
+	
+	@Column(name = "CREATION_TS")
 	@CreationTimestamp
 	private Date crationTs;
 
-	@Column(name = "last_maint_ts")
+	@Column(name = "LAST_MAINT_TS")
 	@UpdateTimestamp
 	private Date lastMaintTs;
 	
-	@Column(name = "operator_id")
+	@Column(name = "OPERATOR_ID")
 	private String operatorId;
+	
+	@Column(name = "CONTRACT_MEMBER_CLAIMS_ID")
+	private Integer contractMemberClaimsId;
 }

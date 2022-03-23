@@ -35,31 +35,32 @@ public class ContractMemberClaimsEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name = "id", nullable = false, unique = true)
+	@Column(name = "CONTRACT_MEMBER_CLAIMS_ID", nullable = false, unique = true)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Integer contractMemberClaimId;
 
-	@Column(name = "contract_id")
+	@Column(name = "CLAIM_ID")
+	private String claimId;
+	
+	@Column(name = "CONTRACT_ID")
 	private String contractId;
+	
+	@Column(name = "MEMBER_ID")
+	private String memberId;
+	
+	@Column(name = "PROVIDER_ID")
+	private String providerId;
 	
 	@Column(name = "state")
 	private String state;
 	
-	@Column(name = "member_id")
-	private String memberId;
-	
-	@Column(name = "provider_id")
-	private String providerId;
+	@Column(name = "status")
+//	@Type(type="org.hibernate.type.StringNVarcharType")
+	private String status;
 	
 	@Column(name = "operator_id")
 	private String operatorId;
 	
-	@Column(name = "claim_id")
-	private String claimId;
-
-	@Column(name = "status")
-	private String status;
-
 	@Column(name = "creation_ts")
 	@CreationTimestamp
 	private Date crationTs;

@@ -36,80 +36,69 @@ public class MemberClaimEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name = "id", nullable = false, unique = true)
+	@Column(name = "MEMBER_CLAIM_ID", nullable = false, unique = true)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Integer memberClaimId;
 	
-	@Column(name = "billing_prov_id")
+	@Column(name = "BILLING_PROV_ID")
 	private String billingProvId;
 	
-	@Column(name = "business_level_4")
+	@Column(name = "BUSINESS_LEVEL_4")
     private String businessLevel4;
 	
-	@Column(name = "business_level_5")
+	@Column(name = "BUSINESS_LEVEL_5")
     private String businessLevel5;
 	
-	@Column(name = "business_level_6")
+	@Column(name = "BUSINESS_LEVEL_6")
     private String businessLevel6;
 	
-	@Column(name = "business_level_7")
+	@Column(name = "BUSINESS_LEVEL_7")
     private String businessLevel7;
 	
-	@Column(name = "claim_id")
-    private String claimId;
-	
-	@Column(name = "claim_source")
+	@Column(name = "CLAIM_SOURCE")
     private String claimSource;
 	
-	@Column(name = "claim_status")
+	@Column(name = "CLAIM_STATUS")
     private String claimStatus;
 	
-	@Column(name = "claim_type")
+	@Column(name = "CLAIM_TYPE")
     private String claimType;
 	
-	@Column(name = "contract_id")
-    private String contractId;
-	
-	@Column(name = "group_number")
+	@Column(name = "GROUP_NUMBER")
     private String groupNumber;
-  //  private XMLGregorianCalendar memberDOB;
 	
-	@Column(name = "member_first_name")
+	@Column(name = "MEMBER_FIRST_NAME")
     private String memberFirstName;
-	
-	@Column(name = "member_id")
-    private String memberID;
 
-	@Column(name = "member_last_name")
+	@Column(name = "MEMBER_LAST_NAME")
 	private String memberLastName;
 	
-	@Column(name = "paid_ts")
+	@Column(name = "PAID_TS")
     private Timestamp paidTs;
 	
-	@Column(name = "person_id")
+	@Column(name = "PERSON_ID")
     private String personId;
 	
-	@Column(name = "provider_id")
-    private String providerId;
-	
-	@Column(name = "received_ts")
+	@Column(name = "RECEIVED_TS")
     private Timestamp receivedTs;
 	
-	@Column(name = "resolved_ts")
+	@Column(name = "RESOLVED_TS")
     private Timestamp resolvedTs;
-//    private List<ServiceLine> serviceLines; // TODO : store in saperate child table
-	@Column(name = "services_number")
+
+	@Column(name = "SERVICES_NUMBER")
     private String servicesNumber;
 	
-	@Column(name = "creation_ts")
+	@Column(name = "CREATION_TS")
 	@CreationTimestamp
 	private Date crationTs;
 
-	@Column(name = "last_maint_ts")
+	@Column(name = "LAST_MAINT_TS")
 	@UpdateTimestamp
 	private Date lastMaintTs;
 	
-	@Column(name = "operator_id")
+	@Column(name = "OPERATOR_ID")
 	private String operatorId;
 
+	@Column(name = "CONTRACT_MEMBER_CLAIMS_ID")
+	private Integer contractMemberClaimsId;
 }
