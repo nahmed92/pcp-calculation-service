@@ -363,7 +363,7 @@ public class PCPCalculationService {
 				validateProviderMessage = "No claim information found with the claim id : "+ contractMemberClaimsEntity.getClaimId();
 			}
 		} catch (Exception e) {
-			validateProviderMessage = e.getMessage();
+			validateProviderMessage = "Exception occurred during pcp assignment processing.";
 		}
 		contractMemberClaimsEntity.setStatus(validateProviderMessage);
 		contractMemberClaimsRepo.setStatus(contractMemberClaimsEntity.getContractMemberClaimId(), validateProviderMessage);

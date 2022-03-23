@@ -56,7 +56,7 @@ public class MemberProviderEntity implements Serializable {
 	private String sourceSystem;
 
 	@Column(name = "STATUS")
-//	@Type(type="org.hibernate.type.StringNVarcharType")
+	@Type(type="org.hibernate.type.StringNVarcharType")
 	private String status;
 
 	@Column(name = "ZIP_CODE")
