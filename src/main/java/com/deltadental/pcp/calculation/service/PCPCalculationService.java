@@ -174,7 +174,7 @@ public class PCPCalculationService {
 				.mtvPersonId(memberClaimEntity.getPersonId())
 				.pcpEffDate(pcpEffectiveDate)
 				.product(DC_PRODUCT)
-				.pcpEndDate(PCP_END_DATE_12_31_9999)
+//				.pcpEndDate(PCP_END_DATE_12_31_9999)
 				.providerId(contractMemberClaimsEntity.getProviderId())
 				.recordIdentifier(String.valueOf(random()))
 				.sourceSystem(DCM_SOURCESYSTEM)
@@ -188,7 +188,7 @@ public class PCPCalculationService {
 																.contractID(contractMemberClaimsEntity.getContractId())
 																.enrolleeNumber(contractMemberClaimsEntity.getMemberId())
 																.pcpEffectiveDate(pcpEffectiveDate)
-																.pcpEndDate(PCP_END_DATE_12_31_9999)
+//																.pcpEndDate(PCP_END_DATE_12_31_9999)
 																.personID(memberClaimEntity.getPersonId())
 //																.practiceLocation(memberClaimServiceEntity.getPracticeLocationNumber())
 																.providerContFlag("N")
@@ -313,12 +313,10 @@ public class PCPCalculationService {
 					saveMemberClaimServices(memberClaimEntity, serviceLines);
 					boolean isExplanationCodeValid = pcpConfigData.isExplanationCodeValid(serviceLines);
 					boolean isProcedureCodeValid = pcpConfigData.isProcedureCodeValid(serviceLines);
-					boolean isClaimStatusValid = pcpConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimEntity.getClaimStatus()));
-	
+					boolean isClaimStatusValid = pcpConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimEntity.getClaimStatus()));	
 					if (isClaimStatusValid && isExplanationCodeValid && isProcedureCodeValid) {
 						PCPValidateResponse pcpValidateResponse = callPCPValidate(contractMemberClaimsEntity, memberClaimEntity, pcpEffectiveDate);
-						String pcpValidationMessage = getPCPValidationMessage(pcpValidateResponse);
-	
+						String pcpValidationMessage = getPCPValidationMessage(pcpValidateResponse);	
 						if (StringUtils.equals(pcpValidateResponse.getProcessStatusCode(), PCP_VALIDATION_SUCCESS)
 								&& StringUtils.equals(StringUtils.trimToEmpty(pcpValidationMessage), StringUtils.trimToEmpty(PCP_VALID_FOR_ENROLLEE))) {
 							MemberProviderEntity memberProviderEntity = saveMemberProvider(contractMemberClaimsEntity.getContractMemberClaimId(), memberClaimEntity.getClaimStatus(), pcpEffectiveDate);
@@ -346,8 +344,7 @@ public class PCPCalculationService {
 							} else {
 								validateProviderMessage = "One of the Service Line Explanation Code is not valid for this claim!";
 							}
-						}
-	
+						}	
 						if (!isProcedureCodeValid) {
 							if (StringUtils.isNotBlank(validateProviderMessage)) {
 								validateProviderMessage = String.join(", ", validateProviderMessage, "One of the Service Line Procedure Code is not valid for this claim!");
