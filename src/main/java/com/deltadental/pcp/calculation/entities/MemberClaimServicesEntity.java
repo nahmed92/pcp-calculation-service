@@ -11,7 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.AllArgsConstructor;
@@ -28,8 +27,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 @Entity
-@Immutable
-@Table(name = "member_claim_services", schema = "dbo")
+@Table(name = "MEMBER_CLAIM_SERVICES", schema = "dbo")
 public class MemberClaimServicesEntity implements Serializable {
 
 	private static final long serialVersionUID = 2757500429236458720L;

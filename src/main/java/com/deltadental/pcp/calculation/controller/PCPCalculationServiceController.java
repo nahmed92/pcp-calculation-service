@@ -56,13 +56,13 @@ public class PCPCalculationServiceController {
 	@ResponseBody
 	@MethodExecutionTime
     @PostMapping(value = PCPCalculationServiceConstants.MEMBER_CONTRACT_CLAIM_URI, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<MessageResponse> assignMemberPCP(@RequestBody MemberContractClaimRequest validateProviderRequest) {
-		log.info("START PCPCalculationServiceController.assignMemberPCP");
+	public ResponseEntity<MessageResponse> memberContractClaim(@RequestBody MemberContractClaimRequest validateProviderRequest) {
+		log.info("START PCPCalculationServiceController.memberContractClaim");
 		pcpCalculationService.stageMemberContractClaimRecord(validateProviderRequest); 
-		pcpCalculationService.assignPCPsToMembers();
+//		pcpCalculationService.assignPCPsToMembers();
 		MessageResponse messageResponse = MessageResponse.builder().message("Successfully staged member contract request.").build();
 		ResponseEntity<MessageResponse> responseEntity = new ResponseEntity<>(messageResponse, HttpStatus.OK); 
-		log.info("END PCPCalculationServiceController.assignMemberPCP");
+		log.info("END PCPCalculationServiceController.memberContractClaim");
 		return responseEntity;
 	}
 	
@@ -82,7 +82,7 @@ public class PCPCalculationServiceController {
 		MessageResponse messageResponse = MessageResponse.builder().build();
 		if(!validateProviderRequestList.isEmpty()) {
 			validateProviderRequestList.forEach(validateProviderRequest -> pcpCalculationService.stageMemberContractClaimRecord(validateProviderRequest));
-			pcpCalculationService.assignPCPsToMembers();
+//			pcpCalculationService.assignPCPsToMembers();
 			messageResponse.setMessage("Successfully staged all the requests.");
 		} else {
 			messageResponse.setMessage("No records to stage for member contract claims!");
@@ -135,7 +135,7 @@ public class PCPCalculationServiceController {
 					validateProviderRequest.setOperatorId("FILE_UPLOAD");
 					pcpCalculationService.stageMemberContractClaimRecord(validateProviderRequest);
 				});
-				pcpCalculationService.assignPCPsToMembers();
+//				pcpCalculationService.assignPCPsToMembers();
 				messageResponse.setMessage("Successfully uploaded member contract claims!");
 				log.info("Successfully uploaded member contract claims!");
 			} else {

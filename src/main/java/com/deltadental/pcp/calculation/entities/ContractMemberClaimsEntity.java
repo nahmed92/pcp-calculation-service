@@ -29,7 +29,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 @Entity
-@Immutable
 @Table(name = "CONTRACT_MEMBER_CLAIMS", schema = "dbo")
 public class ContractMemberClaimsEntity implements Serializable {
 
