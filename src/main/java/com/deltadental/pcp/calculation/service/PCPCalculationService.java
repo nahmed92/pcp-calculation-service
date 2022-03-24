@@ -118,6 +118,8 @@ public class PCPCalculationService {
 		if(null == memberClaimsEntities || memberClaimsEntities.isEmpty()) {
 			saveContractMemberClaims(validateProviderRequest);
 			log.info("Record inserted in contract member claims table : "+validateProviderRequest.toString());
+		} else {
+			log.info("Record already exists in contract member claims table : "+validateProviderRequest.toString());
 		}
 		log.info("END PCPCalculationService.assignMemberPCP");
 	}
