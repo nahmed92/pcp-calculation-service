@@ -109,11 +109,12 @@ public class PCPCalculationService {
 	
 	public void stageMemberContractClaimRecord(MemberContractClaimRequest validateProviderRequest) {
 		log.info("START PCPCalculationService.assignMemberPCP");
-		List<ContractMemberClaimsEntity> memberClaimsEntities = contractMemberClaimsRepo.findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStatusIsNull(
+		List<ContractMemberClaimsEntity> memberClaimsEntities = contractMemberClaimsRepo.findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusIsNull(
 				StringUtils.trimToNull(validateProviderRequest.getClaimId()), 
 				StringUtils.trimToNull(validateProviderRequest.getContractId()), 
 				StringUtils.trimToNull(validateProviderRequest.getMemberId()), 
-				StringUtils.trimToNull(validateProviderRequest.getProviderId()));
+				StringUtils.trimToNull(validateProviderRequest.getProviderId()),
+				StringUtils.trimToNull(validateProviderRequest.getState()));
 		if(null == memberClaimsEntities || memberClaimsEntities.isEmpty()) {
 			saveContractMemberClaims(validateProviderRequest);
 			log.info("Record inserted in contract member claims table : "+validateProviderRequest.toString());
@@ -329,6 +330,7 @@ public class PCPCalculationService {
 					if (isClaimStatusValid && isExplanationCodeValid && isProcedureCodeValid) {
 						PCPValidateResponse pcpValidateResponse = callPCPValidate(contractMemberClaimsEntity, memberClaimEntity, pcpEffectiveDate);
 						String pcpValidationMessage = getPCPValidationMessage(pcpValidateResponse);	
+						log.info("PCP Validation message for claim id "+ contractMemberClaimsEntity.getClaimId() +" is : "+pcpValidationMessage);
 						if (StringUtils.equals(pcpValidateResponse.getProcessStatusCode(), PCP_VALIDATION_SUCCESS)
 								&& StringUtils.equals(StringUtils.trimToEmpty(pcpValidationMessage), StringUtils.trimToEmpty(PCP_VALID_FOR_ENROLLEE))) {
 							MemberProviderEntity memberProviderEntity = saveMemberProvider(contractMemberClaimsEntity.getContractMemberClaimId(), memberClaimEntity.getClaimStatus(), pcpEffectiveDate);

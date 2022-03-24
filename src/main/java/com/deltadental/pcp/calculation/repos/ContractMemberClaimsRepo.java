@@ -22,17 +22,19 @@ public interface ContractMemberClaimsRepo extends JpaRepository<ContractMemberCl
 	
 	List<ContractMemberClaimsEntity> findByClaimIdAndContractIdAndMemberIdAndProviderId(String claimId, String contrctId, String memberId, String providerId);
 	
-	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE  cmc.claimId = :claimId AND  cmc.contractId = :contractId AND  cmc.memberId = :memberId AND  cmc.providerId = :providerId AND cmc.status IS NULL")
-	List<ContractMemberClaimsEntity> findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStatusIsNull(@Param("claimId") String claimId, 
-			@Param("contractId") String contractId, 
-			@Param("memberId") String memberId, 
-			@Param("providerId") String providerId);
-
-	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE  cmc.claimId = :claimId AND  cmc.contractId = :contractId AND  cmc.memberId = :memberId AND  cmc.providerId = :providerId AND cmc.status = :status")
-	List<ContractMemberClaimsEntity> findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStatus(@Param("claimId") String claimId, 
+	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE  cmc.claimId = :claimId AND  cmc.contractId = :contractId AND  cmc.memberId = :memberId AND  cmc.providerId = :providerId AND cmc.state = :state AND cmc.status IS NULL")
+	List<ContractMemberClaimsEntity> findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusIsNull(@Param("claimId") String claimId, 
 			@Param("contractId") String contractId, 
 			@Param("memberId") String memberId, 
 			@Param("providerId") String providerId,
+			@Param("state") String state);
+
+	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE  cmc.claimId = :claimId AND  cmc.contractId = :contractId AND  cmc.memberId = :memberId AND  cmc.providerId = :providerId AND cmc.state = :state AND cmc.status = :status")
+	List<ContractMemberClaimsEntity> findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatus(@Param("claimId") String claimId, 
+			@Param("contractId") String contractId, 
+			@Param("memberId") String memberId, 
+			@Param("providerId") String providerId,
+			@Param("state") String state,
 			@Param("status") String status);
 	
 	List<ContractMemberClaimsEntity> findByStatus(String status);
