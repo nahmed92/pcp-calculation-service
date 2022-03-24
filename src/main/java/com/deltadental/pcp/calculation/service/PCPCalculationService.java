@@ -59,7 +59,7 @@ public class PCPCalculationService {
 
 	private static final String PCP_VALIDATION_SUCCESS = "Success";
 
-//	private static final String PCP_END_DATE_12_31_9999 = "12-31-9999";
+	private static final String PCP_END_DATE_12_31_9999 = "12-31-9999";
 
 	private static final String PCP_STATUS_INITIAL = "INITIAL";
 
@@ -180,7 +180,7 @@ public class PCPCalculationService {
 				.mtvPersonId(memberClaimEntity.getPersonId())
 				.pcpEffDate(pcpEffectiveDate)
 				.product(DC_PRODUCT)
-//				.pcpEndDate(PCP_END_DATE_12_31_9999)
+				.pcpEndDate(PCP_END_DATE_12_31_9999)
 				.providerId(contractMemberClaimsEntity.getProviderId())
 				.recordIdentifier(String.valueOf(random()))
 				.sourceSystem(DCM_SOURCESYSTEM)
