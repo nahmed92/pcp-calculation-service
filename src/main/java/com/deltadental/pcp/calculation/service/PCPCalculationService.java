@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -360,6 +361,9 @@ public class PCPCalculationService {
 				validateProviderMessage = "No claim information found with the claim id : "+ contractMemberClaimsEntity.getClaimId();
 			}
 		} catch (Exception e) {
+			String stacktrace = ExceptionUtils.getStackTrace(e);
+			log.error("Exception trace : "+stacktrace);
+			log.info("Exception trace : "+stacktrace);
 			validateProviderMessage = "Exception occurred during pcp assignment processing.";
 		}
 		contractMemberClaimsEntity.setStatus(validateProviderMessage);
