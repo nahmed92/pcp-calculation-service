@@ -137,6 +137,7 @@ public class PCPCalculationService {
 				.contractId(StringUtils.trimToNull(validateProviderRequest.getContractId()))
 				.memberId(StringUtils.trimToNull(validateProviderRequest.getMemberId()))
 				.providerId(StringUtils.trimToNull(validateProviderRequest.getProviderId()))
+				.state(StringUtils.trimToNull(validateProviderRequest.getState()))
 				.operatorId(StringUtils.trimToNull(validateProviderRequest.getOperatorId()))
 				.build();
 		contractMemberClaimsRepo.save(contractMemberClaimsEntity);
