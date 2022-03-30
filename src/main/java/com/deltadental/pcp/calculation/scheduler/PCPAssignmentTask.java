@@ -10,14 +10,12 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
-
-import javax.transaction.Transactional;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.deltadental.mtv.sync.service.MTVSyncService;
@@ -46,9 +44,10 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Component
 @NoArgsConstructor
 @AllArgsConstructor
+@Component
+@Scope("prototype")
 @Slf4j
 public class PCPAssignmentTask {
 
@@ -97,20 +96,9 @@ public class PCPAssignmentTask {
 	
 	@Autowired
 	private ContractMemberClaimsRepo contractMemberClaimsRepo; 
-
-	@Async
-	public long processPCPAssignment(String state) {
-		long startTime = System.currentTimeMillis();
-		List<ContractMemberClaimsEntity> contractMemberClaimsEntities = contractMemberClaimsRepo.findByStateAndStatus(state, null);
-		if (null != contractMemberClaimsEntities && !contractMemberClaimsEntities.isEmpty()) {
-			contractMemberClaimsEntities.parallelStream().forEach(contractMemberClaim -> processPCPAssignment(contractMemberClaim));
-		}
-		long endTime = System.currentTimeMillis();
-		long seconds = TimeUnit.MILLISECONDS.toSeconds((endTime - startTime));
-		log.info(" Thread Name : " + Thread.currentThread().getName() + " taken to complete process : " + seconds+ "second[s]");
-		return seconds;
-	}
 	
+	private ContractMemberClaimsEntity contractMemberClaimsEntity;
+
 	private String getPCPValidationMessage(PCPValidateResponse pcpValidateResponse) {
 		String pcpValidationMessage = null;
 		if(pcpValidateResponse != null) {
@@ -265,8 +253,8 @@ public class PCPAssignmentTask {
 		return contracts;
 	}
 
-	@Transactional
-	private void processPCPAssignment(ContractMemberClaimsEntity contractMemberClaimsEntity) {
+	public void processPCPAssignment(ContractMemberClaimsEntity contractMemberClaimsEntity) {
+		log.info("START PCPCalculationService.processPCPAssignment");
 		String validateProviderMessage = null;
 		String pcpEffectiveDate = calculatePCPEffectiveDate();
 		try {
@@ -279,23 +267,24 @@ public class PCPAssignmentTask {
 					saveMemberClaimServices(memberClaimEntity, serviceLines);
 					boolean isExplanationCodeValid = pcpConfigData.isExplanationCodeValid(serviceLines);
 					boolean isProcedureCodeValid = pcpConfigData.isProcedureCodeValid(serviceLines);
-					boolean isClaimStatusValid = pcpConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimEntity.getClaimStatus()));
-	
+					boolean isClaimStatusValid = pcpConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimEntity.getClaimStatus()));	
 					if (isClaimStatusValid && isExplanationCodeValid && isProcedureCodeValid) {
 						PCPValidateResponse pcpValidateResponse = callPCPValidate(contractMemberClaimsEntity, memberClaimEntity, pcpEffectiveDate);
-						String pcpValidationMessage = getPCPValidationMessage(pcpValidateResponse);
-	
+						String pcpValidationMessage = getPCPValidationMessage(pcpValidateResponse);	
+						log.info("PCP Validation message for claim id {} is {}.", contractMemberClaimsEntity.getClaimId() , pcpValidationMessage);
 						if (StringUtils.equals(pcpValidateResponse.getProcessStatusCode(), PCP_VALIDATION_SUCCESS)
 								&& StringUtils.equals(StringUtils.trimToEmpty(pcpValidationMessage), StringUtils.trimToEmpty(PCP_VALID_FOR_ENROLLEE))) {
 							MemberProviderEntity memberProviderEntity = saveMemberProvider(contractMemberClaimsEntity.getContractMemberClaimId(), memberClaimEntity.getClaimStatus(), pcpEffectiveDate);
 							ProviderAssignmentRequest providerAssignmentRequest = buildProviderAssignment(contractMemberClaimsEntity, memberClaimEntity, pcpEffectiveDate);
 							ProviderAssignmentResponse providerAssignmentResponse = mtvSyncService.providerAssignment(providerAssignmentRequest);
 							if (StringUtils.equals(providerAssignmentResponse.getReturnCode(), PCP_ASSIGNMENT_OK)) {
-								validateProviderMessage = MEMBER_CONTRACT_CLAIM_PROCESSED;
-								memberProviderRepo.setStatus(memberProviderEntity.getMemberProviderId(), PCP_ASSIGNED);
+								validateProviderMessage = PCP_ASSIGNED;
+								memberProviderRepo.setStatus(memberProviderEntity.getMemberProviderId(), validateProviderMessage);
+								log.info("PCP Assignment status for claim id {} is {}.", contractMemberClaimsEntity.getClaimId() , validateProviderMessage);
 							} else {
 								validateProviderMessage = providerAssignmentResponse.getErrorMessage();
-								memberProviderRepo.setStatus(memberProviderEntity.getMemberProviderId(), PCP_ASSIGNMENT_FAILED);
+								memberProviderRepo.setStatus(memberProviderEntity.getMemberProviderId(), validateProviderMessage);
+								log.info("PCP Assignment status for claim id {} is {}.", contractMemberClaimsEntity.getClaimId() , validateProviderMessage);
 							}
 						} else {
 							validateProviderMessage = pcpValidationMessage;
@@ -312,8 +301,7 @@ public class PCPAssignmentTask {
 							} else {
 								validateProviderMessage = "One of the Service Line Explanation Code is not valid for this claim!";
 							}
-						}
-	
+						}	
 						if (!isProcedureCodeValid) {
 							if (StringUtils.isNotBlank(validateProviderMessage)) {
 								validateProviderMessage = String.join(", ", validateProviderMessage, "One of the Service Line Procedure Code is not valid for this claim!");
@@ -321,17 +309,21 @@ public class PCPAssignmentTask {
 								validateProviderMessage = "One of the Service Line Procedure Code is not valid for this claim!";
 							}
 						}
+						log.info("PCP Assignment status for claim id {} is {}.", contractMemberClaimsEntity.getClaimId() , validateProviderMessage);
 					}
 				} else {
-					validateProviderMessage = "No services are done for this claim information found with the claim id : "+ contractMemberClaimsEntity.getClaimId();
+					validateProviderMessage = "Service Line Items are empty for claim id is"+contractMemberClaimsEntity.getClaimId();
 				}
 			} else {
-				validateProviderMessage = "No claim information found with the claim id : "+ contractMemberClaimsEntity.getClaimId();
+				validateProviderMessage = "Claim information not found for claim id : "+ contractMemberClaimsEntity.getClaimId();
 			}
 		} catch (Exception e) {
-			validateProviderMessage = e.getMessage();
+			String stacktrace = ExceptionUtils.getStackTrace(e);
+			log.error("Exception processing pcp assingment request.", stacktrace);
+			validateProviderMessage = "Exception occurred ."+e.getMessage();
 		}
 		contractMemberClaimsEntity.setStatus(validateProviderMessage);
 		contractMemberClaimsRepo.setStatus(contractMemberClaimsEntity.getContractMemberClaimId(), validateProviderMessage);
-	}	
+		log.info("END PCPCalculationService.processPCPAssignment");
+	}
 }

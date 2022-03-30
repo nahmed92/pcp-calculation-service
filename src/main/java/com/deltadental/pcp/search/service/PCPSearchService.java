@@ -51,9 +51,9 @@ public class PCPSearchService {
 			setMessageConverter(restTemplate);
 			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.POST,  new HttpEntity<>(pcpAssignmentRequest, headers), PCPAssignmentResponse.class);
 		} catch (RestClientException e) {
-			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+			throw PCPCalculationServiceErrors.PCP_SEARCH_SERVICE_ERROR.createException(e.getMessage());
 		} catch (URISyntaxException e) {
-			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+			throw PCPCalculationServiceErrors.PCP_SEARCH_SERVICE_ERROR.createException(e.getMessage());
 		}
 		if(responseEntity.getStatusCode() == HttpStatus.OK) {
 			return responseEntity.getBody();
@@ -75,10 +75,10 @@ public class PCPSearchService {
 			setMessageConverter(restTemplate);
 			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.POST,  new HttpEntity<>(pcpValidateRequest, headers), PCPValidateResponse.class);
 		} catch (RestClientException e) {
-			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+			throw PCPCalculationServiceErrors.PCP_SEARCH_SERVICE_ERROR.createException(e.getMessage());
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
-			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+			throw PCPCalculationServiceErrors.PCP_SEARCH_SERVICE_ERROR.createException(e.getMessage());
 		}
 		if(responseEntity.getStatusCode() == HttpStatus.OK) {
 			return responseEntity.getBody();

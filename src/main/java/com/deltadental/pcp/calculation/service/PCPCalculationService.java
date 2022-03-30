@@ -33,6 +33,7 @@ import com.deltadental.pcp.calculation.repos.ContractMemberClaimsRepo;
 import com.deltadental.pcp.calculation.repos.MemberClaimRepo;
 import com.deltadental.pcp.calculation.repos.MemberClaimServicesRepo;
 import com.deltadental.pcp.calculation.repos.MemberProviderRepo;
+import com.deltadental.pcp.calculation.scheduler.PCPCalculationServiceScheduler;
 import com.deltadental.pcp.search.service.PCPSearchService;
 import com.deltadental.pcp.search.service.PCPValidateResponse;
 import com.deltadental.pcp.search.service.PcpValidateRequest;
@@ -49,9 +50,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PCPCalculationService {
 
-	private static final String MEMBER_CONTRACT_CLAIM_PROCESSED = "PROCESSED";
-
-	private static final String PCP_ASSIGNMENT_FAILED = "PCP ASSIGNMENT FAILED";
+//	private static final String MEMBER_CONTRACT_CLAIM_PROCESSED = "PROCESSED";
+//
+//	private static final String PCP_ASSIGNMENT_FAILED = "PCP ASSIGNMENT FAILED";
 
 	private static final String PCP_ASSIGNED = "PCP ASSIGNED";
 
@@ -94,16 +95,20 @@ public class PCPCalculationService {
 	
 	@Autowired
 	private ContractMemberClaimsRepo contractMemberClaimsRepo; 
+	
+	@Autowired
+	private PCPCalculationServiceScheduler pcpCalculationServiceScheduler; 
 
 	public void assignPCPsToMembers() {
 		log.info("START PCPCalculationService.assignPCPsToMembers");
-		// Step#1
-		List<ContractMemberClaimsEntity> contractMemberClaimsEntities = contractMemberClaimsRepo.findByStatus(null);
-		if (contractMemberClaimsEntities != null && !contractMemberClaimsEntities.isEmpty()) {
-			contractMemberClaimsEntities.forEach(contractMemberClaim -> {
-				processPCPAssignment(contractMemberClaim);
-			});
-		}
+//		// Step#1
+//		List<ContractMemberClaimsEntity> contractMemberClaimsEntities = contractMemberClaimsRepo.findByStatus(null);
+//		if (contractMemberClaimsEntities != null && !contractMemberClaimsEntities.isEmpty()) {
+//			contractMemberClaimsEntities.forEach(contractMemberClaim -> {
+//				processPCPAssignment(contractMemberClaim);
+//			});
+//		}
+		pcpCalculationServiceScheduler.processPendingPCPAssignmentRequest();
 		log.info("END PCPCalculationService.assignPCPsToMembers");
 	}
 	
@@ -333,18 +338,20 @@ public class PCPCalculationService {
 					if (isClaimStatusValid && isExplanationCodeValid && isProcedureCodeValid) {
 						PCPValidateResponse pcpValidateResponse = callPCPValidate(contractMemberClaimsEntity, memberClaimEntity, pcpEffectiveDate);
 						String pcpValidationMessage = getPCPValidationMessage(pcpValidateResponse);	
-						log.info("PCP Validation message for claim id "+ contractMemberClaimsEntity.getClaimId() +" is : "+pcpValidationMessage);
+						log.info("PCP Validation message for claim id {} is {}.", contractMemberClaimsEntity.getClaimId() , pcpValidationMessage);
 						if (StringUtils.equals(pcpValidateResponse.getProcessStatusCode(), PCP_VALIDATION_SUCCESS)
 								&& StringUtils.equals(StringUtils.trimToEmpty(pcpValidationMessage), StringUtils.trimToEmpty(PCP_VALID_FOR_ENROLLEE))) {
 							MemberProviderEntity memberProviderEntity = saveMemberProvider(contractMemberClaimsEntity.getContractMemberClaimId(), memberClaimEntity.getClaimStatus(), pcpEffectiveDate);
 							ProviderAssignmentRequest providerAssignmentRequest = buildProviderAssignment(contractMemberClaimsEntity, memberClaimEntity, pcpEffectiveDate);
 							ProviderAssignmentResponse providerAssignmentResponse = mtvSyncService.providerAssignment(providerAssignmentRequest);
 							if (StringUtils.equals(providerAssignmentResponse.getReturnCode(), PCP_ASSIGNMENT_OK)) {
-								validateProviderMessage = MEMBER_CONTRACT_CLAIM_PROCESSED;
-								memberProviderRepo.setStatus(memberProviderEntity.getMemberProviderId(), PCP_ASSIGNED);
+								validateProviderMessage = PCP_ASSIGNED;
+								memberProviderRepo.setStatus(memberProviderEntity.getMemberProviderId(), validateProviderMessage);
+								log.info("PCP Assignment status for claim id {} is {}.", contractMemberClaimsEntity.getClaimId() , validateProviderMessage);
 							} else {
 								validateProviderMessage = providerAssignmentResponse.getErrorMessage();
-								memberProviderRepo.setStatus(memberProviderEntity.getMemberProviderId(), PCP_ASSIGNMENT_FAILED);
+								memberProviderRepo.setStatus(memberProviderEntity.getMemberProviderId(), validateProviderMessage);
+								log.info("PCP Assignment status for claim id {} is {}.", contractMemberClaimsEntity.getClaimId() , validateProviderMessage);
 							}
 						} else {
 							validateProviderMessage = pcpValidationMessage;
@@ -369,18 +376,18 @@ public class PCPCalculationService {
 								validateProviderMessage = "One of the Service Line Procedure Code is not valid for this claim!";
 							}
 						}
+						log.info("PCP Assignment status for claim id {} is {}.", contractMemberClaimsEntity.getClaimId() , validateProviderMessage);
 					}
 				} else {
-					validateProviderMessage = "No services are done for this claim information found with the claim id : "+ contractMemberClaimsEntity.getClaimId();
+					validateProviderMessage = "Service Line Items are empty for claim id is"+contractMemberClaimsEntity.getClaimId();
 				}
 			} else {
-				validateProviderMessage = "No claim information found with the claim id : "+ contractMemberClaimsEntity.getClaimId();
+				validateProviderMessage = "Claim information not found for claim id : "+ contractMemberClaimsEntity.getClaimId();
 			}
 		} catch (Exception e) {
 			String stacktrace = ExceptionUtils.getStackTrace(e);
-			log.error("Exception trace : "+stacktrace);
-			log.info("Exception trace : "+stacktrace);
-			validateProviderMessage = "Exception occurred during pcp assignment processing.";
+			log.error("Exception processing pcp assingment request.", stacktrace);
+			validateProviderMessage = "Exception occurred ."+e.getMessage();
 		}
 		contractMemberClaimsEntity.setStatus(validateProviderMessage);
 		contractMemberClaimsRepo.setStatus(contractMemberClaimsEntity.getContractMemberClaimId(), validateProviderMessage);

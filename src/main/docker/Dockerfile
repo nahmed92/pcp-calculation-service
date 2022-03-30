@@ -52,5 +52,6 @@ ENTRYPOINT java $JAVA_OPTS \
 	-Dmanagement.endpoints.web.path-mapping.health=${MANAGEMENT_ENDPOINTS_WEB_PATH_MAPPING_HEALTH} \
 	-Dmanagement.endpoint.health.enabled=${MANAGEMENT_ENDPOINT_HEALTH_ENABLED} \
 	-Dmanagement.endpoint.health.show-details=${MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS} \
+	-Dpcp.assignment.process.workers.count=${PCP_ASSIGNMENT_PROCESS_WORKERS_COUNT} \
 	-Denvironment=${ENVIRONMENT} \
 	-jar /pcp-calculation-service-3.0.0.jar

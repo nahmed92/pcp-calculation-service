@@ -49,9 +49,9 @@ public class PCPConfigService {
 			setMessageConverter(restTemplate);
 			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
 		} catch (RestClientException e) {
-			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(e.getMessage());
 		} catch (URISyntaxException e) {
-			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(e.getMessage());
 		}
 		if(responseEntity.getStatusCode() == HttpStatus.OK) {
 			return responseEntity.getBody();
@@ -72,9 +72,9 @@ public class PCPConfigService {
 			setMessageConverter(restTemplate);
 			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
 		} catch (RestClientException e) {
-			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(e.getMessage());
 		} catch (URISyntaxException e) {
-			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(e.getMessage());
 		}
 		if(responseEntity.getStatusCode() == HttpStatus.OK) {
 			return responseEntity.getBody();
@@ -95,9 +95,9 @@ public class PCPConfigService {
 			setMessageConverter(restTemplate);
 			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
 		} catch (RestClientException e) {
-			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(e.getMessage());
 		} catch (URISyntaxException e) {
-			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(e.getMessage());
 		}
 		if(responseEntity.getStatusCode() == HttpStatus.OK) {
 			return responseEntity.getBody();
@@ -119,9 +119,9 @@ public class PCPConfigService {
 			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
 		} catch (RestClientException e) {
 			e.printStackTrace();
-			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(e.getMessage());
 		} catch (URISyntaxException e) {
-			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(e.getMessage());
 		}
 		if(responseEntity.getStatusCode() == HttpStatus.OK) {
 			return responseEntity.getBody();
@@ -152,9 +152,9 @@ public class PCPConfigService {
 //		try {
 //			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.POST,  new HttpEntity<>(pcpAssignmentRequest, headers), PCPValidateResponse.class);
 //		} catch (RestClientException e) {
-//			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+//			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(e.getMessage());
 //		} catch (URISyntaxException e) {
-//			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+//			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(e.getMessage());
 //		}
 //		if(responseEntity.getStatusCode() == HttpStatus.OK) {
 //			return responseEntity.getBody();
@@ -175,9 +175,9 @@ public class PCPConfigService {
 //		try {
 //			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.POST,  new HttpEntity<>(pcpAssignmentRequest, headers), PCPValidateResponse.class);
 //		} catch (RestClientException e) {
-//			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+//			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(e.getMessage());
 //		} catch (URISyntaxException e) {
-//			throw PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.createException(e.getMessage());
+//			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(e.getMessage());
 //		}
 //		if(responseEntity.getStatusCode() == HttpStatus.OK) {
 //			return responseEntity.getBody();
