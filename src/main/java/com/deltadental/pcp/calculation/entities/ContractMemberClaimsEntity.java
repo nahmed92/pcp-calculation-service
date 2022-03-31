@@ -11,7 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -68,4 +67,7 @@ public class ContractMemberClaimsEntity implements Serializable {
 	@Column(name = "last_maint_ts")
 	@UpdateTimestamp
 	private Date lastMaintTs;
+	
+	@Column(name = "INSTANCE_ID")
+	private String instanceId;
 }

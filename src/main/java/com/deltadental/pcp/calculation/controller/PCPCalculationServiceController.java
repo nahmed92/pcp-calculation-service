@@ -44,7 +44,7 @@ public class PCPCalculationServiceController {
 
 	@Autowired
 	PCPCalculationService pcpCalculationService;
-
+	
 	@ApiOperation(
 			value = PCPCalculationServiceConstants.SUMMARY_MEMBER_CONTRACT_CLAIM, 
 			notes = PCPCalculationServiceConstants.SUMMARY_MEMBER_CONTRACT_CLAIM_NOTES, 
