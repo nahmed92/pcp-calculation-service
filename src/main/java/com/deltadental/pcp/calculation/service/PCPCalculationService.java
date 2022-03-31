@@ -112,7 +112,7 @@ public class PCPCalculationService {
 //				processPCPAssignment(contractMemberClaim);
 //			});
 //		}
-//		pcpCalculationServiceScheduler.processPendingPCPAssignmentRequest();
+		pcpCalculationServiceScheduler.processPendingPCPAssignmentRequest();
 		log.info("END PCPCalculationService.assignPCPsToMembers");
 	}
 	
