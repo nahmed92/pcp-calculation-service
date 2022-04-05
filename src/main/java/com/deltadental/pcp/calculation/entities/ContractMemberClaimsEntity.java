@@ -1,7 +1,7 @@
 package com.deltadental.pcp.calculation.entities;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,8 +27,8 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity
 @Table(name = "CONTRACT_MEMBER_CLAIMS", schema = "dbo")
+@Entity
 public class ContractMemberClaimsEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -40,34 +40,34 @@ public class ContractMemberClaimsEntity implements Serializable {
 
 	@Column(name = "CLAIM_ID")
 	private String claimId;
-	
+
 	@Column(name = "CONTRACT_ID")
 	private String contractId;
-	
+
 	@Column(name = "MEMBER_ID")
 	private String memberId;
-	
+
 	@Column(name = "PROVIDER_ID")
 	private String providerId;
-	
-	@Column(name = "state")
+
+	@Column(name = "STATE")
 	private String state;
-	
-	@Column(name = "status")
-	@Type(type="org.hibernate.type.StringNVarcharType")
+
+	@Column(name = "STATUS")
+	@Type(type = "org.hibernate.type.StringNVarcharType")
 	private String status;
-	
+
 	@Column(name = "operator_id")
 	private String operatorId;
-	
-	@Column(name = "creation_ts")
-	@CreationTimestamp
-	private Date crationTs;
 
-	@Column(name = "last_maint_ts")
+	@CreationTimestamp
+	@Column(name = "CREATION_TS", nullable = false, updatable = false)
+	private Timestamp crationTs;
+
 	@UpdateTimestamp
-	private Date lastMaintTs;
-	
+	@Column(name = "LAST_MAINT_TS", nullable = false)
+	private Timestamp lastMaintTs;
+
 	@Column(name = "INSTANCE_ID")
 	private String instanceId;
 }

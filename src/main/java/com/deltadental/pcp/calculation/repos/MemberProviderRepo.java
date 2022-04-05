@@ -14,6 +14,6 @@ import com.deltadental.pcp.calculation.entities.MemberProviderEntity;
 public interface MemberProviderRepo extends JpaRepository<MemberProviderEntity, Integer> {
 
 	@Modifying
-	@Query("update MemberProviderEntity mpe set mpe.status = :status WHERE mpe.id = :id")
+	@Query("update MemberProviderEntity mpe set mpe.status = :status, mpe.lastMaintTs = CURRENT_TIMESTAMP WHERE mpe.id = :id")
 	void setStatus(@Param("id") Integer id, @Param("status") String status);
 }

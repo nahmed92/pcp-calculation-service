@@ -1,6 +1,7 @@
 package com.deltadental.pcp.calculation.entities;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -63,17 +64,17 @@ public class MemberClaimServicesEntity implements Serializable {
 	@UpdateTimestamp
 	private Date serviceResolutionTs;
 
-	@Column(name = "CREATION_TS")
 	@CreationTimestamp
-	private Date crationTs;
+	@Column(name = "CREATION_TS", nullable = false, updatable = false)
+	private Timestamp crationTs;
 
-	@Column(name = "LAST_MAINT_TS")
 	@UpdateTimestamp
-	private Date lastMaintTs;
+	@Column(name = "LAST_MAINT_TS", nullable = false)
+	private Timestamp lastMaintTs;
 
 	@Column(name = "OPERATOR_ID")
 	private String operatorId;
 	
 	@Column(name = "MEMBER_CLAIM_ID")
-	private Integer memberClaimId;
+	private Integer memberClaimId;	
 }
