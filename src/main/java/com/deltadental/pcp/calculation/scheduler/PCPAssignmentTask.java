@@ -52,6 +52,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PCPAssignmentTask implements Runnable {
 
+	private static final String OPERATORID_PCPCALS = "PCPCALS";
+
 	private static final String PCP_ASSIGNED = "PCP ASSIGNED";
 
 	private static final String PCP_ASSIGNMENT_OK = "OK";
@@ -143,12 +145,13 @@ public class PCPAssignmentTask implements Runnable {
 																.contractID(contractMemberClaimsEntity.getContractId())
 																.enrolleeNumber(contractMemberClaimsEntity.getMemberId())
 																.pcpEffectiveDate(pcpEffectiveDate)
-																.pcpEndDate(PCP_END_DATE_12_31_9999)
+//																.pcpEndDate(PCP_END_DATE_12_31_9999)
 																.personID(memberClaimEntity.getPersonId())
 																.providerContFlag("N")
 																.providerID(contractMemberClaimsEntity.getProviderId())
 																.reasonCode(REASON_CODE_5NEW)
 																.sourceSystem(DCM_SOURCESYSTEM)
+																.userId(OPERATORID_PCPCALS)
 																.build();
 		return providerAssignmentRequest;
 	}
