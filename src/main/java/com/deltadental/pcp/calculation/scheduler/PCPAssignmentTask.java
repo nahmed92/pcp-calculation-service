@@ -145,7 +145,6 @@ public class PCPAssignmentTask implements Runnable {
 																.contractID(contractMemberClaimsEntity.getContractId())
 																.enrolleeNumber(contractMemberClaimsEntity.getMemberId())
 																.pcpEffectiveDate(pcpEffectiveDate)
-//																.pcpEndDate(PCP_END_DATE_12_31_9999)
 																.personID(memberClaimEntity.getPersonId())
 																.providerContFlag("N")
 																.providerID(contractMemberClaimsEntity.getProviderId())
@@ -175,6 +174,7 @@ public class PCPAssignmentTask implements Runnable {
 				.resolvedTs(getTimestamp(memberClaimResponse.getResolvedTs().getNanos()))
 				.servicesNumber(memberClaimResponse.getServicesNumber())
 				.contractMemberClaimsId(contractMemberClaimsEntity.getContractMemberClaimId())
+				.operatorId(OPERATORID_PCPCALS)
 				.build();
 		memberClaimRepo.save(memberClaimEntity);
 		return memberClaimEntity;
@@ -193,6 +193,7 @@ public class PCPAssignmentTask implements Runnable {
 						.servicePaidTs(getTimestamp(serviceLine.getServicePaidTs().getNanos()))
 						.serviceResolutionTs(getTimestamp(serviceLine.getServiceResolutionTs().getNanos()))
 						.memberClaimId(memberClaimEntity.getMemberClaimId())
+						.operatorId(OPERATORID_PCPCALS)
 						.build();
 				memberClaimServicesRepo.save(memberClaimServicesEntity);
 			});
@@ -206,6 +207,7 @@ public class PCPAssignmentTask implements Runnable {
 				.reasonCd(REASON_CODE_5NEW)
 				.sourceSystem(DCM_SOURCESYSTEM)
 				.status(PCP_STATUS_INITIAL)
+				.operatorId(OPERATORID_PCPCALS)
 				.contractMemberClaimsId(contractMemberClaimsId)
 				.build();
 		memberProviderRepo.save(memberProviderEntity);

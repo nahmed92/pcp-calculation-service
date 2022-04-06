@@ -44,9 +44,6 @@ public class MemberProviderEntity implements Serializable {
 	@Column(name = "PCP_EFFECTIVE_DATE")
 	private String pcpEffectiveDate;
 	
-	@Column(name = "PCP_END_DATE")
-	private String pcpEndDate;
-
 	@Column(name = "REASON_CD")
 	private String reasonCd;
 
@@ -56,9 +53,6 @@ public class MemberProviderEntity implements Serializable {
 	@Column(name = "STATUS")
 	@Type(type="org.hibernate.type.StringNVarcharType")
 	private String status;
-
-	@Column(name = "ZIP_CODE")
-	private String zipCode;
 	
 	@CreationTimestamp
 	@Column(name = "CREATION_TS", nullable = false, updatable = false)

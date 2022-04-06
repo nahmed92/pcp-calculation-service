@@ -186,7 +186,6 @@ public class PCPCalculationService {
 				.mtvPersonId(memberClaimEntity.getPersonId())
 				.pcpEffDate(pcpEffectiveDate)
 				.product(DC_PRODUCT)
-				.pcpEndDate(PCP_END_DATE_12_31_9999)
 				.providerId(contractMemberClaimsEntity.getProviderId())
 				.recordIdentifier(String.valueOf(random()))
 				.sourceSystem(DCM_SOURCESYSTEM)
