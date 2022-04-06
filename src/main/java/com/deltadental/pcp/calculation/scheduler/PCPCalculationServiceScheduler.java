@@ -20,7 +20,7 @@ public class PCPCalculationServiceScheduler {
 	@Autowired
 	private PCPCalculationServiceWorker worker;
 
-	@Scheduled(cron = "*/30 * * * *", zone = "America/Los_Angeles")
+	@Scheduled(cron = "* */30 * * * *", zone = "America/Los_Angeles")
 	@Synchronized
 	public void processPendingPCPAssignmentRequest() {
 		log.info("START PCPCalculationServiceScheduler.processPendingPCPAssignmentRequest()");
