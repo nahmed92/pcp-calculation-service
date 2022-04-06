@@ -24,14 +24,21 @@ import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
+import lombok.extern.slf4j.Slf4j;
+
 @SpringBootApplication
-//@EnableScheduling
+@EnableScheduling
+@EnableAsync
+@Slf4j
 @ComponentScan(basePackages = { "com.deltadental.*" })
 public class PCPCalculationServiceApplication {
 
 	public static void main(String[] args) {
+		log.info("Starting PCP Calculation Service");
 		SpringApplication.run(PCPCalculationServiceApplication.class, args);
 	}
 
