@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.deltadental.mtv.sync.service.ServiceLine;
@@ -18,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
 @Data
@@ -50,6 +52,21 @@ public class PCPConfigData implements InitializingBean {
 		log.info("Explanation codes list size : "+explanationCodes.size());
 		procedureCodes();
 		log.info("Procedure codes list size : "+procedureCodes.size());
+	}
+	
+	@Scheduled(cron = "0 0 0/12 * * ?", zone = "America/Los_Angeles")
+	@Synchronized
+	public void refreshPCPConfigData() {
+		claimStatusList.clear();
+		procedureCodes.clear();
+		explanationCodes.clear();
+		log.info("Cleared all the pcp config data!");
+		claimStatuses();
+		log.info("Refreshed Claim status list size : "+claimStatusList.size());
+		explanationCodes();
+		log.info("Refreshed Explanation codes list size : "+explanationCodes.size());
+		procedureCodes();
+		log.info("Refreshed Procedure codes list size : "+procedureCodes.size());
 	}
 
 	private List<PcpConfigResponse> getPcpConfigResponseList(String jsonString) {
