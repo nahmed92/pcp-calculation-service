@@ -1,5 +1,6 @@
 package com.deltadental.pcp.calculation.scheduler;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -11,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
+import com.deltadental.pcp.calculation.controller.STATUS;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimsEntity;
 import com.deltadental.pcp.calculation.repos.ContractMemberClaimsRepo;
 
@@ -35,9 +36,6 @@ public class PCPCalculationServiceWorker {
 	private String serviceInstanceId;
 
 	private Executor executor;
-
-	@Autowired
-	private RestTemplate restTemplate;
 	
 	@Autowired
 	private ContractMemberClaimsRepo contractMemberClaimsRepo;
@@ -56,7 +54,6 @@ public class PCPCalculationServiceWorker {
 		log.info("START PCPCalculationServiceWorker.submitTask()");
 		if (null != contractMemberClaimsEntity) {
 			PCPAssignmentTask pcpAssignmentTask = createTask();
-			pcpAssignmentTask.setRestTemplate(restTemplate);
 			pcpAssignmentTask.setContractMemberClaimsEntity(contractMemberClaimsEntity);
 			executor.execute(pcpAssignmentTask);
 		}
@@ -65,7 +62,11 @@ public class PCPCalculationServiceWorker {
 
 	public void processPCPAssignmentRequests() {
 		log.info("START PCPCalculationServiceWorker.processPCPAssignmentRequests()");
-		List<ContractMemberClaimsEntity> contractMemberClaimsEntities = contractMemberClaimsRepo.findByInstanceIdWhereStatusIsNull(serviceInstanceId);
+		List<String> statusList = new ArrayList<>();
+		statusList.add(STATUS.RETRY.getStatus());
+		statusList.add(STATUS.STAGED.getStatus());
+		statusList.add(STATUS.VALIDATED.getStatus());
+		List<ContractMemberClaimsEntity> contractMemberClaimsEntities = contractMemberClaimsRepo.findByInstanceIdWhereStatusIsNull(serviceInstanceId, statusList);
 		if (CollectionUtils.isNotEmpty(contractMemberClaimsEntities)) {
 			log.info("Processing total {} pcp assignment requests on service instance {} ",
 					contractMemberClaimsEntities.size(), serviceInstanceId);

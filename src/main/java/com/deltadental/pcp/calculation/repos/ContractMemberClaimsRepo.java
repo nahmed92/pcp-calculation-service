@@ -21,12 +21,13 @@ public interface ContractMemberClaimsRepo extends JpaRepository<ContractMemberCl
 	
 	List<ContractMemberClaimsEntity> findByClaimIdAndContractIdAndMemberIdAndProviderId(String claimId, String contrctId, String memberId, String providerId);
 	
-	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE  cmc.claimId = :claimId AND  cmc.contractId = :contractId AND  cmc.memberId = :memberId AND  cmc.providerId = :providerId AND cmc.state = :state AND cmc.status IS NULL")
-	List<ContractMemberClaimsEntity> findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusIsNull(@Param("claimId") String claimId, 
+	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE  cmc.claimId = :claimId AND  cmc.contractId = :contractId AND  cmc.memberId = :memberId AND  cmc.providerId = :providerId AND cmc.state = :state AND (cmc.status IS NULL OR cmc.status = :status)")
+	List<ContractMemberClaimsEntity> findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusIsNullOrValue(@Param("claimId") String claimId, 
 			@Param("contractId") String contractId, 
 			@Param("memberId") String memberId, 
 			@Param("providerId") String providerId,
-			@Param("state") String state);
+			@Param("state") String state,
+			@Param("status") String status);
 
 	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE  cmc.claimId = :claimId AND  cmc.contractId = :contractId AND  cmc.memberId = :memberId AND  cmc.providerId = :providerId AND cmc.state = :state AND cmc.status = :status")
 	List<ContractMemberClaimsEntity> findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatus(@Param("claimId") String claimId, 
@@ -43,8 +44,8 @@ public interface ContractMemberClaimsRepo extends JpaRepository<ContractMemberCl
 	@Query("SELECT DISTINCT cmc.state FROM ContractMemberClaimsEntity cmc WHERE cmc.status is null")
 	List<String> findDistinctStateWhereStatusIsNull();
 	
-	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE cmc.instanceId = :instanceId AND cmc.status is null")
-	List<ContractMemberClaimsEntity> findByInstanceIdWhereStatusIsNull(@Param("instanceId") String instanceId);
+	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE cmc.instanceId = :instanceId AND cmc.status in :statusList")
+	List<ContractMemberClaimsEntity> findByInstanceIdWhereStatusIsNull(@Param("instanceId") String instanceId, List<String> statusList);
 	
 	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE cmc.instanceId = :instanceId AND cmc.status = :status")
 	List<ContractMemberClaimsEntity> findByInstanceIdAndStatus(@Param("instanceId") String instanceId, @Param("status") String status);

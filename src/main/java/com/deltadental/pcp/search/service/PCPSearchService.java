@@ -3,6 +3,7 @@ package com.deltadental.pcp.search.service;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -19,12 +20,11 @@ import com.deltadental.pcp.calculation.error.PCPCalculationServiceErrors;
 import com.deltadental.pcp.search.service.pojos.PCPAssignmentResponse;
 import com.deltadental.pcp.search.service.pojos.PcpAssignmentRequest;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@AllArgsConstructor
+//@AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Service("pcpSearchService")
@@ -34,6 +34,7 @@ public class PCPSearchService {
 	@Value("${pcp.search.service.endpoint}")
 	private String pcpSearchServiceEndpoint;
 
+	@Autowired(required = true)
 	private RestTemplate restTemplate;
 	
 	public PCPAssignmentResponse validateProvider(PcpAssignmentRequest pcpAssignmentRequest) {

@@ -95,8 +95,8 @@ public class PCPCalculationServiceController {
 	@ApiOperation(
 			value = PCPCalculationServiceConstants.PROCESS_PCP_MEMBER_CONTRACT, 
 			notes = PCPCalculationServiceConstants.PROCESS_PCP_MEMBER_CONTRACT_NOTES, 
-			response = Contract.class)
-    @ApiResponses({ @ApiResponse(code = 200, message = "Successfully validated provider.", response = Contract.class),
+			response = MessageResponse.class)
+    @ApiResponses({ @ApiResponse(code = 200, message = "Successfully validated provider.", response = MessageResponse.class),
                     @ApiResponse(code = 400, message = "Bad request.", response = ServiceError.class),
                     @ApiResponse(code = 403, message = "Unauthorized", response = ServiceError.class),
                     @ApiResponse(code = 404, message = "Contracts Processor not found.", response = ServiceError.class),

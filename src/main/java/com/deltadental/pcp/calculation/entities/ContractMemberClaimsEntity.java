@@ -70,4 +70,7 @@ public class ContractMemberClaimsEntity implements Serializable {
 
 	@Column(name = "INSTANCE_ID")
 	private String instanceId;
+	
+	@Column(name = "ERROR_MESSAGE")
+	private String errorMessage;
 }

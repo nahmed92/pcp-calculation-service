@@ -3,6 +3,7 @@ package com.deltadental.mtv.sync.service;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -15,23 +16,21 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.deltadental.pcp.calculation.error.PCPCalculationServiceErrors;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 @Data
 @Service("mtvSyncService")
 @Slf4j
 public class MTVSyncService {
-
 	
 	@Value("${pcp.mtv.sync.service.endpoint}")
 	private String pcpMtvSyncServiceEndpoint;
 
-//	@Autowired(required=true)
+	@Autowired(required=true)
 	private RestTemplate restTemplate;
 	
 	public RetrieveContractResponse retrieveContract(RetrieveContract retrieveContract) {
