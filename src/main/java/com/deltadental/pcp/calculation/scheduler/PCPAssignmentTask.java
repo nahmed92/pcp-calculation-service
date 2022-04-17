@@ -280,7 +280,7 @@ public class PCPAssignmentTask implements Runnable {
 											errorMessage = "pcp update service provider assignmnet returned error, please check logs.";
 										}
 										status = STATUS.ERROR.getStatus();
-										errorMessage = String.join(" : ", providerAssignmentResponse.getErrorCode() , providerAssignmentResponse.getErrorMessage());)
+										errorMessage = String.join(":", providerAssignmentResponse.getErrorCode() , providerAssignmentResponse.getErrorMessage());
 										memberProviderRepo.setStatus(memberProviderEntity.getMemberProviderId(), errorMessage);
 										log.info("PCP Assignment status for claim id {} is {}.", contractMemberClaimsEntity.getClaimId() , status);
 									}
