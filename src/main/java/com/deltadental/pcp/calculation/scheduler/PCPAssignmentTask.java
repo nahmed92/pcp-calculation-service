@@ -272,7 +272,7 @@ public class PCPAssignmentTask implements Runnable {
 									ProviderAssignmentResponse providerAssignmentResponse = mtvSyncService.providerAssignment(providerAssignmentRequest);
 									if (StringUtils.equals(providerAssignmentResponse.getReturnCode(), PCP_ASSIGNMENT_OK)) {
 										status = STATUS.PCP_ASSIGNED.getStatus();
-										memberProviderRepo.setStatus(memberProviderEntity.getMemberProviderId(), errorMessage);
+										memberProviderRepo.setStatus(memberProviderEntity.getMemberProviderId(), status);
 										log.info("PCP Assignment status for claim id {} is {}.", contractMemberClaimsEntity.getClaimId() , status);
 									} else {
 										errorMessage = providerAssignmentResponse.getErrorMessage();
