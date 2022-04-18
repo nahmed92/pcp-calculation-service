@@ -61,7 +61,7 @@ public class PCPCalculationService {
 				StringUtils.trimToNull(validateProviderRequest.getProviderId()),
 				StringUtils.trimToNull(validateProviderRequest.getState()),
 				STATUS.PCP_ASSIGNED.getStatus());
-		if(CollectionUtils.isNotEmpty(memberClaimsEntities)) {
+		if(CollectionUtils.isEmpty(memberClaimsEntities)) {
 			saveAndValidateContractMemberClaims(validateProviderRequest);
 			log.info("Record inserted in contract member claims table : "+validateProviderRequest.toString());
 		} else {
