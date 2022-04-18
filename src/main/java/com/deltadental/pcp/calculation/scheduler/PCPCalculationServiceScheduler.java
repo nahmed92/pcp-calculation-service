@@ -20,7 +20,8 @@ public class PCPCalculationServiceScheduler {
 	@Autowired
 	private PCPCalculationServiceWorker worker;
 
-	@Scheduled(cron = "${pcp.calculation.corn.job.scheduler}", zone = "${pcp.calculation.job.scheduler.zone}")
+//	@Scheduled(cron = "${pcp.calculation.corn.job.scheduler}", zone = "${pcp.calculation.job.scheduler.zone}")
+	@Scheduled(cron = "* */30 * * * *", zone = "America/Los_Angeles")
 	@Synchronized
 	public void processPendingPCPAssignmentRequest() {
 		log.info("START PCPCalculationServiceScheduler.processPendingPCPAssignmentRequest()");

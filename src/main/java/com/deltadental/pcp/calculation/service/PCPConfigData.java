@@ -54,7 +54,7 @@ public class PCPConfigData implements InitializingBean {
 		log.info("Procedure codes list size : "+procedureCodes.size());
 	}
 	
-	@Scheduled(cron = "${pcp.config.corn.job.scheduler}", zone = "${pcp.calculation.job.scheduler.zone}")
+	@Scheduled(cron = "* * 2 * * *", zone = "America/Los_Angeles")
 	@Synchronized
 	public void refreshPCPConfigData() {
 		claimStatusList.clear();
