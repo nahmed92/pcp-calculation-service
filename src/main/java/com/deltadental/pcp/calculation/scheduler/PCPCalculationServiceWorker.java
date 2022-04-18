@@ -66,7 +66,7 @@ public class PCPCalculationServiceWorker {
 		statusList.add(STATUS.RETRY.getStatus());
 		statusList.add(STATUS.STAGED.getStatus());
 		statusList.add(STATUS.VALIDATED.getStatus());
-		List<ContractMemberClaimsEntity> contractMemberClaimsEntities = contractMemberClaimsRepo.findByInstanceIdWhereStatusIsNull(serviceInstanceId, statusList);
+		List<ContractMemberClaimsEntity> contractMemberClaimsEntities = contractMemberClaimsRepo.findByInstanceIdWhereStatusInList(serviceInstanceId, statusList);
 		if (CollectionUtils.isNotEmpty(contractMemberClaimsEntities)) {
 			log.info("Processing total {} pcp assignment requests on service instance {} ",
 					contractMemberClaimsEntities.size(), serviceInstanceId);

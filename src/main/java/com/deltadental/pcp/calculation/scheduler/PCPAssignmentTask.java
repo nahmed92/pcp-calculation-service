@@ -341,6 +341,7 @@ public class PCPAssignmentTask implements Runnable {
 		}
 		contractMemberClaimsEntity.setErrorMessage(errorMessage);
 		contractMemberClaimsEntity.setStatus(status);
+		contractMemberClaimsRepo.save(contractMemberClaimsEntity);
 		log.info("END PCPCalculationService.processPCPAssignment");
 	}
 

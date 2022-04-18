@@ -11,7 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.AllArgsConstructor;
@@ -51,7 +50,6 @@ public class MemberProviderEntity implements Serializable {
 	private String sourceSystem;
 
 	@Column(name = "STATUS")
-	@Type(type="org.hibernate.type.StringNVarcharType")
 	private String status;
 	
 	@CreationTimestamp

@@ -11,7 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.AllArgsConstructor;
@@ -54,7 +53,6 @@ public class ContractMemberClaimsEntity implements Serializable {
 	private String state;
 
 	@Column(name = "STATUS")
-	@Type(type = "org.hibernate.type.StringNVarcharType")
 	private String status;
 
 	@Column(name = "operator_id")

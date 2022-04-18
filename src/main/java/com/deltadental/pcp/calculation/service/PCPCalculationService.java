@@ -1,5 +1,6 @@
 package com.deltadental.pcp.calculation.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -46,6 +47,15 @@ public class PCPCalculationService {
 	@Value("${service.instance.id}")
 	private String serviceInstanceId;
 
+	private static final List<String> statusList = new ArrayList<>();
+	
+	static {
+		statusList.add(STATUS.RETRY.getStatus());
+		statusList.add(STATUS.STAGED.getStatus());
+		statusList.add(STATUS.VALIDATED.getStatus());
+		statusList.add(STATUS.PCP_ASSIGNED.getStatus());
+	}
+	
 	public void assignPCPsToMembers() {
 		log.info("START PCPCalculationService.assignPCPsToMembers");
 		pcpCalculationServiceScheduler.processPendingPCPAssignmentRequest();
@@ -54,13 +64,13 @@ public class PCPCalculationService {
 	
 	public void stageMemberContractClaimRecord(MemberContractClaimRequest validateProviderRequest) {
 		log.info("START PCPCalculationService.assignMemberPCP");
-		List<ContractMemberClaimsEntity> memberClaimsEntities = contractMemberClaimsRepo.findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusIsNullOrValue(
+		List<ContractMemberClaimsEntity> memberClaimsEntities = contractMemberClaimsRepo.findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
 				StringUtils.trimToNull(validateProviderRequest.getClaimId()), 
 				StringUtils.trimToNull(validateProviderRequest.getContractId()), 
 				StringUtils.trimToNull(validateProviderRequest.getMemberId()), 
 				StringUtils.trimToNull(validateProviderRequest.getProviderId()),
 				StringUtils.trimToNull(validateProviderRequest.getState()),
-				STATUS.PCP_ASSIGNED.getStatus());
+				statusList);
 		if(CollectionUtils.isEmpty(memberClaimsEntities)) {
 			saveAndValidateContractMemberClaims(validateProviderRequest);
 			log.info("Record inserted in contract member claims table : "+validateProviderRequest.toString());
