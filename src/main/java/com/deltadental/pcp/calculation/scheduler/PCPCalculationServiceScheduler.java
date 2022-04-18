@@ -1,11 +1,13 @@
 package com.deltadental.pcp.calculation.scheduler;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -18,8 +20,8 @@ public class PCPCalculationServiceScheduler {
 	@Autowired
 	private PCPCalculationServiceWorker worker;
 
-//	@Scheduled(cron = "${pcp.calculation.corn.job.scheduler}", zone = "${pcp.calculation.job.scheduler.zone}")
-//	@Synchronized
+	@Scheduled(cron = "${pcp.calculation.corn.job.scheduler}", zone = "${pcp.calculation.job.scheduler.zone}")
+	@Synchronized
 	public void processPendingPCPAssignmentRequest() {
 		log.info("START PCPCalculationServiceScheduler.processPendingPCPAssignmentRequest()");
 		worker.processPCPAssignmentRequests();

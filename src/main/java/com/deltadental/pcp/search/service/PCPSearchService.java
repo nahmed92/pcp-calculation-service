@@ -3,6 +3,7 @@ package com.deltadental.pcp.search.service;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -24,7 +25,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-//@AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Service("pcpSearchService")
@@ -44,17 +44,15 @@ public class PCPSearchService {
 		String uriBuilder = builder.build().encode().toUriString();
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		ResponseEntity<PCPAssignmentResponse> responseEntity = null;
 		try {
-			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.POST,  new HttpEntity<>(pcpAssignmentRequest, headers), PCPAssignmentResponse.class);
-		} catch (RestClientException e) {
-			throw PCPCalculationServiceErrors.PCP_SEARCH_SERVICE_ERROR.createException(e.getMessage());
-		} catch (URISyntaxException e) {
-			throw PCPCalculationServiceErrors.PCP_SEARCH_SERVICE_ERROR.createException(e.getMessage());
+			ResponseEntity<PCPAssignmentResponse> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.POST,  new HttpEntity<>(pcpAssignmentRequest, headers), PCPAssignmentResponse.class);
+			if(responseEntity.getStatusCode() == HttpStatus.OK) {
+				return responseEntity.getBody();
+			} 
+		} catch (RestClientException | URISyntaxException e) {
+			String stacktrace = ExceptionUtils.getStackTrace(e);
+			throw PCPCalculationServiceErrors.PCP_SEARCH_SERVICE_ERROR.createException(stacktrace);
 		}
-		if(responseEntity.getStatusCode() == HttpStatus.OK) {
-			return responseEntity.getBody();
-		} 
 		log.info("END PCPSearchService.validateProvider");
 		return null;
 	}
@@ -67,18 +65,15 @@ public class PCPSearchService {
 		String uriBuilder = builder.build().encode().toUriString();
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		ResponseEntity<PCPValidateResponse> responseEntity = null;
 		try {
-			responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.POST,  new HttpEntity<>(pcpValidateRequest, headers), PCPValidateResponse.class);
-		} catch (RestClientException e) {
-			throw PCPCalculationServiceErrors.PCP_SEARCH_SERVICE_ERROR.createException(e.getMessage());
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			throw PCPCalculationServiceErrors.PCP_SEARCH_SERVICE_ERROR.createException(e.getMessage());
+			ResponseEntity<PCPValidateResponse> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.POST,  new HttpEntity<>(pcpValidateRequest, headers), PCPValidateResponse.class);
+			if(responseEntity.getStatusCode() == HttpStatus.OK) {
+				return responseEntity.getBody();
+			}
+		} catch (RestClientException | URISyntaxException e) {
+			String stacktrace = ExceptionUtils.getStackTrace(e);
+			throw PCPCalculationServiceErrors.PCP_SEARCH_SERVICE_ERROR.createException(stacktrace);
 		}
-		if(responseEntity.getStatusCode() == HttpStatus.OK) {
-			return responseEntity.getBody();
-		} 
 		log.info("END PCPSearchService.validateProvider");
 		return null;
 	}

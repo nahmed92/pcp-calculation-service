@@ -3,6 +3,7 @@ package com.deltadental.mtv.sync.service;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -21,7 +22,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @NoArgsConstructor
-//@AllArgsConstructor
 @Data
 @Service("mtvSyncService")
 @Slf4j
@@ -40,17 +40,13 @@ public class MTVSyncService {
 		String uriBuilder = builder.build().encode().toUriString();
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		
-		// Create the request body by wrapping
-        // the object in HttpEntity 
         HttpEntity<RetrieveContract> request = new HttpEntity<RetrieveContract>(retrieveContract, headers);
 		try {
 			ResponseEntity<RetrieveContractResponse> retrieveContractResponse = restTemplate.postForEntity(new URI(uriBuilder), request, RetrieveContractResponse.class);
 			return retrieveContractResponse.getBody();
-		} catch (RestClientException e) {
-			throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException(e.getMessage());
-		} catch (URISyntaxException e) {
-			throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException(e.getMessage());
+		} catch (RestClientException | URISyntaxException e) {
+			String stacktrace = ExceptionUtils.getStackTrace(e);
+			throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException(stacktrace);
 		}
 	}
 	
@@ -65,13 +61,11 @@ public class MTVSyncService {
 		try {
 			ResponseEntity<RetrieveEligibilitySummaryResponse> responseEntity = restTemplate.postForEntity(new URI(uriBuilder),  request, RetrieveEligibilitySummaryResponse.class);
 			return responseEntity.getBody();
-		} catch (RestClientException e) {
-			throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException(e.getMessage());
-		} catch (URISyntaxException e) {
-			throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException(e.getMessage());
+		} catch (RestClientException | URISyntaxException e) {
+			String stacktrace = ExceptionUtils.getStackTrace(e);
+			throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException(stacktrace);
 		}
 	}
-	
 	
 	public UpdatePCPResponse updatePCPMember(UpdatePCPRequest updatePCP) {
 		log.info("START MTVSyncService.updatePCPMember");
@@ -81,18 +75,14 @@ public class MTVSyncService {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity<UpdatePCPRequest> request = new HttpEntity<UpdatePCPRequest>(updatePCP, headers);
-		UpdatePCPResponse responseEntity = null;
 		try {
-			responseEntity = restTemplate.postForObject(new URI(uriBuilder), request, UpdatePCPResponse.class);
-		} catch (RestClientException e) {
-			throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException(e.getMessage());
-		} catch (URISyntaxException e) {
-			throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException(e.getMessage());
+			UpdatePCPResponse responseEntity = restTemplate.postForObject(new URI(uriBuilder), request, UpdatePCPResponse.class);
+			return responseEntity;
+		} catch (RestClientException | URISyntaxException e) {
+			String stacktrace = ExceptionUtils.getStackTrace(e);
+			throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException(stacktrace);
 		}
-		log.info("END MTVSyncService.updatePCPMember");
-		return responseEntity;
 	}
-	
 
 	public MemberClaimResponse memberClaim(MemberClaimRequest memberClaimRequest) {
 		log.info("START MTVSyncService.memberClaim");
@@ -102,18 +92,15 @@ public class MTVSyncService {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity<MemberClaimRequest> request = new HttpEntity<MemberClaimRequest>(memberClaimRequest, headers);
-		MemberClaimResponse responseEntity = null;
 		try {
-			responseEntity = restTemplate.postForObject(new URI(uriBuilder), request, MemberClaimResponse.class);
-		} catch (RestClientException e) {
-			throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException(e.getMessage());
-		} catch (URISyntaxException e) {
-			throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException(e.getMessage());
+			MemberClaimResponse responseEntity = restTemplate.postForObject(new URI(uriBuilder), request, MemberClaimResponse.class);
+			return responseEntity;
+		} catch (RestClientException | URISyntaxException e) {
+			String stacktrace = ExceptionUtils.getStackTrace(e);
+			throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException(stacktrace);
 		}
-		log.info("END MTVSyncService.memberClaim");
-		return responseEntity;
+		
 	}
-	
 
 	public ProviderAssignmentResponse providerAssignment(ProviderAssignmentRequest providerAssignmentRequest) {
 		log.info("START MTVSyncService.providerAssignment");
@@ -123,15 +110,12 @@ public class MTVSyncService {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity<ProviderAssignmentRequest> request = new HttpEntity<ProviderAssignmentRequest>(providerAssignmentRequest, headers);
-		ProviderAssignmentResponse responseEntity = null;
 		try {
-			responseEntity = restTemplate.postForObject(new URI(uriBuilder), request, ProviderAssignmentResponse.class);
-		} catch (RestClientException e) {
-			throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException(e.getMessage());
-		} catch (URISyntaxException e) {
-			throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException(e.getMessage());
-		}
-		log.info("END MTVSyncService.providerAssignment");
-		return responseEntity;
+			ProviderAssignmentResponse responseEntity = restTemplate.postForObject(new URI(uriBuilder), request, ProviderAssignmentResponse.class);
+			return responseEntity;
+		} catch (RestClientException | URISyntaxException e) {
+			String stacktrace = ExceptionUtils.getStackTrace(e);
+			throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException(stacktrace);
+		}		
 	}
 }
