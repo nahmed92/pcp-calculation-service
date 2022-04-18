@@ -273,7 +273,6 @@
 		        </exclusion>
 			</exclusions>
 		</dependency>
-
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
@@ -362,7 +361,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${maven-compiler.version}</version>
 				<configuration>
 					<release>11</release>
 					<forceJavacCompilerUse>true</forceJavacCompilerUse>
@@ -387,27 +385,6 @@
 			</plugin>
 			<!-- End Docker image creation -->
 
-			<!-- <plugin>
-				<groupId>org.jvnet.jaxb2.maven2</groupId>
-				<artifactId>maven-jaxb2-plugin</artifactId>
-				<version>0.14.0</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<schemaLanguage>WSDL</schemaLanguage>
-					<generatePackage>com.deltadental.platform.pcp.stub</generatePackage>
-					<generateDirectory>${project.build.directory}/generated/src/main/java</generateDirectory>
-					<schemaDirectory>${project.basedir}/src/main/resources/wsdl/pcp</schemaDirectory>
-					<schemaIncludes>
-			        	<include>*.wsdl</include>
-			       	</schemaIncludes>
-				</configuration>
-			</plugin> -->
 			<!-- Jacoco integration test plugin -->
 			<plugin>
 				<groupId>org.sonarsource.scanner.maven</groupId>
