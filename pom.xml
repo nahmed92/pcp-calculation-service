@@ -13,7 +13,8 @@
 	<artifactId>pcp-calculation-service</artifactId>
 	<version>3.0.0</version>
 	<name>pcp-calculation-service</name>
-	<description>Wrapper Springboot Service for PCP Calculation Service</description>
+	<description>Wrapper Springboot Service for PCP Calculation Service
+	</description>
 	<properties>
 		<service.name>${project.name}</service.name>
 
@@ -30,18 +31,21 @@
 		<json.version>20210307</json.version>
 
 		<lombok.version>1.18.16</lombok.version>
-
+		<sqlserver.version>9.2.0.jre11</sqlserver.version>
 		<!-- Testing framework -->
-		<junit.version>5.5.2</junit.version>
+		<junit.version>4.12</junit.version>
+		<!-- <junit.version>5.5.2</junit.version> -->
 		<junit.platform.version>1.7.1</junit.platform.version>
 
 		<mokito.version>3.1.0</mokito.version>
 
 		<!-- Delta Dental's Platform common library with frequently needed utilities -->
-		<services-common-library-version>1.0.12</services-common-library-version>
+		<services-common-library-version>1.0.12
+		</services-common-library-version>
 
 		<!-- Code Quality modules -->
-		<maven-check-style-plugin-version>2.17</maven-check-style-plugin-version>
+		<maven-check-style-plugin-version>2.17
+		</maven-check-style-plugin-version>
 		<maven-jxr-plugin-version>2.5</maven-jxr-plugin-version>
 
 		<docker.plugin.version>0.2.3</docker.plugin.version>
@@ -57,10 +61,15 @@
 		<sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 		<sonar-jacoco-listeners.version>1.4</sonar-jacoco-listeners.version>
-		<sonar.jacoco.reportPath>${jacoco.outputDir}/${jacoco.out.ut.file}</sonar.jacoco.reportPath>
-		<sonar.surefire.reportsPath>target/surefire-reports</sonar.surefire.reportsPath>
-		<sonar.jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</sonar.jacoco.itReportPath>
-
+		<sonar.jacoco.reportPath>${jacoco.outputDir}/${jacoco.out.ut.file}
+		</sonar.jacoco.reportPath>
+		<sonar.surefire.reportsPath>target/surefire-reports
+		</sonar.surefire.reportsPath>
+		<sonar.jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}
+		</sonar.jacoco.itReportPath>
+		<easymock.version>2.4</easymock.version>
+		<objenesis.version>2.5</objenesis.version>
+		<mockito.version>1.9.5</mockito.version>
 		<checkstyle.version>8.4</checkstyle.version>
 
 		<!-- Logger versions -->
@@ -81,7 +90,14 @@
 	</dependencyManagement>
 
 	<dependencies>
-		
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+		</dependency>
 		<!-- Spring boot Web starter -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -120,13 +136,32 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<exclusions>
+                <exclusion>
+                    <groupId>org.apache.tomcat</groupId>
+                    <artifactId>tomcat-jdbc</artifactId>
+                </exclusion>
+            </exclusions>
 		</dependency>
-		
+
 		<dependency>
-			<groupId>com.microsoft.sqlserver</groupId>
-			<artifactId>mssql-jdbc</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-c3p0</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <version>${sqlserver.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>6.1.5.Final</version>
+        </dependency>
 
 		<!-- Added for actuator -->
 		<dependency>
@@ -167,10 +202,10 @@
 			<artifactId>spring-oxm</artifactId>
 		</dependency>
 		<dependency>
-            <groupId>wsdl4j</groupId>
-            <artifactId>wsdl4j</artifactId>
-        </dependency>
-		
+			<groupId>wsdl4j</groupId>
+			<artifactId>wsdl4j</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
@@ -202,34 +237,34 @@
 		<!-- End of Utils -->
 
 		<dependency>
-		    <groupId>com.sun.xml.bind</groupId>
-		    <artifactId>jaxb-core</artifactId>
-		    <version>2.3.0.1</version>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-core</artifactId>
+			<version>2.3.0.1</version>
 		</dependency>
 		<dependency>
-	        <groupId>javax.xml.bind</groupId>
-	        <artifactId>jaxb-api</artifactId>
-	        <version>2.3.1</version>
-	    </dependency>
-	    <dependency>
-	        <groupId>com.sun.xml.bind</groupId>
-	        <artifactId>jaxb-impl</artifactId>
-	        <version>2.3.1</version>
-	    </dependency>
-		<dependency>
-		    <groupId>org.javassist</groupId>
-		    <artifactId>javassist</artifactId>
-		    <version>3.25.0-GA</version>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.3.1</version>
 		</dependency>
 		<dependency>
-		    <groupId>javax.xml.ws</groupId>
-		    <artifactId>jaxws-api</artifactId>
-		    <version>2.3.1</version>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<version>2.3.1</version>
 		</dependency>
 		<dependency>
-		    <groupId>com.sun.xml.messaging.saaj</groupId>
-		    <artifactId>saaj-impl</artifactId>
-		    <version>1.5.1</version>
+			<groupId>org.javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.25.0-GA</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.xml.ws</groupId>
+			<artifactId>jaxws-api</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.messaging.saaj</groupId>
+			<artifactId>saaj-impl</artifactId>
+			<version>1.5.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -253,6 +288,14 @@
 			<artifactId>validation-api</artifactId>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/junit/junit -->
+		<dependency>
+		    <groupId>junit</groupId>
+		    <artifactId>junit</artifactId>
+		    <version>${junit.version}</version>
+		    <scope>test</scope>
+		</dependency>
+
 		<!-- Testing Dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -268,49 +311,60 @@
 					<artifactId>junit-vintage-engine</artifactId>
 				</exclusion>
 				<exclusion>
-		            <groupId>com.vaadin.external.google</groupId>
-		            <artifactId>android-json</artifactId>
-		        </exclusion>
+					<groupId>com.vaadin.external.google</groupId>
+					<artifactId>android-json</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
+		<!-- <dependency> <groupId>org.junit.jupiter</groupId> <artifactId>junit-jupiter-api</artifactId> 
+			<version>${junit.version}</version> <scope>test</scope> </dependency> <dependency> 
+			<groupId>org.junit.jupiter</groupId> <artifactId>junit-jupiter-engine</artifactId> 
+			<version>${junit.version}</version> <scope>test</scope> </dependency> <dependency> 
+			<groupId>org.junit.platform</groupId> <artifactId>junit-platform-commons</artifactId> 
+			<version>${junit.platform.version}</version> </dependency> <dependency> <groupId>org.junit.platform</groupId> 
+			<artifactId>junit-platform-engine</artifactId> <version>${junit.platform.version}</version> 
+			<scope>test</scope> </dependency> <dependency> <groupId>org.junit.platform</groupId> 
+			<artifactId>junit-platform-launcher</artifactId> <version>${junit.platform.version}</version> 
+			<scope>test</scope> </dependency> -->
+
 		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<version>${junit.version}</version>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<version>2.22.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
-			<version>${junit.version}</version>
+			<groupId>org.objenesis</groupId>
+			<artifactId>objenesis</artifactId>
+			<version>${objenesis.version}</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>org.junit.platform</groupId>
-			<artifactId>junit-platform-commons</artifactId>
-			<version>${junit.platform.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.platform</groupId>
-			<artifactId>junit-platform-engine</artifactId>
-			<version>${junit.platform.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.platform</groupId>
-			<artifactId>junit-platform-launcher</artifactId>
-			<version>${junit.platform.version}</version>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+			<version>${easymock.version}</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
-			<version>1.9.5</version>
+			<version>${mockito.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>com.github.ben-manes.caffeine</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
@@ -436,7 +490,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<configuration>
-					<argLine>--illegal-access=permit -Xmx1024m -XX:MaxPermSize=256m}</argLine>
+					<argLine>--illegal-access=permit -Xmx1024m -XX:MaxPermSize=256m}
+					</argLine>
 					<properties>
 						<property>
 							<name>listener</name>
@@ -539,7 +594,8 @@
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<version>2.22.2</version>
 						<configuration>
-							<argLine>--illegal-access=permit -Xmx1024m -XX:MaxPermSize=256m}</argLine>
+							<argLine>--illegal-access=permit -Xmx1024m -XX:MaxPermSize=256m}
+							</argLine>
 							<properties>
 								<property>
 									<name>listener</name>

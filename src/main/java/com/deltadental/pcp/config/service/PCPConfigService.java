@@ -2,6 +2,8 @@ package com.deltadental.pcp.config.service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,6 +110,56 @@ public class PCPConfigService {
 			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(stacktrace);
 		}
 		log.info("END PCPConfigService.claimStatus");
+		return null;
+	}
+	
+	public InclusionExclusion[] exclusions(String providerId) {
+		log.info("START PCPConfigService.exclusions");
+		final String exclusionsProviderUrl = pcpConfigServiceEndpoint.concat(PCPConfigServiceConstants.EXCLUSIONS_PROVIDER);
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(exclusionsProviderUrl);
+		Map<String, String> params = new HashMap<String, String>();
+	    params.put("providerId", providerId);
+	    URI exclusionsUri = builder.buildAndExpand(params).toUri();
+	    log.info("exclusions uri : "+exclusionsUri);
+	    HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		
+		HttpEntity requestEntity = new HttpEntity<>(headers);
+		try {
+			ResponseEntity<InclusionExclusion[]> responseEntity = this.restTemplate.exchange(exclusionsUri, HttpMethod.GET, requestEntity, InclusionExclusion[].class);
+			if (null != responseEntity && responseEntity.getStatusCode() == HttpStatus.OK) {
+				return responseEntity.getBody();
+			}
+		} catch (RestClientException e) {
+			String stacktrace = ExceptionUtils.getStackTrace(e);
+			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(stacktrace);
+		}		
+		log.info("START PCPConfigService.exclusions");
+		return null;
+	}
+	
+	public InclusionExclusion[] inclusions(String providerId) {
+		log.info("START PCPConfigService.inclusions");
+		final String inclusionsProviderUrl = pcpConfigServiceEndpoint.concat(PCPConfigServiceConstants.INCLUSIONS_PROVIDER);
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(inclusionsProviderUrl);
+		Map<String, String> params = new HashMap<String, String>();
+	    params.put("providerId", providerId);
+	    URI inclusionsUri = builder.buildAndExpand(params).toUri();
+	    log.info("exclusions uri : "+inclusionsUri);
+	    HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		
+		HttpEntity requestEntity = new HttpEntity<>(headers);
+		try {
+			ResponseEntity<InclusionExclusion[]> responseEntity = this.restTemplate.exchange(inclusionsUri, HttpMethod.GET, requestEntity, InclusionExclusion[].class);
+			if (null != responseEntity && responseEntity.getStatusCode() == HttpStatus.OK) {
+				return responseEntity.getBody();
+			}
+		} catch (RestClientException e) {
+			String stacktrace = ExceptionUtils.getStackTrace(e);
+			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(stacktrace);
+		}		
+		log.info("START PCPConfigService.inclusions");
 		return null;
 	}
 }

@@ -1,12 +1,6 @@
 package com.deltadental.pcp.calculation.scheduler;
 
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.temporal.TemporalAdjusters;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -227,25 +221,10 @@ public class PCPAssignmentTask implements Runnable {
 		int randomNumber = rand.nextInt(maxNumber) + 1;
 		return randomNumber;
 	}
-	
-	private String calculatePCPEffectiveDate() {
-		ZoneId defaultZoneId = ZoneId.systemDefault();
-		final DateFormat fmt = new SimpleDateFormat("MM-dd-yyyy");
-		int currentDateDay = LocalDate.now().getDayOfMonth();
-        if (currentDateDay >= 1 && currentDateDay < 16) {
-        	LocalDate firstDayOfMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
-        	Date firstDateOfMonth = Date.from(firstDayOfMonth.atStartOfDay(defaultZoneId).toInstant());
-        	return fmt.format(firstDateOfMonth);
-        } else {
-        	LocalDate firstDayOfNextMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfNextMonth());
-        	Date firstDateOfNextMonth = Date.from(firstDayOfNextMonth.atStartOfDay(defaultZoneId).toInstant());
-        	return fmt.format(firstDateOfNextMonth);
-        }
-	}
 
 	public void processPCPAssignment(ContractMemberClaimsEntity contractMemberClaimsEntity) {
 		log.info("START PCPCalculationService.processPCPAssignment processing "+contractMemberClaimsEntity.toString());
-		String pcpEffectiveDate = calculatePCPEffectiveDate();
+		String pcpEffectiveDate = pcpConfigData.calculatePCPEffectiveDate();
 		String errorMessage = null;
 		String status = STATUS.VALIDATED.getStatus();
 		try {

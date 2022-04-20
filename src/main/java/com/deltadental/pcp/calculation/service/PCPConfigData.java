@@ -1,8 +1,18 @@
 package com.deltadental.pcp.calculation.service;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +20,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.deltadental.mtv.sync.service.ServiceLine;
+import com.deltadental.pcp.config.service.GroupRestrictions;
+import com.deltadental.pcp.config.service.InclusionExclusion;
 import com.deltadental.pcp.config.service.PCPConfigService;
 import com.deltadental.pcp.config.service.PcpConfigResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -35,6 +47,10 @@ public class PCPConfigData implements InitializingBean {
 	@Autowired
 	private PCPConfigService pcpConfigService;
 
+	private static final DateTimeFormatter _FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S", Locale.US);
+	private static final DateFormat MMDDYYYY_FORMATTER = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
+	private static final String ZONE_ID = "America/Los_Angeles";
+	
 	private String lookAHeadDays;
 	private List<PcpConfigResponse> claimStatusList = new ArrayList<>();
 	private List<PcpConfigResponse> procedureCodes = new ArrayList<>();
@@ -54,7 +70,7 @@ public class PCPConfigData implements InitializingBean {
 		log.info("Procedure codes list size : "+procedureCodes.size());
 	}
 	
-	@Scheduled(cron = "* * 2 * * *", zone = "America/Los_Angeles")
+	@Scheduled(cron = "* * 2 * * *", zone = ZONE_ID)
 	@Synchronized
 	public void refreshPCPConfigData() {
 		claimStatusList.clear();
@@ -153,5 +169,81 @@ public class PCPConfigData implements InitializingBean {
 			}
 		}
 		return isProcedureCodeValid;
+	}
+	
+	public boolean inclusion(String providerId, String group, String division) {
+		Boolean inclusionFlag = Boolean.TRUE;
+		InclusionExclusion[] inclusions = pcpConfigService.inclusions(providerId);
+		List<InclusionExclusion> inclusionList = Arrays.asList(inclusions);
+		if(CollectionUtils.isNotEmpty(inclusionList)) {
+			if(inclusionList.size() == 1) {
+				inclusionFlag = Boolean.valueOf(matchInclusion(inclusionList.get(0), providerId, group, division));
+				log.info("Provider {}, Group {}, Division {} is listed in inclusion list.", providerId, group, division);
+			} else {
+				inclusionFlag = Boolean.valueOf(inclusionList.stream().anyMatch(inclusion -> matchInclusion(inclusion, providerId, group, division)));
+				log.info("Provider {}, Group {}, Division {} is listed in inclusion list.", providerId, group, division);
+			}			
+		} else {
+			log.info("Provider {}, Group {}, Division {} is not listed in inclusion list.", providerId, group, division);
+		}
+		return inclusionFlag.booleanValue();
+	}
+	
+	public boolean exclusion(String providerId, String group, String division) {
+		Boolean exclusionFlag = Boolean.FALSE;
+		InclusionExclusion[] exclusions = pcpConfigService.exclusions(providerId);
+		List<InclusionExclusion> exclusionList = Arrays.asList(exclusions);
+		if(CollectionUtils.isNotEmpty(exclusionList)) {
+			if(exclusionList.size() == 1) {
+				exclusionFlag = Boolean.valueOf(matchExclusion(exclusionList.get(0), providerId, group, division));
+				log.info("Provider {}, Group {}, Division {} is listed in exlusion list.", providerId, group, division);
+			} else {
+				exclusionFlag = Boolean.valueOf(exclusionList.stream().anyMatch(exclusion -> matchInclusion(exclusion, providerId, group, division)));
+				log.info("Provider {}, Group {}, Division {} is listed in exlusion list.", providerId, group, division);
+			}
+		} else {
+			log.info("Provider {}, Group {}, Division {} is not listed in exlusion list.", providerId, group, division);
+			exclusionFlag = Boolean.TRUE;
+		}
+		return exclusionFlag;
+	}
+	
+	public String calculatePCPEffectiveDate() {
+		ZoneId defaultZoneId = ZoneId.of(ZONE_ID);
+		LocalDate now = LocalDate.now(defaultZoneId);		
+		int currentDateDay = now.getDayOfMonth();
+        if (currentDateDay < 16) {
+        	LocalDate firstDayOfMonth = LocalDate.now(defaultZoneId).with(TemporalAdjusters.firstDayOfMonth());
+        	Date firstDateOfMonth = Date.from(firstDayOfMonth.atStartOfDay(defaultZoneId).toInstant());
+        	return MMDDYYYY_FORMATTER.format(firstDateOfMonth);
+        } else {
+        	LocalDate firstDayOfNextMonth = LocalDate.now(defaultZoneId).with(TemporalAdjusters.firstDayOfNextMonth());
+        	Date firstDateOfNextMonth = Date.from(firstDayOfNextMonth.atStartOfDay(defaultZoneId).toInstant());
+        	return MMDDYYYY_FORMATTER.format(firstDateOfNextMonth);
+        }
+	}
+	
+	private boolean matchInclusion(InclusionExclusion inclusionExclusion, String providerId, String group, String division) {
+		LocalDate effectiveDate = LocalDate.parse(inclusionExclusion.getEffectiveDate(), _FORMATTER);
+		LocalDate now = LocalDate.now();
+		if(now.isAfter(effectiveDate) || now.isEqual(effectiveDate)) {
+			GroupRestrictions groupRestrictions = inclusionExclusion.getGroupRestrictions();
+			return StringUtils.equals(groupRestrictions.getMasterContractId(), providerId) && StringUtils.equals(groupRestrictions.getGroupId(), group) && StringUtils.equals(groupRestrictions.getDivisionId(), division);
+		} else {
+			log.info("Provider {} inclusion list configuration is not effective as of this date {}.", providerId, now);
+			return true;
+		}
+	}
+	
+	private boolean matchExclusion(InclusionExclusion inclusionExclusion, String providerId, String group, String division) {
+		LocalDate effectiveDate = LocalDate.parse(inclusionExclusion.getEffectiveDate(), _FORMATTER);
+		LocalDate now = LocalDate.now();
+		if(now.isBefore(effectiveDate) || now.isEqual(effectiveDate)) {
+			GroupRestrictions groupRestrictions = inclusionExclusion.getGroupRestrictions();
+			return !(StringUtils.equals(groupRestrictions.getMasterContractId(), providerId) && StringUtils.equals(groupRestrictions.getGroupId(), group) && StringUtils.equals(groupRestrictions.getDivisionId(), division));
+		} else {
+			log.info("Provider {} exlusion list configuration is not effective as of this date {}.", providerId, now);
+			return true;
+		}
 	}
 }
