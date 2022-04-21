@@ -1,17 +1,19 @@
 package com.deltadental.pcp.calculation.entities;
 
 import java.sql.Timestamp;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.transaction.Transactional;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import lombok.AllArgsConstructor;
@@ -36,6 +38,9 @@ import lombok.ToString;
 @Transactional
 @Table(name = PCPCalculationActivityEntity.TABLE_NAME,  schema = "dbo")
 @EnableJpaAuditing
+@org.hibernate.annotations.Entity(
+        dynamicUpdate = true
+)
 public class PCPCalculationActivityEntity implements java.io.Serializable{
 	
 	/**
@@ -68,11 +73,21 @@ public class PCPCalculationActivityEntity implements java.io.Serializable{
 	private Timestamp endTime;
 	
 	@Column(name= "created_date", updatable = false)
-	@CreationTimestamp
+//	@CreationTimestamp
 	private Timestamp createdDate;
 
 	@Column(name = "last_updated_date")
-	@UpdateTimestamp
+//	@UpdateTimestamp
 	private Timestamp lastUpdatedDate;
 
+	@PrePersist
+    public void onInsert() {
+		createdDate = Timestamp.from(ZonedDateTime.now(ZoneId.of("America/Los_Angeles")).toInstant());
+		lastUpdatedDate = createdDate;
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+    	lastUpdatedDate = Timestamp.from(ZonedDateTime.now(ZoneId.of("America/Los_Angeles")).toInstant());
+    }
 }

@@ -87,5 +87,5 @@ public class ContractMemberClaimsEntity implements Serializable {
     @PreUpdate
     public void onUpdate() {
     	lastMaintTs = Timestamp.from(ZonedDateTime.now(ZoneId.of("America/Los_Angeles")).toInstant());
-     }
+    }
 }
