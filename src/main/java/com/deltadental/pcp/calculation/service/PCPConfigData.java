@@ -171,7 +171,7 @@ public class PCPConfigData implements InitializingBean {
 		return isProcedureCodeValid;
 	}
 	
-	public boolean inclusion(String providerId, String group, String division) {
+	public boolean isProviderInInclusionList(String providerId, String group, String division) {
 		Boolean inclusionFlag = Boolean.TRUE;
 		InclusionExclusion[] inclusions = pcpConfigService.inclusions(providerId);
 		List<InclusionExclusion> inclusionList = Arrays.asList(inclusions);
@@ -189,14 +189,16 @@ public class PCPConfigData implements InitializingBean {
 		return inclusionFlag.booleanValue();
 	}
 	
-	public boolean exclusion(String providerId, String group, String division) {
+	public boolean isProviderInExclusionList(String providerId, String group, String division) {
 		Boolean exclusionFlag = Boolean.FALSE;
 		InclusionExclusion[] exclusions = pcpConfigService.exclusions(providerId);
 		List<InclusionExclusion> exclusionList = Arrays.asList(exclusions);
 		if(CollectionUtils.isNotEmpty(exclusionList)) {
 			if(exclusionList.size() == 1) {
 				exclusionFlag = Boolean.valueOf(matchExclusion(exclusionList.get(0), providerId, group, division));
-				log.info("Provider {}, Group {}, Division {} is listed in exlusion list.", providerId, group, division);
+				if(!exclusionFlag) {
+					log.info("Provider {}, Group {}, Division {} is listed in exlusion list.", providerId, group, division);
+				}
 			} else {
 				exclusionFlag = Boolean.valueOf(exclusionList.stream().anyMatch(exclusion -> matchInclusion(exclusion, providerId, group, division)));
 				log.info("Provider {}, Group {}, Division {} is listed in exlusion list.", providerId, group, division);
@@ -228,7 +230,7 @@ public class PCPConfigData implements InitializingBean {
 		LocalDate now = LocalDate.now();
 		if(now.isAfter(effectiveDate) || now.isEqual(effectiveDate)) {
 			GroupRestrictions groupRestrictions = inclusionExclusion.getGroupRestrictions();
-			return StringUtils.equals(groupRestrictions.getMasterContractId(), providerId) && StringUtils.equals(groupRestrictions.getGroupId(), group) && StringUtils.equals(groupRestrictions.getDivisionId(), division);
+			return StringUtils.equals(groupRestrictions.getMasterContractId(), providerId) && StringUtils.equals(groupRestrictions.getGroupId(), group);
 		} else {
 			log.info("Provider {} inclusion list configuration is not effective as of this date {}.", providerId, now);
 			return true;
@@ -240,7 +242,7 @@ public class PCPConfigData implements InitializingBean {
 		LocalDate now = LocalDate.now();
 		if(now.isBefore(effectiveDate) || now.isEqual(effectiveDate)) {
 			GroupRestrictions groupRestrictions = inclusionExclusion.getGroupRestrictions();
-			return !(StringUtils.equals(groupRestrictions.getMasterContractId(), providerId) && StringUtils.equals(groupRestrictions.getGroupId(), group) && StringUtils.equals(groupRestrictions.getDivisionId(), division));
+			return !(StringUtils.equals(groupRestrictions.getMasterContractId(), providerId) && StringUtils.equals(groupRestrictions.getGroupId(), group));
 		} else {
 			log.info("Provider {} exlusion list configuration is not effective as of this date {}.", providerId, now);
 			return true;

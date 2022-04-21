@@ -113,39 +113,55 @@ public class PCPCalculationService {
 		try {
 			MemberClaimRequest memberClaimRequest = MemberClaimRequest.builder().memberClaimId(contractMemberClaimsEntity.getClaimId()).build();
 			MemberClaimResponse memberClaimResponse = mtvSyncService.memberClaim(memberClaimRequest);
+			
 			if (null != memberClaimResponse && (memberClaimResponse.getErrorCode() == null || memberClaimResponse.getErrorMessage() == null)) {
-				List<ServiceLine> serviceLines = memberClaimResponse.getServiceLines();
-				if(CollectionUtils.isNotEmpty(serviceLines)) {
-					boolean isExplanationCodeValid = pcpConfigData.isExplanationCodeValid(serviceLines);
-					boolean isProcedureCodeValid = pcpConfigData.isProcedureCodeValid(serviceLines);
-					boolean isClaimStatusValid = pcpConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus()));	
-					if (isClaimStatusValid && isExplanationCodeValid && isProcedureCodeValid) {
-						status = STATUS.VALIDATED.getStatus();		
+				// TODO : Find division number
+				boolean exclusionFlag = pcpConfigData.isProviderInExclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), null);
+				boolean inclusionFlag = pcpConfigData.isProviderInInclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), null);
+				if(exclusionFlag || inclusionFlag) {
+					List<ServiceLine> serviceLines = memberClaimResponse.getServiceLines();
+					if(CollectionUtils.isNotEmpty(serviceLines)) {
+						boolean isExplanationCodeValid = pcpConfigData.isExplanationCodeValid(serviceLines);
+						boolean isProcedureCodeValid = pcpConfigData.isProcedureCodeValid(serviceLines);
+						boolean isClaimStatusValid = pcpConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus()));	
+						if (isClaimStatusValid && isExplanationCodeValid && isProcedureCodeValid) {
+							status = STATUS.VALIDATED.getStatus();		
+						} else {
+							if (!isClaimStatusValid) {
+								errorMessage = String.format("Claim status %s is not valid for PCP assignment!", StringUtils.trimToNull(memberClaimResponse.getClaimStatus()));
+							}
+							if (!isExplanationCodeValid) {
+								if (StringUtils.isNotBlank(errorMessage)) {
+									errorMessage = String.join(", ", errorMessage, "One of the Service Line Explanation Code[s] is not valid for this claim!");
+								} else {
+									errorMessage = "One of the Service Line Explanation Code[s] is not valid for this claim!";
+								}
+							}	
+							if (!isProcedureCodeValid) {
+								if (StringUtils.isNotBlank(errorMessage)) {
+									errorMessage = String.join(", ", errorMessage, "One of the Service Line Procedure Code[s] is not valid for this claim!");
+								} else {
+									errorMessage = "One of the Service Line Procedure Code[s] is not valid for this claim!";
+								}
+							}
+							log.info(errorMessage);
+							status = STATUS.ERROR.getStatus();
+							log.info("PCP Assignment status for claim id {} is {}.", contractMemberClaimsEntity.getClaimId() , errorMessage);
+						}
 					} else {
-						if (!isClaimStatusValid) {
-							errorMessage = String.format("Claim status %s is not valid for PCP assignment!", StringUtils.trimToNull(memberClaimResponse.getClaimStatus()));
-						}
-						if (!isExplanationCodeValid) {
-							if (StringUtils.isNotBlank(errorMessage)) {
-								errorMessage = String.join(", ", errorMessage, "One of the Service Line Explanation Code[s] is not valid for this claim!");
-							} else {
-								errorMessage = "One of the Service Line Explanation Code[s] is not valid for this claim!";
-							}
-						}	
-						if (!isProcedureCodeValid) {
-							if (StringUtils.isNotBlank(errorMessage)) {
-								errorMessage = String.join(", ", errorMessage, "One of the Service Line Procedure Code[s] is not valid for this claim!");
-							} else {
-								errorMessage = "One of the Service Line Procedure Code[s] is not valid for this claim!";
-							}
-						}
-						log.info(errorMessage);
+						errorMessage = String.format("Service Line Items are empty for claim# %s ",contractMemberClaimsEntity.getClaimId());
 						status = STATUS.ERROR.getStatus();
-						log.info("PCP Assignment status for claim id {} is {}.", contractMemberClaimsEntity.getClaimId() , errorMessage);
 					}
 				} else {
-					errorMessage = String.format("Service Line Items are empty for claim# %s ",contractMemberClaimsEntity.getClaimId());
-					status = STATUS.ERROR.getStatus();
+					if(!exclusionFlag) {
+						errorMessage = String.format("Provider {}, Group {}, Division {} is listed in exlusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), "");
+					}
+					if(!inclusionFlag) {
+						if (StringUtils.isNotBlank(errorMessage)) {
+							errorMessage = String.join(", ", errorMessage, String.format("Provider {}, Group {}, Division {} is listed in inclusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), ""));
+						}
+					}
+					status = STATUS.ERROR.getStatus();	
 				}
 			}  else {
 				if(memberClaimResponse == null) {

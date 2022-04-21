@@ -3,7 +3,6 @@ package com.deltadental.pcp.calculation.repos;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -25,10 +24,10 @@ public interface ContractMemberClaimsRepo extends JpaRepository<ContractMemberCl
 
 	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE cmc.instanceId = :instanceId AND cmc.status in :statusList")
 	List<ContractMemberClaimsEntity> findByInstanceIdWhereStatusInList(@Param("instanceId") String instanceId, @Param("statusList") List<String> statusList);
-	
-	@Transactional
-	@Modifying(clearAutomatically = true, flushAutomatically = true)
-	@Query("update ContractMemberClaimsEntity cmc set cmc.status = :status, cmc.lastMaintTs = CURRENT_TIMESTAMP WHERE cmc.contractMemberClaimId = :contractMemberClaimId")
-	void setStatus(@Param("contractMemberClaimId") Integer contractMemberClaimId, @Param("status") String status);
+//	
+//	@Transactional
+//	@Modifying(clearAutomatically = true, flushAutomatically = true)
+//	@Query("update ContractMemberClaimsEntity cmc set cmc.status = :status, cmc.lastMaintTs = CURRENT_TIMESTAMP WHERE cmc.contractMemberClaimId = :contractMemberClaimId")
+//	void setStatus(@Param("contractMemberClaimId") Integer contractMemberClaimId, @Param("status") String status);
 	
 }
