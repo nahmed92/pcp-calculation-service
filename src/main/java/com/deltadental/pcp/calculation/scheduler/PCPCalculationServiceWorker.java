@@ -1,9 +1,11 @@
 package com.deltadental.pcp.calculation.scheduler;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
@@ -15,7 +17,9 @@ import org.springframework.stereotype.Component;
 
 import com.deltadental.pcp.calculation.controller.STATUS;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimsEntity;
+import com.deltadental.pcp.calculation.entities.PCPCalculationActivityEntity;
 import com.deltadental.pcp.calculation.repos.ContractMemberClaimsRepo;
+import com.deltadental.pcp.calculation.repos.PCPCalculationServiceActivityRepo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,6 +43,9 @@ public class PCPCalculationServiceWorker {
 	
 	@Autowired
 	private ContractMemberClaimsRepo contractMemberClaimsRepo;
+
+	@Autowired
+	private PCPCalculationServiceActivityRepo activityRepo;
 
 	@PostConstruct
 	public void setup() {
@@ -68,6 +75,7 @@ public class PCPCalculationServiceWorker {
 		statusList.add(STATUS.VALIDATED.getStatus());
 		List<ContractMemberClaimsEntity> contractMemberClaimsEntities = contractMemberClaimsRepo.findByInstanceIdWhereStatusInList(serviceInstanceId, statusList);
 		if (CollectionUtils.isNotEmpty(contractMemberClaimsEntities)) {
+			long startTime = System.currentTimeMillis();
 			log.info("Processing total {} pcp assignment requests on service instance {} ",
 					contractMemberClaimsEntities.size(), serviceInstanceId);
 			contractMemberClaimsEntities.forEach(contractMemberClaimEntity -> {
@@ -78,6 +86,17 @@ public class PCPCalculationServiceWorker {
 					log.error("Exception processing pcp assingment request for contract member claim {} ", contractMemberClaimEntity.toString(), e);
 				}
 			});
+			long endTime = System.currentTimeMillis();
+			long minutes = TimeUnit.MILLISECONDS.toMinutes((endTime - startTime));
+		    log.info(" Thread Name + {}  taken to complete process :  {} minute[s]",Thread.currentThread().getName(), minutes);
+			PCPCalculationActivityEntity activity = PCPCalculationActivityEntity.builder()
+					.instanceId(serviceInstanceId)
+					.numOfRecords(contractMemberClaimsEntities.size())
+					.timeToProcess(minutes)
+					.startTime(new Timestamp(startTime))
+					.endTime(new Timestamp(endTime))
+					.build();
+			activityRepo.save(activity);
 		} else {
 			log.info("No pending requests for pcp assignment.");
 		}
