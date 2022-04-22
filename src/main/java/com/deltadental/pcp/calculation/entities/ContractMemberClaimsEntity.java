@@ -42,25 +42,25 @@ public class ContractMemberClaimsEntity implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer contractMemberClaimId;
 
-	@Column(name = "CLAIM_ID")
+	@Column(name = "CLAIM_ID", nullable = false, updatable = false)
 	private String claimId;
 
-	@Column(name = "CONTRACT_ID")
+	@Column(name = "CONTRACT_ID", nullable = false, updatable = false)
 	private String contractId;
 
-	@Column(name = "MEMBER_ID")
+	@Column(name = "MEMBER_ID", nullable = false, updatable = false)
 	private String memberId;
 
-	@Column(name = "PROVIDER_ID")
+	@Column(name = "PROVIDER_ID", nullable = false, updatable = false)
 	private String providerId;
 
-	@Column(name = "STATE")
+	@Column(name = "STATE", nullable = false, updatable = false)
 	private String state;
 
-	@Column(name = "STATUS")
+	@Column(name = "STATUS", nullable = true, updatable = true)
 	private String status;
 
-	@Column(name = "operator_id")
+	@Column(name = "operator_id", updatable = false)
 	private String operatorId;
 
 //	@CreationTimestamp
@@ -71,10 +71,10 @@ public class ContractMemberClaimsEntity implements Serializable {
 	@Column(name = "LAST_MAINT_TS", nullable = false)
 	private Timestamp lastMaintTs;
 
-	@Column(name = "INSTANCE_ID")
+	@Column(name = "INSTANCE_ID", updatable = false)
 	private String instanceId;
 	
-	@Column(name = "ERROR_MESSAGE")
+	@Column(name = "ERROR_MESSAGE", updatable = false)
 	private String errorMessage;
 	
 	

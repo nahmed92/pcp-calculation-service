@@ -2,10 +2,13 @@ package com.deltadental.pcp.calculation.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @Api(value = "/pcp-calculation")
 @Slf4j
 @Data
+@Validated
 @NoArgsConstructor
 public class PCPCalculationServiceController {
 
@@ -56,7 +60,7 @@ public class PCPCalculationServiceController {
 	@ResponseBody
 	@MethodExecutionTime
     @PostMapping(value = PCPCalculationServiceConstants.MEMBER_CONTRACT_CLAIM_URI, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<MessageResponse> memberContractClaim(@RequestBody MemberContractClaimRequest validateProviderRequest) {
+	public ResponseEntity<MessageResponse> memberContractClaim(@Valid @RequestBody MemberContractClaimRequest validateProviderRequest) {
 		log.info("START PCPCalculationServiceController.memberContractClaim");
 		pcpCalculationService.stageMemberContractClaimRecord(validateProviderRequest); 
 		MessageResponse messageResponse = MessageResponse.builder().message("Successfully staged member contract request.").build();
@@ -76,7 +80,7 @@ public class PCPCalculationServiceController {
 	@ResponseBody
 	@MethodExecutionTime
     @PostMapping(value = PCPCalculationServiceConstants.ASSIGN_MEMBERS_CONTRACTS_CLAIMS_URI, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<MessageResponse> assignPCPsToMembers(@RequestBody List<MemberContractClaimRequest> validateProviderRequestList) {
+	public ResponseEntity<MessageResponse> assignPCPsToMembers(@Valid @RequestBody List<MemberContractClaimRequest> validateProviderRequestList) {
 		log.info("START PCPCalculationServiceController.assignMemberPCP");
 		MessageResponse messageResponse = MessageResponse.builder().build();
 		if(!validateProviderRequestList.isEmpty()) {
