@@ -259,7 +259,7 @@ public class PCPAssignmentTask implements Runnable {
 										ProviderAssignmentResponse providerAssignmentResponse = mtvSyncService.providerAssignment(providerAssignmentRequest);
 										if (StringUtils.equals(providerAssignmentResponse.getReturnCode(), PCP_ASSIGNMENT_OK)) {
 											status = STATUS.PCP_ASSIGNED.getStatus();
-											memberProviderRepo.setStatus(memberProviderEntity.getMemberProviderId(), status);
+											memberProviderEntity.setStatus(status);
 											log.info("PCP Assignment status for claim id {} is {}.", contractMemberClaimsEntity.getClaimId(), status);
 										} else {
 											errorMessage = providerAssignmentResponse.getErrorMessage();
@@ -268,9 +268,11 @@ public class PCPAssignmentTask implements Runnable {
 											}
 											status = STATUS.ERROR.getStatus();
 											errorMessage = String.join(":", providerAssignmentResponse.getErrorCode(), providerAssignmentResponse.getErrorMessage());
-											memberProviderRepo.setStatus(memberProviderEntity.getMemberProviderId(), errorMessage);
+											memberProviderEntity.setStatus(status);
+											memberProviderEntity.setErrorMessage(errorMessage);
 											log.info("PCP Assignment status for claim id {} is {}.", contractMemberClaimsEntity.getClaimId(), status);
 										}
+										memberProviderRepo.save(memberProviderEntity);
 									} catch (Exception e) {
 										String stacktrace = ExceptionUtils.getStackTrace(e);
 										log.error("Exception occured during provider assignment from metavance sync Service.", stacktrace);

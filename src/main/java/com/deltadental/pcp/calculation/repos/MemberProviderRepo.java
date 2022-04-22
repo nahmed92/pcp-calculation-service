@@ -1,9 +1,6 @@
 package com.deltadental.pcp.calculation.repos;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,8 +10,8 @@ import com.deltadental.pcp.calculation.entities.MemberProviderEntity;
 @Transactional(readOnly = false)
 public interface MemberProviderRepo extends JpaRepository<MemberProviderEntity, Integer> {
 
-	@Transactional
-	@Modifying(clearAutomatically = true, flushAutomatically = true)
-	@Query("update MemberProviderEntity mpe set mpe.status = :status, mpe.lastMaintTs = CURRENT_TIMESTAMP WHERE mpe.memberProviderId = :memberProviderId")
-	void setStatus(@Param("memberProviderId") Integer memberProviderId, @Param("status") String status);
+//	@Transactional
+//	@Modifying(clearAutomatically = true, flushAutomatically = true)
+//	@Query("update MemberProviderEntity mpe set mpe.status = :status, mpe.lastMaintTs = CURRENT_TIMESTAMP WHERE mpe.memberProviderId = :memberProviderId")
+//	void setStatus(@Param("memberProviderId") Integer memberProviderId, @Param("status") String status);
 }

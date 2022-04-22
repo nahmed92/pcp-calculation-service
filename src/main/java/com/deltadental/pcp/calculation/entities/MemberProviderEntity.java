@@ -70,6 +70,9 @@ public class MemberProviderEntity implements Serializable {
 	@Column(name = "CONTRACT_MEMBER_CLAIMS_ID")
 	private Integer contractMemberClaimsId;	
 	
+	@Column(name = "ERROR_MESSAGE")
+	private String errorMessage;
+	
 	@PrePersist
     public void onInsert() {
 		crationTs = Timestamp.from(ZonedDateTime.now(ZoneId.of("America/Los_Angeles")).toInstant());
