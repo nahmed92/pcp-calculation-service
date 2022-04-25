@@ -74,7 +74,7 @@ public class ContractMemberClaimsEntity implements Serializable {
 	@Column(name = "INSTANCE_ID", updatable = false)
 	private String instanceId;
 	
-	@Column(name = "ERROR_MESSAGE", updatable = false)
+	@Column(name = "ERROR_MESSAGE", updatable = true)
 	private String errorMessage;
 	
 	
