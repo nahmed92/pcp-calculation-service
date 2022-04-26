@@ -102,7 +102,6 @@ public class PCPCalculationService {
 				.build();
 		contractMemberClaimsRepo.save(contractMemberClaimsEntity);
 		validateContractMemberClaim(contractMemberClaimsEntity);
-		contractMemberClaimsRepo.save(contractMemberClaimsEntity);
 		log.info("START PCPCalculationService.saveContractMemberClaims");
 	}
 	
@@ -180,6 +179,7 @@ public class PCPCalculationService {
 		}
 		contractMemberClaimsEntity.setErrorMessage(errorMessage);
 		contractMemberClaimsEntity.setStatus(status);
+		contractMemberClaimsRepo.save(contractMemberClaimsEntity);
 		log.info("END PCPCalculationService.validateContractMemberClaim");
 	}
 }

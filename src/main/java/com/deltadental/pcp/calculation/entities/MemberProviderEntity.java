@@ -70,8 +70,14 @@ public class MemberProviderEntity implements Serializable {
 	@Column(name = "CONTRACT_MEMBER_CLAIMS_ID")
 	private Integer contractMemberClaimsId;	
 	
-	@Column(name = "ERROR_MESSAGE")
-	private String errorMessage;
+	@Column(name = "PERSON_ID")
+    private String personId;
+	
+	@Column(name = "MEMBER_ID")
+	private String memberId;
+
+	@Column(name = "CONTRACT_ID")
+	private String contractId;
 	
 	@PrePersist
     public void onInsert() {
