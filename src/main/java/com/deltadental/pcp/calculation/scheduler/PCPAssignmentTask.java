@@ -208,6 +208,7 @@ public class PCPAssignmentTask implements Runnable {
 				.contractId(memberClaimResponse.getContractId())
 				.contractMemberClaimsId(contractMemberClaimsEntity.getContractMemberClaimId())
 				.status(status)
+				.providerId(memberClaimResponse.getProviderId())
 				.build();
 		memberProviderRepo.save(memberProviderEntity);
 		return memberProviderEntity;
