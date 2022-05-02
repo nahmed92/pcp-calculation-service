@@ -68,6 +68,7 @@ class PCPConfigDataTest {
 		assertFalse(inclusionFlag);
 	}
 	
+	/*
 	@DisplayName("Test provider exclusion")
 	@Test
 	@Ignore
@@ -92,7 +93,7 @@ class PCPConfigDataTest {
 		boolean inclusionFlag = pcpConfigData.isProviderInExclusionList("DC026845", "78772", "00001");
 		assertTrue(inclusionFlag);
 	}
-
+*/
 	@DisplayName("Test calculate effective date")
 	@Test
 	void testCalculateEffectiveDate() {
