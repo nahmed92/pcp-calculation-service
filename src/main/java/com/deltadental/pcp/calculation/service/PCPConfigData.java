@@ -180,11 +180,11 @@ public class PCPConfigData implements InitializingBean {
 				inclusionFlag = Boolean.valueOf(matchInclusion(inclusionList.get(0), providerId, group, division));
 				log.info("Provider {}, Group {}, Division {} is listed in inclusion list.", providerId, group, division);
 			} else {
-				inclusionFlag = Boolean.valueOf(inclusionList.stream()
-						.anyMatch(inclusion -> matchInclusion(inclusion, providerId, group, division)));
+				inclusionFlag = Boolean.valueOf(inclusionList.stream().anyMatch(inclusion -> matchInclusion(inclusion, providerId, group, division)));
 				log.info("Provider {}, Group {}, Division {} is listed in inclusion list.", providerId, group, division);
 			}
 		} else {
+			inclusionFlag = Boolean.TRUE;
 			log.info("Provider {}, Group {}, Division {} is not listed in inclusion list.", providerId, group, division);
 		}
 		return inclusionFlag.booleanValue();
@@ -201,7 +201,7 @@ public class PCPConfigData implements InitializingBean {
 					log.info("Provider {}, Group {}, Division {} is listed in exlusion list.", providerId, group, division);
 				}
 			} else {
-				exclusionFlag = Boolean.valueOf(exclusionList.stream() .anyMatch(exclusion -> matchInclusion(exclusion, providerId, group, division)));
+				exclusionFlag = Boolean.valueOf(exclusionList.stream().anyMatch(exclusion -> matchInclusion(exclusion, providerId, group, division)));
 				log.info("Provider {}, Group {}, Division {} is listed in exlusion list.", providerId, group, division);
 			}
 		} else {
