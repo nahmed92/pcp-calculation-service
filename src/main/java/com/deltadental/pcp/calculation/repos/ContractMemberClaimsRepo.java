@@ -14,13 +14,14 @@ import com.deltadental.pcp.calculation.entities.ContractMemberClaimsEntity;
 @Transactional(readOnly = false)
 public interface ContractMemberClaimsRepo extends JpaRepository<ContractMemberClaimsEntity, Integer> {
 
+	//FIXME: remove query
 	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE  cmc.claimId = :claimId AND  cmc.contractId = :contractId AND  cmc.memberId = :memberId AND  cmc.providerId = :providerId AND cmc.state = :state AND cmc.status in :statusList")
 	List<ContractMemberClaimsEntity> findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(@Param("claimId") String claimId, 
 			@Param("contractId") String contractId, 
 			@Param("memberId") String memberId, 
 			@Param("providerId") String providerId,
 			@Param("state") String state,
-			@Param("statusList") List<String> statusList);
+			@Param("status") List<String> status);
 
 	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE cmc.instanceId = :instanceId AND cmc.status in :statusList")
 	List<ContractMemberClaimsEntity> findByInstanceIdWhereStatusInList(@Param("instanceId") String instanceId, @Param("statusList") List<String> statusList);

@@ -1,4 +1,4 @@
-package com.deltadental.pcp.calculation.service;
+package com.deltadental.pcp.calculation.interservice;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,9 +20,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.deltadental.mtv.sync.service.ServiceLine;
+import com.deltadental.pcp.config.interservice.PCPConfigServiceClient;
 import com.deltadental.pcp.config.service.GroupRestrictions;
 import com.deltadental.pcp.config.service.InclusionExclusion;
-import com.deltadental.pcp.config.service.PCPConfigService;
 import com.deltadental.pcp.config.service.PcpConfigResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -45,13 +45,12 @@ public class PCPConfigData implements InitializingBean {
 	private ObjectMapper objectMapper;
 
 	@Autowired
-	private PCPConfigService pcpConfigService;
+	private PCPConfigServiceClient pcpConfigServiceClient;
 
 	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S", Locale.US);
 	private final DateFormat mmddyyyyFormatter = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
 	private static final String ZONE_ID = "America/Los_Angeles";
 	
-	private String lookAHeadDays;
 	private List<PcpConfigResponse> claimStatusList = new ArrayList<>();
 	private List<PcpConfigResponse> procedureCodes = new ArrayList<>();
 	private List<PcpConfigResponse> explanationCodes = new ArrayList<>();
@@ -63,26 +62,22 @@ public class PCPConfigData implements InitializingBean {
 		explanationCodes.clear();
 		log.info("Cleared all the pcp config data!");
 		claimStatuses();
-		log.info("Claim status list size : "+claimStatusList.size());
+		log.info("Claim status  : {} ",claimStatusList);
 		explanationCodes();
-		log.info("Explanation codes list size : "+explanationCodes.size());
+		log.info("Explanation codes : {} ",explanationCodes);
 		procedureCodes();
-		log.info("Procedure codes list size : "+procedureCodes.size());
+		log.info("Procedure codes : ",procedureCodes);
 	}
 	
 	@Scheduled(cron = "* * 2 * * *", zone = ZONE_ID)
 	@Synchronized
+	//FIXME: remove scheduler and cache config data
 	public void refreshPCPConfigData() {
-		claimStatusList.clear();
-		procedureCodes.clear();
-		explanationCodes.clear();
-		log.info("Cleared all the pcp config data!");
-		claimStatuses();
-		log.info("Refreshed Claim status list size : "+claimStatusList.size());
-		explanationCodes();
-		log.info("Refreshed Explanation codes list size : "+explanationCodes.size());
-		procedureCodes();
-		log.info("Refreshed Procedure codes list size : "+procedureCodes.size());
+		try {
+			afterPropertiesSet();
+		} catch (Exception e) {
+			log.error("Unable to refresh pcp config",e);
+		}
 	}
 
 	private List<PcpConfigResponse> getPcpConfigResponseList(String jsonString) {
@@ -98,19 +93,19 @@ public class PCPConfigData implements InitializingBean {
 	}
 
 	private void claimStatuses() {
-		String jsonClaimStatusStr = pcpConfigService.claimStatus();
+		String jsonClaimStatusStr = pcpConfigServiceClient.claimStatus();
 		List<PcpConfigResponse> pcpConfigResponses = getPcpConfigResponseList(jsonClaimStatusStr);
 		setClaimStatusList(pcpConfigResponses);
 	}
 
 	private void explanationCodes() {
-		String jsonExplanationCodeStr = pcpConfigService.explanationCode();
+		String jsonExplanationCodeStr = pcpConfigServiceClient.explanationCode();
 		List<PcpConfigResponse> pcpConfigResponses = getPcpConfigResponseList(jsonExplanationCodeStr);
 		setExplanationCodes(pcpConfigResponses);
 	}
 
 	private void procedureCodes() {
-		String jsonProcedureCodeStr = pcpConfigService.procedureCode();
+		String jsonProcedureCodeStr = pcpConfigServiceClient.procedureCode();
 		List<PcpConfigResponse> pcpConfigResponses = getPcpConfigResponseList(jsonProcedureCodeStr);
 		setProcedureCodes(pcpConfigResponses);
 	}
@@ -128,20 +123,15 @@ public class PCPConfigData implements InitializingBean {
 	public boolean isExplanationCodeValid(List<ServiceLine> serviceLines) {
 		boolean isExplanationCodeValid = false;
 		if (serviceLines != null && !serviceLines.isEmpty()) {
-			List<PcpConfigResponse> pcpConfigResponses = this.getExplanationCodes();
-			if (serviceLines.size() == 1) {
-				return pcpConfigResponses.stream().anyMatch(pcpConfigResponse -> StringUtils.equals(pcpConfigResponse.getCodeValue(), serviceLines.get(0).getExplnCode()));
-			} else {
-				for(ServiceLine serviceLine : serviceLines) {
-					for (PcpConfigResponse pcpConfigResponse : pcpConfigResponses) {
-						if(StringUtils.equals(StringUtils.trim(pcpConfigResponse.getCodeValue()), StringUtils.trim(serviceLine.getExplnCode()))) {
-							isExplanationCodeValid = true;
-							break;
-						}
-					}
-					if(isExplanationCodeValid) {
+			for(ServiceLine serviceLine : serviceLines) {
+				for (PcpConfigResponse pcpConfigResponse : getExplanationCodes()) {
+					if( StringUtils.equals(StringUtils.trim(pcpConfigResponse.getCodeValue()), StringUtils.trim(serviceLine.getExplnCode()))) {
+						isExplanationCodeValid = true;
 						break;
 					}
+				}
+				if(isExplanationCodeValid) {
+					break;
 				}
 			}
 		}
@@ -151,20 +141,15 @@ public class PCPConfigData implements InitializingBean {
 	public boolean isProcedureCodeValid(List<ServiceLine> serviceLines) {
 		boolean isProcedureCodeValid = true;
 		if (serviceLines != null && !serviceLines.isEmpty()) {
-			List<PcpConfigResponse> pcpConfigResponses = this.getProcedureCodes();
-			if (serviceLines.size() == 1) {
-				return pcpConfigResponses.stream().noneMatch(pcpConfigResponse -> StringUtils.equals(pcpConfigResponse.getCodeValue(), serviceLines.get(0).getProcedureCode()));
-			} else {
-				for (ServiceLine serviceLine : serviceLines) {
-					for (PcpConfigResponse pcpConfigResponse : pcpConfigResponses) {
-						if (StringUtils.equals(StringUtils.trim(pcpConfigResponse.getCodeValue()), StringUtils.trim(serviceLine.getProcedureCode()))) {
-							isProcedureCodeValid = false;
-							break;
-						}
-					}
-					if(!isProcedureCodeValid) {
+			for (ServiceLine serviceLine : serviceLines) {
+				for (PcpConfigResponse pcpConfigResponse : getProcedureCodes()) {
+					if (StringUtils.equals(StringUtils.trim(pcpConfigResponse.getCodeValue()), StringUtils.trim(serviceLine.getProcedureCode()))) {
+						isProcedureCodeValid = false;
 						break;
 					}
+				}
+				if(!isProcedureCodeValid) {
+					break;
 				}
 			}
 		}
@@ -173,7 +158,7 @@ public class PCPConfigData implements InitializingBean {
 	
 	public boolean isProviderInInclusionList(String providerId, String group, String division) {
 		Boolean inclusionFlag = Boolean.TRUE;
-		InclusionExclusion[] inclusions = pcpConfigService.inclusions(providerId);
+		InclusionExclusion[] inclusions = pcpConfigServiceClient.inclusions(providerId);
 		List<InclusionExclusion> inclusionList = Arrays.asList(inclusions);
 		if (CollectionUtils.isNotEmpty(inclusionList)) {
 			if (inclusionList.size() == 1) {
@@ -192,7 +177,7 @@ public class PCPConfigData implements InitializingBean {
 	
 	public boolean isProviderInExclusionList(String providerId, String group, String division) {
 		Boolean exclusionFlag = Boolean.FALSE;
-		InclusionExclusion[] exclusions = pcpConfigService.exclusions(providerId);
+		InclusionExclusion[] exclusions = pcpConfigServiceClient.exclusions(providerId);
 		List<InclusionExclusion> exclusionList = Arrays.asList(exclusions);
 		if (CollectionUtils.isNotEmpty(exclusionList)) {
 			if (exclusionList.size() == 1) {

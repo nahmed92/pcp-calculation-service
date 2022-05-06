@@ -15,11 +15,12 @@ import com.deltadental.mtv.sync.service.MTVSyncService;
 import com.deltadental.mtv.sync.service.MemberClaimRequest;
 import com.deltadental.mtv.sync.service.MemberClaimResponse;
 import com.deltadental.mtv.sync.service.ServiceLine;
-import com.deltadental.pcp.calculation.controller.STATUS;
 import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimsEntity;
+import com.deltadental.pcp.calculation.enums.STATUS;
+import com.deltadental.pcp.calculation.interservice.PCPConfigData;
 import com.deltadental.pcp.calculation.repos.ContractMemberClaimsRepo;
-import com.deltadental.pcp.calculation.scheduler.PCPCalculationServiceScheduler;
+import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -41,8 +42,6 @@ public class PCPCalculationService {
 	@Autowired
 	private ContractMemberClaimsRepo contractMemberClaimsRepo; 
 	
-	@Autowired
-	private PCPCalculationServiceScheduler pcpCalculationServiceScheduler; 
 	
 	@Value("${service.instance.id}")
 	private String serviceInstanceId;
@@ -56,36 +55,33 @@ public class PCPCalculationService {
 		statusList.add(STATUS.PCP_ASSIGNED.getStatus());
 	}
 	
-	public void assignPCPsToMembers() {
-		log.info("START PCPCalculationService.assignPCPsToMembers");
-		pcpCalculationServiceScheduler.processPendingPCPAssignmentRequest();
-		log.info("END PCPCalculationService.assignPCPsToMembers");
-	}
-	
-	public void stageMemberContractClaimRecord(MemberContractClaimRequest validateProviderRequest) {
-		log.info("START PCPCalculationService.assignMemberPCP");
+	public void stageMemberContractClaimRecord(MemberContractClaimRequest memberContractClaimRequest) {
+		log.info("START PCPCalculationService.stageMemberContractClaimRecord");
 		List<ContractMemberClaimsEntity> memberClaimsEntities = contractMemberClaimsRepo.findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
-				StringUtils.trimToNull(validateProviderRequest.getClaimId()), 
-				StringUtils.trimToNull(validateProviderRequest.getContractId()), 
-				StringUtils.trimToNull(validateProviderRequest.getMemberId()), 
-				StringUtils.trimToNull(validateProviderRequest.getProviderId()),
-				StringUtils.trimToNull(validateProviderRequest.getState()),
+				StringUtils.trimToNull(memberContractClaimRequest.getClaimId()), // check this and remove
+				StringUtils.trimToNull(memberContractClaimRequest.getContractId()), 
+				StringUtils.trimToNull(memberContractClaimRequest.getMemberId()), 
+				StringUtils.trimToNull(memberContractClaimRequest.getProviderId()),
+				StringUtils.trimToNull(memberContractClaimRequest.getState()),
 				statusList);
+		
 		if(CollectionUtils.isEmpty(memberClaimsEntities)) {
-			saveAndValidateContractMemberClaims(validateProviderRequest);
-			log.info("Record inserted in contract member claims table : "+validateProviderRequest.toString());
+			log.info("Inserting  {} ",memberContractClaimRequest);
+			saveAndValidateContractMemberClaims(memberContractClaimRequest);
+			
 		} else {
-			log.info("Record already exists in contract member claims table : "+validateProviderRequest.toString());
+			log.warn("Record already exists in contract member claims table : {} ",memberContractClaimRequest);
 		}
-		log.info("END PCPCalculationService.assignMemberPCP");
+		log.info("END PCPCalculationService.stageMemberContractClaimRecord");
 	}
 
-	public void stageMemberContractClaimRecords(List<MemberContractClaimRequest> validateProviderRequests) {
-		log.info("START PCPCalculationService.assignMemberPCP");
-		if(null != validateProviderRequests && !validateProviderRequests.isEmpty()) {
-			validateProviderRequests.forEach(validateProviderRequest -> saveAndValidateContractMemberClaims(validateProviderRequest));
+	public void stageMemberContractClaimRecords(List<MemberContractClaimRequest> memberContractClaimRequests) {
+		log.info("START PCPCalculationService.stageMemberContractClaimRecords");
+		if(CollectionUtils.isNotEmpty(memberContractClaimRequests)) {
+			
+			memberContractClaimRequests.forEach(i -> stageMemberContractClaimRecord(i));
 		}
-		log.info("END PCPCalculationService.assignMemberPCP");
+		log.info("END PCPCalculationService.stageMemberContractClaimRecords");
 	}
 	
 	private void saveAndValidateContractMemberClaims(MemberContractClaimRequest validateProviderRequest) {
@@ -101,10 +97,11 @@ public class PCPCalculationService {
 				.status(STATUS.STAGED.name())
 				.build();
 		contractMemberClaimsRepo.save(contractMemberClaimsEntity);
-		validateContractMemberClaim(contractMemberClaimsEntity);
+		validateContractMemberClaim(contractMemberClaimsEntity); // FIXME: Async call
 		log.info("START PCPCalculationService.saveContractMemberClaims");
 	}
 	
+	@MethodExecutionTime
 	private void validateContractMemberClaim(ContractMemberClaimsEntity contractMemberClaimsEntity) {
 		log.info("START PCPCalculationService.validateContractMemberClaim");
 		String errorMessage = null;

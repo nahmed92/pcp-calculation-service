@@ -1,4 +1,4 @@
-package com.deltadental.pcp.calculation.scheduler;
+package com.deltadental.pcp.calculation.worker;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -15,9 +15,9 @@ import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.deltadental.pcp.calculation.controller.STATUS;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimsEntity;
 import com.deltadental.pcp.calculation.entities.PCPCalculationActivityEntity;
+import com.deltadental.pcp.calculation.enums.STATUS;
 import com.deltadental.pcp.calculation.repos.ContractMemberClaimsRepo;
 import com.deltadental.pcp.calculation.repos.PCPCalculationServiceActivityRepo;
 

@@ -1,4 +1,4 @@
-package com.deltadental.pcp.calculation.controller;
+package com.deltadental.pcp.calculation.enums;
 
 import lombok.Getter;
 
@@ -7,6 +7,7 @@ import lombok.Getter;
  */
 @Getter
 public enum STATUS {
+	
 	STAGED("STAGED"),
 	VALIDATED("VALIDATED"),
 //	VALIDATION_FAILED(),

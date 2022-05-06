@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,17 +14,12 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.deltadental.pcp.calculation.constants.PCPCalculationServiceConstants;
 import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
-import com.deltadental.pcp.calculation.domain.MemberContractClaimResponse;
-import com.deltadental.pcp.calculation.domain.MessageResponse;
-import com.deltadental.pcp.calculation.service.ExcelHelper;
-import com.deltadental.pcp.calculation.service.PCPCalculationService;
+import com.deltadental.pcp.calculation.service.MemberContractClaimService;
 import com.deltadental.pcp.search.service.pojos.PCPAssignmentResponse;
 import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 import com.deltadental.platform.common.exception.ServiceError;
@@ -47,72 +43,28 @@ import lombok.extern.slf4j.Slf4j;
 public class PCPCalculationServiceController {
 
 	@Autowired
-	PCPCalculationService pcpCalculationService;
-	
-	@ApiOperation(
-			value = PCPCalculationServiceConstants.SUMMARY_MEMBER_CONTRACT_CLAIM, 
-			notes = PCPCalculationServiceConstants.SUMMARY_MEMBER_CONTRACT_CLAIM_NOTES, 
-			response = PCPAssignmentResponse.class)
-    @ApiResponses({ @ApiResponse(code = 200, message = "Successfully assigned primary care provider for member.", response = MemberContractClaimResponse.class),
-                    @ApiResponse(code = 400, message = "Bad request.", response = ServiceError.class),
-                    @ApiResponse(code = 404, message = "Unable assign primary care provider for member.", response = ServiceError.class),
-                    @ApiResponse(code = 500, message = "Internal server error.", response = ServiceError.class) })
+	private MemberContractClaimService memberContractClaimService;
+
+	@ApiOperation(value = PCPCalculationServiceConstants.SUMMARY_MEMBERS_CONTRACTS_CLAIMS, notes = PCPCalculationServiceConstants.SUMMARY_MEMBERS_CONTRACTS_CLAIMS_NOTES, response = PCPAssignmentResponse.class)
+	@ApiResponses({
+			@ApiResponse(code = 200, message = "Successfully assigned primary care providers to members.", response = Boolean.class),
+			@ApiResponse(code = 400, message = "Bad request.", response = ServiceError.class),
+			@ApiResponse(code = 404, message = "Unable assign primary care provider for member.", response = ServiceError.class),
+			@ApiResponse(code = 500, message = "Internal server error.", response = ServiceError.class) })
 	@ResponseBody
 	@MethodExecutionTime
-    @PostMapping(value = PCPCalculationServiceConstants.MEMBER_CONTRACT_CLAIM_URI, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<MessageResponse> memberContractClaim(@Valid @RequestBody MemberContractClaimRequest validateProviderRequest) {
-		log.info("START PCPCalculationServiceController.memberContractClaim");
-		pcpCalculationService.stageMemberContractClaimRecord(validateProviderRequest); 
-		MessageResponse messageResponse = MessageResponse.builder().message("Successfully staged member contract request.").build();
-		ResponseEntity<MessageResponse> responseEntity = new ResponseEntity<>(messageResponse, HttpStatus.OK); 
-		log.info("END PCPCalculationServiceController.memberContractClaim");
-		return responseEntity;
-	}
-	
-	@ApiOperation(
-			value = PCPCalculationServiceConstants.SUMMARY_MEMBERS_CONTRACTS_CLAIMS, 
-			notes = PCPCalculationServiceConstants.SUMMARY_MEMBERS_CONTRACTS_CLAIMS_NOTES, 
-			response = PCPAssignmentResponse.class)
-    @ApiResponses({ @ApiResponse(code = 200, message = "Successfully assigned primary care providers to members.", response = MessageResponse.class),
-                    @ApiResponse(code = 400, message = "Bad request.", response = ServiceError.class),
-                    @ApiResponse(code = 404, message = "Unable assign primary care provider for member.", response = ServiceError.class),
-                    @ApiResponse(code = 500, message = "Internal server error.", response = ServiceError.class) })
-	@ResponseBody
-	@MethodExecutionTime
-    @PostMapping(value = PCPCalculationServiceConstants.ASSIGN_MEMBERS_CONTRACTS_CLAIMS_URI, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<MessageResponse> assignPCPsToMembers(@Valid @RequestBody List<MemberContractClaimRequest> validateProviderRequestList) {
-		log.info("START PCPCalculationServiceController.assignMemberPCP");
-		MessageResponse messageResponse = MessageResponse.builder().build();
-		if(!validateProviderRequestList.isEmpty()) {
-			validateProviderRequestList.forEach(validateProviderRequest -> pcpCalculationService.stageMemberContractClaimRecord(validateProviderRequest));
-			messageResponse.setMessage("Successfully staged all the requests.");
+	@PostMapping(value = "/members-contracts-and-claims", produces = { MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<Boolean> stageMembersContractsAndClaims(
+			@Valid @RequestBody List<MemberContractClaimRequest> memberContractClaimRequests) {
+		log.info("START PCPCalculationServiceController.stageMembersContractsAndClaims");
+		ResponseEntity<Boolean> responseEntity = null;
+		if (CollectionUtils.isNotEmpty(memberContractClaimRequests)) {
+			memberContractClaimService.stageMemberContractClaimRecords(memberContractClaimRequests);
+			responseEntity = new ResponseEntity<>(Boolean.TRUE, HttpStatus.CREATED);
 		} else {
-			messageResponse.setMessage("No records to stage for member contract claims!");
+			responseEntity = new ResponseEntity<>(Boolean.FALSE, HttpStatus.BAD_REQUEST);
 		}
-		ResponseEntity<MessageResponse> responseEntity = new ResponseEntity<>(messageResponse, HttpStatus.OK); 
-		log.info("END PCPCalculationServiceController.assignMemberPCP");
-		return responseEntity;
-	}
-	
-	@ApiOperation(
-			value = PCPCalculationServiceConstants.PROCESS_PCP_MEMBER_CONTRACT, 
-			notes = PCPCalculationServiceConstants.PROCESS_PCP_MEMBER_CONTRACT_NOTES, 
-			response = MessageResponse.class)
-    @ApiResponses({ @ApiResponse(code = 200, message = "Successfully validated provider.", response = MessageResponse.class),
-                    @ApiResponse(code = 400, message = "Bad request.", response = ServiceError.class),
-                    @ApiResponse(code = 403, message = "Unauthorized", response = ServiceError.class),
-                    @ApiResponse(code = 404, message = "Contracts Processor not found.", response = ServiceError.class),
-                    @ApiResponse(code = 500, message = "Internal server error.", response = ServiceError.class) })
-	@ResponseBody
-	@MethodExecutionTime
-    @PostMapping(value = PCPCalculationServiceConstants.PROCESS_PCP_MEMBER_CONTRACT_URI, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<MessageResponse> processPcpMemberContract() {
-		log.info("START PCPCalculationServiceController.processPcpMemberContract");
-		pcpCalculationService.assignPCPsToMembers();
-		MessageResponse messageResponse = MessageResponse.builder().build();
-		messageResponse.setMessage("PCP Assignment Completed!");
-		ResponseEntity<MessageResponse> responseEntity = new ResponseEntity<>(messageResponse, HttpStatus.OK); 
-		log.info("END PCPCalculationServiceController.processPcpMemberContract");
+		log.info("END PCPCalculationServiceController.stageMembersContractsAndClaims");
 		return responseEntity;
 	}
 

@@ -17,26 +17,20 @@ import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
-@SuppressWarnings("deprecation")
 @Data
-@Getter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Table(name = "CONTRACT_MEMBER_CLAIMS", schema = "dbo")
 @Entity
-@org.hibernate.annotations.Entity(
-        dynamicUpdate = true
-)
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class ContractMemberClaimsEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	// FIXME:
 	@Id
 	@Column(name = "CONTRACT_MEMBER_CLAIMS_ID", nullable = false, unique = true)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -73,19 +67,18 @@ public class ContractMemberClaimsEntity implements Serializable {
 
 	@Column(name = "INSTANCE_ID", updatable = false)
 	private String instanceId;
-	
+
 	@Column(name = "ERROR_MESSAGE", updatable = true)
 	private String errorMessage;
-	
-	
+
 	@PrePersist
-    public void onInsert() {
+	public void onInsert() {
 		crationTs = Timestamp.from(ZonedDateTime.now(ZoneId.of("America/Los_Angeles")).toInstant());
 		lastMaintTs = crationTs;
-    }
+	}
 
-    @PreUpdate
-    public void onUpdate() {
-    	lastMaintTs = Timestamp.from(ZonedDateTime.now(ZoneId.of("America/Los_Angeles")).toInstant());
-    }
+	@PreUpdate
+	public void onUpdate() {
+		lastMaintTs = Timestamp.from(ZonedDateTime.now(ZoneId.of("America/Los_Angeles")).toInstant());
+	}
 }
