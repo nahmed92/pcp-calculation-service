@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.deltadental.pcp.calculation.constants.PCPCalculationServiceConstants;
 import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
 import com.deltadental.pcp.calculation.service.MemberContractClaimService;
-import com.deltadental.pcp.search.interservice.pojo.PCPAssignmentResponse;
 import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 import com.deltadental.platform.common.exception.ServiceError;
 
@@ -45,7 +44,7 @@ public class PCPCalculationServiceController {
 	@Autowired
 	private MemberContractClaimService memberContractClaimService;
 
-	@ApiOperation(value = PCPCalculationServiceConstants.SUMMARY_MEMBERS_CONTRACTS_CLAIMS, notes = PCPCalculationServiceConstants.SUMMARY_MEMBERS_CONTRACTS_CLAIMS_NOTES, response = PCPAssignmentResponse.class)
+	@ApiOperation(value = PCPCalculationServiceConstants.SUMMARY_MEMBERS_CONTRACTS_CLAIMS, notes = PCPCalculationServiceConstants.SUMMARY_MEMBERS_CONTRACTS_CLAIMS_NOTES, response = Boolean.class)
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successfully assigned primary care providers to members.", response = Boolean.class),
 			@ApiResponse(code = 400, message = "Bad request.", response = ServiceError.class),

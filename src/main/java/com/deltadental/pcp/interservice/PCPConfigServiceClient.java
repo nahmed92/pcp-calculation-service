@@ -1,12 +1,6 @@
-package com.deltadental.pcp.config.interservice;
+package com.deltadental.pcp.interservice;
 
-import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.CLAIM_STATUS;
-import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.EXCLUSIONS_PROVIDER;
-import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.EXPLANATION_CODE;
-import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.INCLUSIONS_PROVIDER;
-import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.PROCEDURE_CODE;
-import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.PROVIDER_LOOKAHEAD_DAYS;
-
+import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
