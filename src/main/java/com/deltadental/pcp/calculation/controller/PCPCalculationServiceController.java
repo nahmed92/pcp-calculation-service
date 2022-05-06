@@ -115,40 +115,5 @@ public class PCPCalculationServiceController {
 		log.info("END PCPCalculationServiceController.processPcpMemberContract");
 		return responseEntity;
 	}
-	
-	@ApiOperation(
-			value = PCPCalculationServiceConstants.SUMMARY_UPLOAD_MEMBERS_CONTRACTS_CLAIMS, 
-			notes = PCPCalculationServiceConstants.SUMMARY_UPLOAD_MEMBERS_CONTRACTS_CLAIMS_NOTES, 
-			response = String.class)
-    @ApiResponses({ @ApiResponse(code = 200, message = "Successfully uploaded pcp member claims.", response = String.class),
-                    @ApiResponse(code = 400, message = "Bad request.", response = ServiceError.class),
-                    @ApiResponse(code = 404, message = "Unable to upload pcp member claims.", response = ServiceError.class),
-                    @ApiResponse(code = 500, message = "Internal server error.", response = ServiceError.class) })
-	@ResponseBody
-	@MethodExecutionTime
-    @PostMapping(value = PCPCalculationServiceConstants.UPLOAD_MEMBERS_CONTRACTS_CLAIMS_URI, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<MessageResponse> uploadPCPMemberClaims(@RequestParam("pcpMemberClaimsDataFile") MultipartFile pcpMemberClaimsDataFile) {
-		log.info("START PCPCalculationServiceController.uploadPCPMemberClaims");
-		MessageResponse messageResponse = MessageResponse.builder().build();
-		if(ExcelHelper.hasExcelFormat(pcpMemberClaimsDataFile)) {
-			List<MemberContractClaimRequest> validateProviderRequests = ExcelHelper.extractPCPMemberClaimsData(pcpMemberClaimsDataFile);
-			if(!validateProviderRequests.isEmpty()) {
-				validateProviderRequests.forEach(validateProviderRequest -> { 
-					validateProviderRequest.setOperatorId("FILE_UPLOAD");
-					pcpCalculationService.stageMemberContractClaimRecord(validateProviderRequest);
-				});
-				messageResponse.setMessage("Successfully uploaded member contract claims!");
-				log.info("Successfully uploaded member contract claims!");
-			} else {
-				messageResponse.setMessage("No member contract claims to upload in uploaded file.");
-				log.info("No member contract claims to upload in uploaded file.");
-			}
-		} else {
-			messageResponse.setMessage("Invalid excel data!");
-			log.info("Invalid excel data!");
-		}
-		ResponseEntity<MessageResponse> responseEntity = new ResponseEntity<>(messageResponse, HttpStatus.OK); 
-		log.info("END PCPCalculationServiceController.uploadPCPMemberClaims");
-		return responseEntity;
-	}
+
 }
