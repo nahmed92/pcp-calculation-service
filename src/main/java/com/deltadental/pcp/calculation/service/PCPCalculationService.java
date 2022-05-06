@@ -111,7 +111,6 @@ public class PCPCalculationService {
 			MemberClaimResponse memberClaimResponse = mtvSyncService.memberClaim(memberClaimRequest);
 			
 			if (null != memberClaimResponse && (memberClaimResponse.getErrorCode() == null || memberClaimResponse.getErrorMessage() == null)) {
-				// TODO : Find division number
 				boolean exclusionFlag = pcpConfigData.isProviderInExclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber());
 				boolean inclusionFlag = pcpConfigData.isProviderInInclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber());
 				if(exclusionFlag || inclusionFlag) {
