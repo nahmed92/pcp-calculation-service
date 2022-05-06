@@ -19,11 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.deltadental.mtv.sync.service.ServiceLine;
+import com.deltadental.mtv.sync.interservice.pojo.ServiceLine;
 import com.deltadental.pcp.config.interservice.PCPConfigServiceClient;
-import com.deltadental.pcp.config.service.GroupRestrictions;
-import com.deltadental.pcp.config.service.InclusionExclusion;
-import com.deltadental.pcp.config.service.PcpConfigResponse;
+import com.deltadental.pcp.config.interservice.pojo.GroupRestrictions;
+import com.deltadental.pcp.config.interservice.pojo.InclusionExclusion;
+import com.deltadental.pcp.config.interservice.pojo.PcpConfigResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

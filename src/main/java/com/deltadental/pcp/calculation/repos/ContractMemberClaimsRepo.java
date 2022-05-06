@@ -15,7 +15,7 @@ import com.deltadental.pcp.calculation.entities.ContractMemberClaimsEntity;
 public interface ContractMemberClaimsRepo extends JpaRepository<ContractMemberClaimsEntity, Integer> {
 
 	//FIXME: remove query
-	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE  cmc.claimId = :claimId AND  cmc.contractId = :contractId AND  cmc.memberId = :memberId AND  cmc.providerId = :providerId AND cmc.state = :state AND cmc.status in :statusList")
+	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE  cmc.claimId = :claimId AND  cmc.contractId = :contractId AND  cmc.memberId = :memberId AND  cmc.providerId = :providerId AND cmc.state = :state AND cmc.status in :status")
 	List<ContractMemberClaimsEntity> findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(@Param("claimId") String claimId, 
 			@Param("contractId") String contractId, 
 			@Param("memberId") String memberId, 

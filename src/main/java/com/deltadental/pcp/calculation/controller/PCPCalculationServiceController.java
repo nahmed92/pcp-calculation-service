@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.deltadental.pcp.calculation.constants.PCPCalculationServiceConstants;
 import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
 import com.deltadental.pcp.calculation.service.MemberContractClaimService;
-import com.deltadental.pcp.search.service.pojos.PCPAssignmentResponse;
+import com.deltadental.pcp.search.interservice.pojo.PCPAssignmentResponse;
 import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 import com.deltadental.platform.common.exception.ServiceError;
 

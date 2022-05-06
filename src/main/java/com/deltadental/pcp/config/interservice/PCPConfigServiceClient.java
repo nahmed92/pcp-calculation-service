@@ -1,11 +1,11 @@
 package com.deltadental.pcp.config.interservice;
 
-import static com.deltadental.pcp.config.service.PCPConfigServiceConstants.CLAIM_STATUS;
-import static com.deltadental.pcp.config.service.PCPConfigServiceConstants.EXCLUSIONS_PROVIDER;
-import static com.deltadental.pcp.config.service.PCPConfigServiceConstants.EXPLANATION_CODE;
-import static com.deltadental.pcp.config.service.PCPConfigServiceConstants.INCLUSIONS_PROVIDER;
-import static com.deltadental.pcp.config.service.PCPConfigServiceConstants.PROCEDURE_CODE;
-import static com.deltadental.pcp.config.service.PCPConfigServiceConstants.PROVIDER_LOOKAHEAD_DAYS;
+import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.CLAIM_STATUS;
+import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.EXCLUSIONS_PROVIDER;
+import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.EXPLANATION_CODE;
+import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.INCLUSIONS_PROVIDER;
+import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.PROCEDURE_CODE;
+import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.PROVIDER_LOOKAHEAD_DAYS;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -26,7 +26,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.deltadental.pcp.calculation.error.PCPCalculationServiceErrors;
-import com.deltadental.pcp.config.service.InclusionExclusion;
+import com.deltadental.pcp.config.interservice.pojo.InclusionExclusion;
 
 import lombok.extern.slf4j.Slf4j;
 

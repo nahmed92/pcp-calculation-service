@@ -1,7 +1,7 @@
 package com.deltadental.pcp.calculation.domain;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -19,20 +19,20 @@ import lombok.NoArgsConstructor;
 @Valid
 public class MemberContractClaimRequest {
 
-	@NotEmpty(message = "Claim Id cannot be null or empty!")
+	@NotBlank(message = "Claim Id cannot be null or empty!")
 	private String claimId;
 
-	@NotEmpty(message = "Contract Id cannot be null or empty!")
+	@NotBlank(message = "Contract Id cannot be null or empty!")
 	private String contractId;
 
-	@NotEmpty(message = "Member Id cannot be null or empty!")
+	@NotBlank(message = "Member Id cannot be null or empty!")
 	@Size(max = 2, min = 2, message = "Member ID length must be two(2).")
 	private String memberId;
 
-	@NotEmpty(message = "Provider Id cannot be null or empty!")
+	@NotBlank(message = "Provider Id cannot be null or empty!")
 	private String providerId;
 
-	@NotEmpty(message = "State cannot be null or empty!")
+	@NotBlank(message = "State cannot be null or empty!")
 	@Size(max = 2, min = 2, message = "State code length must be two(2).")
 	private String state; //FIXME: Change to enum
 

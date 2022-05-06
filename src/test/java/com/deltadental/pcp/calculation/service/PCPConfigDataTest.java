@@ -26,8 +26,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.deltadental.pcp.calculation.interservice.PCPConfigData;
 import com.deltadental.pcp.config.interservice.PCPConfigServiceClient;
-import com.deltadental.pcp.config.service.GroupRestrictions;
-import com.deltadental.pcp.config.service.InclusionExclusion;
+import com.deltadental.pcp.config.interservice.pojo.GroupRestrictions;
+import com.deltadental.pcp.config.interservice.pojo.InclusionExclusion;
 
 @TestInstance(Lifecycle.PER_CLASS)
 @RunWith(MockitoJUnitRunner.class)

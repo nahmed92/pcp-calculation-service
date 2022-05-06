@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.deltadental.mtv.sync.service.MTVSyncService;
-import com.deltadental.mtv.sync.service.MemberClaimRequest;
-import com.deltadental.mtv.sync.service.MemberClaimResponse;
-import com.deltadental.mtv.sync.service.ServiceLine;
+import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
+import com.deltadental.mtv.sync.interservice.pojo.MemberClaimRequest;
+import com.deltadental.mtv.sync.interservice.pojo.MemberClaimResponse;
+import com.deltadental.mtv.sync.interservice.pojo.ServiceLine;
 import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimsEntity;
 import com.deltadental.pcp.calculation.enums.STATUS;
@@ -34,7 +34,7 @@ public class PCPCalculationService {
 	
 	@Autowired
 	@Qualifier("mtvSyncService")
-	private MTVSyncService mtvSyncService;
+	private MTVSyncServiceClient mtvSyncService;
 	
 	@Autowired
 	private PCPConfigData pcpConfigData;

@@ -13,12 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.deltadental.mtv.sync.service.MTVSyncService;
-import com.deltadental.mtv.sync.service.MemberClaimRequest;
-import com.deltadental.mtv.sync.service.MemberClaimResponse;
-import com.deltadental.mtv.sync.service.ProviderAssignmentRequest;
-import com.deltadental.mtv.sync.service.ProviderAssignmentResponse;
-import com.deltadental.mtv.sync.service.ServiceLine;
+import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
+import com.deltadental.mtv.sync.interservice.pojo.MemberClaimRequest;
+import com.deltadental.mtv.sync.interservice.pojo.MemberClaimResponse;
+import com.deltadental.mtv.sync.interservice.pojo.ProviderAssignmentRequest;
+import com.deltadental.mtv.sync.interservice.pojo.ProviderAssignmentResponse;
+import com.deltadental.mtv.sync.interservice.pojo.ServiceLine;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimsEntity;
 import com.deltadental.pcp.calculation.entities.MemberClaimEntity;
 import com.deltadental.pcp.calculation.entities.MemberClaimServicesEntity;
@@ -30,11 +30,11 @@ import com.deltadental.pcp.calculation.repos.ContractMemberClaimsRepo;
 import com.deltadental.pcp.calculation.repos.MemberClaimRepo;
 import com.deltadental.pcp.calculation.repos.MemberClaimServicesRepo;
 import com.deltadental.pcp.calculation.repos.MemberProviderRepo;
-import com.deltadental.pcp.search.service.PCPSearchServiceClient;
-import com.deltadental.pcp.search.service.PCPValidateRequest;
-import com.deltadental.pcp.search.service.PCPValidateResponse;
-import com.deltadental.pcp.search.service.pojos.EnrolleeDetail;
-import com.deltadental.pcp.search.service.pojos.PCPResponse;
+import com.deltadental.pcp.search.interservice.PCPSearchServiceClient;
+import com.deltadental.pcp.search.interservice.PCPValidateRequest;
+import com.deltadental.pcp.search.interservice.PCPValidateResponse;
+import com.deltadental.pcp.search.interservice.pojo.EnrolleeDetail;
+import com.deltadental.pcp.search.interservice.pojo.PCPResponse;
 import com.deltadental.platform.common.exception.ServiceException;
 
 import lombok.AllArgsConstructor;
@@ -74,7 +74,7 @@ public class PCPAssignmentTask implements Runnable {
 	private PCPSearchServiceClient pcpSearchService;
 	
 	@Autowired
-	private MTVSyncService mtvSyncService;
+	private MTVSyncServiceClient mtvSyncService;
 	
 	@Autowired
 	private PCPConfigData pcpConfigData;

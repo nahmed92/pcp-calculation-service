@@ -34,13 +34,13 @@ public class MemberContractClaimService {
 	@Value("${service.instance.id}")
 	private String serviceInstanceId;
 
-	private static final List<String> statusList = new ArrayList<>();
+	private static final List<String> status = new ArrayList<>();
 
 	static {
-		statusList.add(STATUS.RETRY.getStatus());
-		statusList.add(STATUS.STAGED.getStatus());
-		statusList.add(STATUS.VALIDATED.getStatus());
-		statusList.add(STATUS.PCP_ASSIGNED.getStatus());
+		status.add(STATUS.RETRY.getStatus());
+		status.add(STATUS.STAGED.getStatus());
+		status.add(STATUS.VALIDATED.getStatus());
+		status.add(STATUS.PCP_ASSIGNED.getStatus());
 	}
 
 	private void save(MemberContractClaimRequest memberContractClaimRequest) {
@@ -51,7 +51,7 @@ public class MemberContractClaimService {
 						StringUtils.trimToNull(memberContractClaimRequest.getContractId()),
 						StringUtils.trimToNull(memberContractClaimRequest.getMemberId()),
 						StringUtils.trimToNull(memberContractClaimRequest.getProviderId()),
-						StringUtils.trimToNull(memberContractClaimRequest.getState()), statusList);
+						StringUtils.trimToNull(memberContractClaimRequest.getState()), status);
 
 		if (CollectionUtils.isEmpty(memberClaimsEntities)) {
 			log.info("Inserting  {} ", memberContractClaimRequest);
