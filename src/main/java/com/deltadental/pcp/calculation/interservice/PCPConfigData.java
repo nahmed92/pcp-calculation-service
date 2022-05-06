@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.deltadental.mtv.sync.interservice.pojo.ServiceLine;
+import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
 import com.deltadental.pcp.config.interservice.pojo.GroupRestrictions;
 import com.deltadental.pcp.config.interservice.pojo.InclusionExclusion;
 import com.deltadental.pcp.config.interservice.pojo.PcpConfigResponse;

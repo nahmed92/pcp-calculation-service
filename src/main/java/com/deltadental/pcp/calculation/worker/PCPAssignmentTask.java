@@ -14,11 +14,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
-import com.deltadental.mtv.sync.interservice.pojo.MemberClaimRequest;
-import com.deltadental.mtv.sync.interservice.pojo.MemberClaimResponse;
-import com.deltadental.mtv.sync.interservice.pojo.ProviderAssignmentRequest;
-import com.deltadental.mtv.sync.interservice.pojo.ProviderAssignmentResponse;
-import com.deltadental.mtv.sync.interservice.pojo.ServiceLine;
+import com.deltadental.mtv.sync.interservice.dto.MemberClaimRequest;
+import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
+import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentRequest;
+import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentResponse;
+import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimsEntity;
 import com.deltadental.pcp.calculation.entities.MemberClaimEntity;
 import com.deltadental.pcp.calculation.entities.MemberClaimServicesEntity;

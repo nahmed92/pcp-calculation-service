@@ -12,9 +12,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
-import com.deltadental.mtv.sync.interservice.pojo.MemberClaimRequest;
-import com.deltadental.mtv.sync.interservice.pojo.MemberClaimResponse;
-import com.deltadental.mtv.sync.interservice.pojo.ServiceLine;
+import com.deltadental.mtv.sync.interservice.dto.MemberClaimRequest;
+import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
+import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
 import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimsEntity;
 import com.deltadental.pcp.calculation.enums.STATUS;
@@ -22,7 +22,6 @@ import com.deltadental.pcp.calculation.interservice.PCPConfigData;
 import com.deltadental.pcp.calculation.repos.ContractMemberClaimsRepo;
 import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

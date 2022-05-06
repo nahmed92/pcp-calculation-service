@@ -9,19 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.deltadental.pcp.calculation.Mapper;
 import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimsEntity;
 import com.deltadental.pcp.calculation.enums.STATUS;
+import com.deltadental.pcp.calculation.mapper.Mapper;
 import com.deltadental.pcp.calculation.repos.ContractMemberClaimsRepo;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
-@NoArgsConstructor
-@AllArgsConstructor
 @Slf4j
 public class MemberContractClaimService {
 
@@ -55,8 +51,9 @@ public class MemberContractClaimService {
 
 		if (CollectionUtils.isEmpty(memberClaimsEntities)) {
 			log.info("Inserting  {} ", memberContractClaimRequest);
-			ContractMemberClaimsEntity contractMemberClaimsEntity = mapper.map(memberContractClaimRequest,serviceInstanceId);
-			
+			ContractMemberClaimsEntity contractMemberClaimsEntity = mapper.map(memberContractClaimRequest,
+					serviceInstanceId);
+
 			repo.save(contractMemberClaimsEntity);
 
 		} else {
