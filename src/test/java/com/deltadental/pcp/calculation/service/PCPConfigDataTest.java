@@ -14,7 +14,6 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
 import java.util.Locale;
 
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,16 +24,17 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.deltadental.pcp.calculation.interservice.PCPConfigData;
+import com.deltadental.pcp.config.interservice.PCPConfigServiceClient;
 import com.deltadental.pcp.config.service.GroupRestrictions;
 import com.deltadental.pcp.config.service.InclusionExclusion;
-import com.deltadental.pcp.config.service.PCPConfigService;
 
 @TestInstance(Lifecycle.PER_CLASS)
 @RunWith(MockitoJUnitRunner.class)
 class PCPConfigDataTest {
 
 	@Mock
-	private PCPConfigService mockPCPConfigService;
+	private PCPConfigServiceClient mockPCPConfigService;
 	
 	private PCPConfigData pcpConfigData;
 	
@@ -42,7 +42,7 @@ class PCPConfigDataTest {
 	public void initialize() {
 		MockitoAnnotations.initMocks(this);
 		pcpConfigData = new PCPConfigData();
-		pcpConfigData.setPcpConfigService(mockPCPConfigService);
+		pcpConfigData.setPcpConfigServiceClient(mockPCPConfigService);
 	}
 	
 	@DisplayName("Test provider inclusion")

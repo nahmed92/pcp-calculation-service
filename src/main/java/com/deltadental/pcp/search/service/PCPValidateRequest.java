@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class PcpValidateRequest {
+public class PCPValidateRequest {
 
 	private String contractId;
     private String lookAheadDays;

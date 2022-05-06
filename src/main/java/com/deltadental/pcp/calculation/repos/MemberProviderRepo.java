@@ -10,8 +10,4 @@ import com.deltadental.pcp.calculation.entities.MemberProviderEntity;
 @Transactional(readOnly = false)
 public interface MemberProviderRepo extends JpaRepository<MemberProviderEntity, Integer> {
 
-//	@Transactional
-//	@Modifying(clearAutomatically = true, flushAutomatically = true)
-//	@Query("update MemberProviderEntity mpe set mpe.status = :status, mpe.lastMaintTs = CURRENT_TIMESTAMP WHERE mpe.memberProviderId = :memberProviderId")
-//	void setStatus(@Param("memberProviderId") Integer memberProviderId, @Param("status") String status);
 }

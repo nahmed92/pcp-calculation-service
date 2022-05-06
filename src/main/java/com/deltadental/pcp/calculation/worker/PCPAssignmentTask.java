@@ -30,9 +30,9 @@ import com.deltadental.pcp.calculation.repos.ContractMemberClaimsRepo;
 import com.deltadental.pcp.calculation.repos.MemberClaimRepo;
 import com.deltadental.pcp.calculation.repos.MemberClaimServicesRepo;
 import com.deltadental.pcp.calculation.repos.MemberProviderRepo;
-import com.deltadental.pcp.search.service.PCPSearchService;
+import com.deltadental.pcp.search.service.PCPSearchServiceClient;
+import com.deltadental.pcp.search.service.PCPValidateRequest;
 import com.deltadental.pcp.search.service.PCPValidateResponse;
-import com.deltadental.pcp.search.service.PcpValidateRequest;
 import com.deltadental.pcp.search.service.pojos.EnrolleeDetail;
 import com.deltadental.pcp.search.service.pojos.PCPResponse;
 import com.deltadental.platform.common.exception.ServiceException;
@@ -71,7 +71,7 @@ public class PCPAssignmentTask implements Runnable {
 	public static String PCP_VALID_FOR_ENROLLEE = " Input PCP is Valid for the Enrollee "; 
 	
 	@Autowired
-	private PCPSearchService pcpSearchService;
+	private PCPSearchServiceClient pcpSearchService;
 	
 	@Autowired
 	private MTVSyncService mtvSyncService;
@@ -117,7 +117,7 @@ public class PCPAssignmentTask implements Runnable {
 	}
 	
 	private PCPValidateResponse callPCPValidate(MemberClaimResponse memberClaimResponse, String pcpEffectiveDate) throws ServiceException {
-		PcpValidateRequest pcpValidateRequest = PcpValidateRequest.builder()
+		PCPValidateRequest pcpValidateRequest = PCPValidateRequest.builder()
 				.contractId(memberClaimResponse.getContractId())
 				.lookAheadDays(LOOK_A_HEAD_DAYS_90)
 				.memberType(memberClaimResponse.getMemberID())
@@ -229,8 +229,8 @@ public class PCPAssignmentTask implements Runnable {
 			Random rand = SecureRandom.getInstanceStrong();
 			return rand.nextInt(10) + 1;
 		} catch (NoSuchAlgorithmException e) {
-		}
-		return 0;
+			return 0;
+		}		
 	}
 
 	public void processPCPAssignment() {

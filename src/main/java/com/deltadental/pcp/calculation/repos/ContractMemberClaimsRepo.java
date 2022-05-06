@@ -23,12 +23,7 @@ public interface ContractMemberClaimsRepo extends JpaRepository<ContractMemberCl
 			@Param("state") String state,
 			@Param("status") List<String> status);
 
-	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE cmc.instanceId = :instanceId AND cmc.status in :statusList")
-	List<ContractMemberClaimsEntity> findByInstanceIdWhereStatusInList(@Param("instanceId") String instanceId, @Param("statusList") List<String> statusList);
-//	
-//	@Transactional
-//	@Modifying(clearAutomatically = true, flushAutomatically = true)
-//	@Query("update ContractMemberClaimsEntity cmc set cmc.status = :status, cmc.lastMaintTs = CURRENT_TIMESTAMP WHERE cmc.contractMemberClaimId = :contractMemberClaimId")
-//	void setStatus(@Param("contractMemberClaimId") Integer contractMemberClaimId, @Param("status") String status);
-	
+	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE cmc.instanceId = :instanceId AND cmc.status in :status")
+	List<ContractMemberClaimsEntity> findByInstanceIdWhereStatusInList(@Param("instanceId") String instanceId, @Param("status") List<String> status);
+
 }

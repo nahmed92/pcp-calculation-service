@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @Service("pcpSearchService")
 @Slf4j
-public class PCPSearchService {
+public class PCPSearchServiceClient {
 
 	@Value("${pcp.search.service.endpoint}")
 	private String pcpSearchServiceEndpoint;
@@ -38,7 +38,7 @@ public class PCPSearchService {
 	private RestTemplate restTemplate;
 	
 	public PCPAssignmentResponse validateProvider(PcpAssignmentRequest pcpAssignmentRequest) {
-		log.info("START PCPSearchService.validateProvider");
+		log.info("START PCPSearchServiceClient.validateProvider");
 		String providerValidateEndPoint = pcpSearchServiceEndpoint.concat(PCPSearchServiceConstants.PROVIDER_VALIDATION);
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(providerValidateEndPoint);
 		String uriBuilder = builder.build().encode().toUriString();
@@ -53,13 +53,13 @@ public class PCPSearchService {
 			String stacktrace = ExceptionUtils.getStackTrace(e);
 			throw PCPCalculationServiceErrors.PCP_SEARCH_SERVICE_ERROR.createException(stacktrace);
 		}
-		log.info("END PCPSearchService.validateProvider");
+		log.info("END PCPSearchServiceClient.validateProvider");
 		return null;
 	}
 	
 	
-	public PCPValidateResponse pcpValidate(PcpValidateRequest pcpValidateRequest) {
-		log.info("START PCPSearchService.validateProvider");
+	public PCPValidateResponse pcpValidate(PCPValidateRequest pcpValidateRequest) {
+		log.info("START PCPSearchServiceClient.validateProvider");
 		String providerValidateEndPoint = pcpSearchServiceEndpoint.concat(PCPSearchServiceConstants.PCP_VALIDATION);
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(providerValidateEndPoint);
 		String uriBuilder = builder.build().encode().toUriString();
@@ -74,7 +74,7 @@ public class PCPSearchService {
 			String stacktrace = ExceptionUtils.getStackTrace(e);
 			throw PCPCalculationServiceErrors.PCP_SEARCH_SERVICE_ERROR.createException(stacktrace);
 		}
-		log.info("END PCPSearchService.validateProvider");
+		log.info("END PCPSearchServiceClient.validateProvider");
 		return null;
 	}
 }

@@ -1,11 +1,17 @@
 package com.deltadental.pcp.config.interservice;
 
+import static com.deltadental.pcp.config.service.PCPConfigServiceConstants.CLAIM_STATUS;
+import static com.deltadental.pcp.config.service.PCPConfigServiceConstants.EXCLUSIONS_PROVIDER;
+import static com.deltadental.pcp.config.service.PCPConfigServiceConstants.EXPLANATION_CODE;
+import static com.deltadental.pcp.config.service.PCPConfigServiceConstants.INCLUSIONS_PROVIDER;
+import static com.deltadental.pcp.config.service.PCPConfigServiceConstants.PROCEDURE_CODE;
+import static com.deltadental.pcp.config.service.PCPConfigServiceConstants.PROVIDER_LOOKAHEAD_DAYS;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -21,7 +27,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.deltadental.pcp.calculation.error.PCPCalculationServiceErrors;
 import com.deltadental.pcp.config.service.InclusionExclusion;
-import static com.deltadental.pcp.config.service.PCPConfigServiceConstants.*;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,6 +41,28 @@ public class PCPConfigServiceClient{
 	private RestTemplate restTemplate;
 	
 	//FIXME: Generalize to one Method
+	
+	public String pcpConfigData(String serviceEndPoint) {
+		log.info("START PCPConfigServiceClient.pcpConfigData {} ", serviceEndPoint);
+		String providerLookaheadDaysEndPoint = pcpConfigServiceEndpoint.concat(serviceEndPoint);
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(providerLookaheadDaysEndPoint);
+		String uriBuilder = builder.build().encode().toUriString();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		try {
+			ResponseEntity<String> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
+			if(responseEntity.getStatusCode() == HttpStatus.OK) {
+				return responseEntity.getBody();
+			}else {
+				log.error("Got {} response code from PCP Config API {} ",responseEntity.getStatusCode(),serviceEndPoint);
+			} 
+		} catch (RestClientException | URISyntaxException e) {
+			log.error("Unable to call PCP Config for API {} ",serviceEndPoint,e);
+			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(e);
+		}
+		log.info("END PCPConfigServiceClient.pcpConfigData {} ", serviceEndPoint);
+		return null;
+	}
 	
 	public String providerLookaheadDays() {
 		log.info("START PCPConfigServiceClient.providerLookaheadDays");
