@@ -47,8 +47,8 @@ public class PCPConfigData implements InitializingBean {
 	@Autowired
 	private PCPConfigService pcpConfigService;
 
-	private static final DateTimeFormatter _FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S", Locale.US);
-	private static final DateFormat MMDDYYYY_FORMATTER = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
+	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S", Locale.US);
+	private final DateFormat mmddyyyyFormatter = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
 	private static final String ZONE_ID = "America/Los_Angeles";
 	
 	private String lookAHeadDays;
@@ -174,20 +174,17 @@ public class PCPConfigData implements InitializingBean {
 	public boolean isProviderInInclusionList(String providerId, String group, String division) {
 		Boolean inclusionFlag = Boolean.TRUE;
 		InclusionExclusion[] inclusions = pcpConfigService.inclusions(providerId);
-		if(null != inclusions) {
 		List<InclusionExclusion> inclusionList = Arrays.asList(inclusions);
-			if(CollectionUtils.isNotEmpty(inclusionList)) {
-				if(inclusionList.size() == 1) {
-					inclusionFlag = Boolean.valueOf(matchInclusion(inclusionList.get(0), providerId, group, division));
-					log.info("Provider {}, Group {}, Division {} is listed in inclusion list.", providerId, group, division);
-				} else {
-					inclusionFlag = Boolean.valueOf(inclusionList.stream().anyMatch(inclusion -> matchInclusion(inclusion, providerId, group, division)));
-					log.info("Provider {}, Group {}, Division {} is listed in inclusion list.", providerId, group, division);
-				}			
+		if (CollectionUtils.isNotEmpty(inclusionList)) {
+			if (inclusionList.size() == 1) {
+				inclusionFlag = Boolean.valueOf(matchInclusion(inclusionList.get(0), providerId, group, division));
+				log.info("Provider {}, Group {}, Division {} is listed in inclusion list.", providerId, group, division);
 			} else {
-				log.info("Provider {}, Group {}, Division {} is not listed in inclusion list.", providerId, group, division);
+				inclusionFlag = Boolean.valueOf(inclusionList.stream()
+						.anyMatch(inclusion -> matchInclusion(inclusion, providerId, group, division)));
+				log.info("Provider {}, Group {}, Division {} is listed in inclusion list.", providerId, group, division);
 			}
-		}  else {
+		} else {
 			log.info("Provider {}, Group {}, Division {} is not listed in inclusion list.", providerId, group, division);
 		}
 		return inclusionFlag.booleanValue();
@@ -196,27 +193,21 @@ public class PCPConfigData implements InitializingBean {
 	public boolean isProviderInExclusionList(String providerId, String group, String division) {
 		Boolean exclusionFlag = Boolean.FALSE;
 		InclusionExclusion[] exclusions = pcpConfigService.exclusions(providerId);
-		if(null != exclusions) {
-			List<InclusionExclusion> exclusionList = Arrays.asList(exclusions);
-			if(CollectionUtils.isNotEmpty(exclusionList)) {
-				if(exclusionList.size() == 1) {
-					exclusionFlag = Boolean.valueOf(matchExclusion(exclusionList.get(0), providerId, group, division));
-					if(!exclusionFlag) {
-						log.info("Provider {}, Group {}, Division {} is listed in exlusion list.", providerId, group, division);
-					}
-				} else {
-					exclusionFlag = Boolean.valueOf(exclusionList.stream().anyMatch(exclusion -> matchInclusion(exclusion, providerId, group, division)));
+		List<InclusionExclusion> exclusionList = Arrays.asList(exclusions);
+		if (CollectionUtils.isNotEmpty(exclusionList)) {
+			if (exclusionList.size() == 1) {
+				exclusionFlag = Boolean.valueOf(matchExclusion(exclusionList.get(0), providerId, group, division));
+				if (!exclusionFlag) {
 					log.info("Provider {}, Group {}, Division {} is listed in exlusion list.", providerId, group, division);
 				}
 			} else {
-				log.info("Provider {}, Group {}, Division {} is not listed in exlusion list.", providerId, group, division);
-				exclusionFlag = Boolean.TRUE;
+				exclusionFlag = Boolean.valueOf(exclusionList.stream() .anyMatch(exclusion -> matchInclusion(exclusion, providerId, group, division)));
+				log.info("Provider {}, Group {}, Division {} is listed in exlusion list.", providerId, group, division);
 			}
 		} else {
 			log.info("Provider {}, Group {}, Division {} is not listed in exlusion list.", providerId, group, division);
 			exclusionFlag = Boolean.TRUE;
 		}
-		
 		return exclusionFlag;
 	}
 	
@@ -227,16 +218,16 @@ public class PCPConfigData implements InitializingBean {
         if (currentDateDay < 16) {
         	LocalDate firstDayOfMonth = LocalDate.now(defaultZoneId).with(TemporalAdjusters.firstDayOfMonth());
         	Date firstDateOfMonth = Date.from(firstDayOfMonth.atStartOfDay(defaultZoneId).toInstant());
-        	return MMDDYYYY_FORMATTER.format(firstDateOfMonth);
+        	return mmddyyyyFormatter.format(firstDateOfMonth);
         } else {
         	LocalDate firstDayOfNextMonth = LocalDate.now(defaultZoneId).with(TemporalAdjusters.firstDayOfNextMonth());
         	Date firstDateOfNextMonth = Date.from(firstDayOfNextMonth.atStartOfDay(defaultZoneId).toInstant());
-        	return MMDDYYYY_FORMATTER.format(firstDateOfNextMonth);
+        	return mmddyyyyFormatter.format(firstDateOfNextMonth);
         }
 	}
 	
 	private boolean matchInclusion(InclusionExclusion inclusionExclusion, String providerId, String group, String division) {
-		LocalDate effectiveDate = LocalDate.parse(inclusionExclusion.getEffectiveDate(), _FORMATTER);
+		LocalDate effectiveDate = LocalDate.parse(inclusionExclusion.getEffectiveDate(), dateTimeFormatter);
 		LocalDate now = LocalDate.now();
 		if(now.isAfter(effectiveDate) || now.isEqual(effectiveDate)) {
 			GroupRestrictions groupRestrictions = inclusionExclusion.getGroupRestrictions();
@@ -248,7 +239,7 @@ public class PCPConfigData implements InitializingBean {
 	}
 	
 	private boolean matchExclusion(InclusionExclusion inclusionExclusion, String providerId, String group, String division) {
-		LocalDate effectiveDate = LocalDate.parse(inclusionExclusion.getEffectiveDate(), _FORMATTER);
+		LocalDate effectiveDate = LocalDate.parse(inclusionExclusion.getEffectiveDate(), dateTimeFormatter);
 		LocalDate now = LocalDate.now();
 		if(now.isBefore(effectiveDate) || now.isEqual(effectiveDate)) {
 			GroupRestrictions groupRestrictions = inclusionExclusion.getGroupRestrictions();

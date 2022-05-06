@@ -122,20 +122,19 @@ public class PCPConfigService {
 	    URI exclusionsUri = builder.buildAndExpand(params).toUri();
 	    log.info("exclusions uri : "+exclusionsUri);
 	    HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		
-		HttpEntity requestEntity = new HttpEntity<>(headers);
+		headers.setContentType(MediaType.APPLICATION_JSON);		
 		try {
-			ResponseEntity<InclusionExclusion[]> responseEntity = this.restTemplate.exchange(exclusionsUri, HttpMethod.GET, requestEntity, InclusionExclusion[].class);
+			ResponseEntity<InclusionExclusion[]> responseEntity = this.restTemplate.exchange(exclusionsUri, HttpMethod.GET, new HttpEntity<>(headers), InclusionExclusion[].class);
 			if (null != responseEntity && responseEntity.getStatusCode() == HttpStatus.OK) {
 				return responseEntity.getBody();
 			}
 		} catch (RestClientException e) {
 			String stacktrace = ExceptionUtils.getStackTrace(e);
+			log.error("Exception in getting exclusion list ", e);
 			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(stacktrace);
 		}		
-		log.info("START PCPConfigService.exclusions");
-		return null;
+		log.info("END PCPConfigService.exclusions");
+		return new InclusionExclusion[0];
 	}
 	
 	public InclusionExclusion[] inclusions(String providerId) {
@@ -147,19 +146,18 @@ public class PCPConfigService {
 	    URI inclusionsUri = builder.buildAndExpand(params).toUri();
 	    log.info("exclusions uri : "+inclusionsUri);
 	    HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		
-		HttpEntity requestEntity = new HttpEntity<>(headers);
+		headers.setContentType(MediaType.APPLICATION_JSON);		
 		try {
-			ResponseEntity<InclusionExclusion[]> responseEntity = this.restTemplate.exchange(inclusionsUri, HttpMethod.GET, requestEntity, InclusionExclusion[].class);
+			ResponseEntity<InclusionExclusion[]> responseEntity = this.restTemplate.exchange(inclusionsUri, HttpMethod.GET, new HttpEntity<>(headers), InclusionExclusion[].class);
 			if (null != responseEntity && responseEntity.getStatusCode() == HttpStatus.OK) {
 				return responseEntity.getBody();
 			}
 		} catch (RestClientException e) {
 			String stacktrace = ExceptionUtils.getStackTrace(e);
+			log.error("Exception in getting inclusion list ", e);
 			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(stacktrace);
 		}		
-		log.info("START PCPConfigService.inclusions");
-		return null;
+		log.info("END PCPConfigService.inclusions");
+		return new InclusionExclusion[0];
 	}
 }

@@ -1,5 +1,7 @@
 package com.deltadental.pcp.calculation.scheduler;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Random;
@@ -223,11 +225,12 @@ public class PCPAssignmentTask implements Runnable {
 	}
 	
 	private int random() {
-		Random rand = new Random();
-		int maxNumber = 10;
-
-		int randomNumber = rand.nextInt(maxNumber) + 1;
-		return randomNumber;
+		try {
+			Random rand = SecureRandom.getInstanceStrong();
+			return rand.nextInt(10) + 1;
+		} catch (NoSuchAlgorithmException e) {
+		}
+		return 0;
 	}
 
 	public void processPCPAssignment() {
@@ -243,7 +246,6 @@ public class PCPAssignmentTask implements Runnable {
 			MemberClaimResponse memberClaimResponse = mtvSyncService.memberClaim(memberClaimRequest);
 			if (null != memberClaimResponse
 					&& (memberClaimResponse.getErrorCode() == null || memberClaimResponse.getErrorMessage() == null)) {
-				// TODO : Find division number
 				boolean exclusionFlag = pcpConfigData.isProviderInExclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber());
 				boolean inclusionFlag = pcpConfigData.isProviderInInclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber());
 				if (exclusionFlag || inclusionFlag) {
