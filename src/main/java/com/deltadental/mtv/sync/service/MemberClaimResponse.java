@@ -33,6 +33,7 @@ public class MemberClaimResponse {
     private String contractId;
     private String errorCode;
     private String errorMessage;
+    private String divisionNumber;
     private String groupNumber;
   //  private XMLGregorianCalendar memberDOB;
     private String memberFirstName;

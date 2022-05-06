@@ -7,6 +7,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 import javax.net.ssl.SSLContext;
 
@@ -24,8 +25,10 @@ import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
 
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @EnableAsync
 @Slf4j
 @ComponentScan(basePackages = { "com.deltadental.*" })
-public class PCPCalculationServiceApplication {
+public class PCPCalculationServiceApplication implements AsyncConfigurer {
 
 	public static void main(String[] args) {
 		log.info("Starting PCP Calculation Service");
@@ -56,12 +59,24 @@ public class PCPCalculationServiceApplication {
 	}
 
 	private static void setMessageConverter(RestTemplate restTemplate) {
-		List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();        
+		List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
 		MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-		converter.setSupportedMediaTypes(Collections.singletonList(MediaType.ALL));  
+		converter.setSupportedMediaTypes(Collections.singletonList(MediaType.ALL));
 		messageConverters.add(new FormHttpMessageConverter());
-        messageConverters.add(new StringHttpMessageConverter());
-		messageConverters.add(converter);  
-		restTemplate.setMessageConverters(messageConverters); 
+		messageConverters.add(new StringHttpMessageConverter());
+		messageConverters.add(converter);
+		restTemplate.setMessageConverters(messageConverters);
+	}
+
+	@Override
+	@Bean
+	public Executor getAsyncExecutor() {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(5);
+		executor.setMaxPoolSize(20);
+		executor.setQueueCapacity(10);
+		executor.setThreadNamePrefix("PCP-Calculation-");
+		executor.initialize();
+		return executor;
 	}
 }

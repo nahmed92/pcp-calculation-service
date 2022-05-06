@@ -174,16 +174,20 @@ public class PCPConfigData implements InitializingBean {
 	public boolean isProviderInInclusionList(String providerId, String group, String division) {
 		Boolean inclusionFlag = Boolean.TRUE;
 		InclusionExclusion[] inclusions = pcpConfigService.inclusions(providerId);
+		if(null != inclusions) {
 		List<InclusionExclusion> inclusionList = Arrays.asList(inclusions);
-		if(CollectionUtils.isNotEmpty(inclusionList)) {
-			if(inclusionList.size() == 1) {
-				inclusionFlag = Boolean.valueOf(matchInclusion(inclusionList.get(0), providerId, group, division));
-				log.info("Provider {}, Group {}, Division {} is listed in inclusion list.", providerId, group, division);
+			if(CollectionUtils.isNotEmpty(inclusionList)) {
+				if(inclusionList.size() == 1) {
+					inclusionFlag = Boolean.valueOf(matchInclusion(inclusionList.get(0), providerId, group, division));
+					log.info("Provider {}, Group {}, Division {} is listed in inclusion list.", providerId, group, division);
+				} else {
+					inclusionFlag = Boolean.valueOf(inclusionList.stream().anyMatch(inclusion -> matchInclusion(inclusion, providerId, group, division)));
+					log.info("Provider {}, Group {}, Division {} is listed in inclusion list.", providerId, group, division);
+				}			
 			} else {
-				inclusionFlag = Boolean.valueOf(inclusionList.stream().anyMatch(inclusion -> matchInclusion(inclusion, providerId, group, division)));
-				log.info("Provider {}, Group {}, Division {} is listed in inclusion list.", providerId, group, division);
-			}			
-		} else {
+				log.info("Provider {}, Group {}, Division {} is not listed in inclusion list.", providerId, group, division);
+			}
+		}  else {
 			log.info("Provider {}, Group {}, Division {} is not listed in inclusion list.", providerId, group, division);
 		}
 		return inclusionFlag.booleanValue();
@@ -192,21 +196,27 @@ public class PCPConfigData implements InitializingBean {
 	public boolean isProviderInExclusionList(String providerId, String group, String division) {
 		Boolean exclusionFlag = Boolean.FALSE;
 		InclusionExclusion[] exclusions = pcpConfigService.exclusions(providerId);
-		List<InclusionExclusion> exclusionList = Arrays.asList(exclusions);
-		if(CollectionUtils.isNotEmpty(exclusionList)) {
-			if(exclusionList.size() == 1) {
-				exclusionFlag = Boolean.valueOf(matchExclusion(exclusionList.get(0), providerId, group, division));
-				if(!exclusionFlag) {
+		if(null != exclusions) {
+			List<InclusionExclusion> exclusionList = Arrays.asList(exclusions);
+			if(CollectionUtils.isNotEmpty(exclusionList)) {
+				if(exclusionList.size() == 1) {
+					exclusionFlag = Boolean.valueOf(matchExclusion(exclusionList.get(0), providerId, group, division));
+					if(!exclusionFlag) {
+						log.info("Provider {}, Group {}, Division {} is listed in exlusion list.", providerId, group, division);
+					}
+				} else {
+					exclusionFlag = Boolean.valueOf(exclusionList.stream().anyMatch(exclusion -> matchInclusion(exclusion, providerId, group, division)));
 					log.info("Provider {}, Group {}, Division {} is listed in exlusion list.", providerId, group, division);
 				}
 			} else {
-				exclusionFlag = Boolean.valueOf(exclusionList.stream().anyMatch(exclusion -> matchInclusion(exclusion, providerId, group, division)));
-				log.info("Provider {}, Group {}, Division {} is listed in exlusion list.", providerId, group, division);
+				log.info("Provider {}, Group {}, Division {} is not listed in exlusion list.", providerId, group, division);
+				exclusionFlag = Boolean.TRUE;
 			}
 		} else {
 			log.info("Provider {}, Group {}, Division {} is not listed in exlusion list.", providerId, group, division);
 			exclusionFlag = Boolean.TRUE;
 		}
+		
 		return exclusionFlag;
 	}
 	
@@ -230,7 +240,7 @@ public class PCPConfigData implements InitializingBean {
 		LocalDate now = LocalDate.now();
 		if(now.isAfter(effectiveDate) || now.isEqual(effectiveDate)) {
 			GroupRestrictions groupRestrictions = inclusionExclusion.getGroupRestrictions();
-			return StringUtils.equals(groupRestrictions.getMasterContractId(), providerId) && StringUtils.equals(groupRestrictions.getGroupId(), group);
+			return StringUtils.equals(groupRestrictions.getMasterContractId(), providerId) && StringUtils.equals(groupRestrictions.getGroupId(), group) && StringUtils.equals(groupRestrictions.getDivisionId(), division);
 		} else {
 			log.info("Provider {} inclusion list configuration is not effective as of this date {}.", providerId, now);
 			return true;
@@ -242,7 +252,7 @@ public class PCPConfigData implements InitializingBean {
 		LocalDate now = LocalDate.now();
 		if(now.isBefore(effectiveDate) || now.isEqual(effectiveDate)) {
 			GroupRestrictions groupRestrictions = inclusionExclusion.getGroupRestrictions();
-			return !(StringUtils.equals(groupRestrictions.getMasterContractId(), providerId) && StringUtils.equals(groupRestrictions.getGroupId(), group));
+			return !(StringUtils.equals(groupRestrictions.getMasterContractId(), providerId) && StringUtils.equals(groupRestrictions.getGroupId(), group)  && StringUtils.equals(groupRestrictions.getDivisionId(), division));
 		} else {
 			log.info("Provider {} exlusion list configuration is not effective as of this date {}.", providerId, now);
 			return true;

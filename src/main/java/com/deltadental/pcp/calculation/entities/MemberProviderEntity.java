@@ -82,6 +82,15 @@ public class MemberProviderEntity implements Serializable {
 	@Column(name = "PROVIDER_ID")
 	private String providerId;
 	
+	@Column(name = "PRACTICE_LOCATION_ID")
+	private String practiceLocationId;
+	
+	@Column(name = "PROVIDER_CONTRACT_ID")
+	private String providerContractId;
+	
+	@Column(name = "BUSINESS_LEVEL_ASSN_ID")
+	private String businessLevelAssnId;
+	
 	@PrePersist
     public void onInsert() {
 		crationTs = Timestamp.from(ZonedDateTime.now(ZoneId.of("America/Los_Angeles")).toInstant());
