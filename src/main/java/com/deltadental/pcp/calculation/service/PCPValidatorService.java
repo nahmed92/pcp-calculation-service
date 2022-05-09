@@ -1,6 +1,5 @@
 package com.deltadental.pcp.calculation.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -14,10 +13,10 @@ import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
 import com.deltadental.mtv.sync.interservice.dto.MemberClaimRequest;
 import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
 import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
-import com.deltadental.pcp.calculation.entities.ContractMemberClaimsEntity;
-import com.deltadental.pcp.calculation.enums.STATUS;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
+import com.deltadental.pcp.calculation.enums.Status;
 import com.deltadental.pcp.calculation.interservice.PCPConfigData;
-import com.deltadental.pcp.calculation.repos.ContractMemberClaimsRepo;
+import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
 import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 
 import lombok.NoArgsConstructor;
@@ -37,31 +36,19 @@ public class PCPValidatorService {
 	private PCPConfigData pcpConfigData;
 
 	@Autowired
-	private ContractMemberClaimsRepo repo;
+	private ContractMemberClaimRepo repo;
 
 	@Value("${service.instance.id}")
 	private String serviceInstanceId;
 
-	private static final List<String> statusList = new ArrayList<>();
 
-	private static final List<String> statusValidateList = new ArrayList<>();
-
-	static {
-		statusList.add(STATUS.RETRY.getStatus());
-		statusList.add(STATUS.STAGED.getStatus());
-		statusList.add(STATUS.VALIDATED.getStatus());
-		statusList.add(STATUS.PCP_ASSIGNED.getStatus());
-
-		statusValidateList.add(STATUS.RETRY.getStatus());
-		statusValidateList.add(STATUS.STAGED.getStatus());
-
-	}
+	private static final List<Status> SEARCH_STATUS_VALIDATE = List.of(Status.RETRY, Status.STAGED);
 
 	@MethodExecutionTime
-	private void validateContractMemberClaim(ContractMemberClaimsEntity contractMemberClaimsEntity) {
+	private void validateContractMemberClaim(ContractMemberClaimEntity contractMemberClaimsEntity) {
 		log.info("START PCPValidatorService.validateContractMemberClaim");
 		StringBuilder errorBuilder = new StringBuilder();
-		String status = STATUS.VALIDATED.getStatus();
+		Status status = Status.VALIDATED;
 		try {
 			MemberClaimRequest memberClaimRequest = MemberClaimRequest.builder()
 					.memberClaimId(contractMemberClaimsEntity.getClaimId()).build();
@@ -81,7 +68,7 @@ public class PCPValidatorService {
 						boolean isClaimStatusValid = pcpConfigData
 								.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus()));
 						if (isClaimStatusValid && isExplanationCodeValid && isProcedureCodeValid) {
-							status = STATUS.VALIDATED.getStatus();
+							status = Status.VALIDATED;
 						} else {
 							if (!isClaimStatusValid) {
 								errorBuilder.append("Claim status").append(memberClaimResponse.getClaimStatus())
@@ -96,14 +83,14 @@ public class PCPValidatorService {
 										"One of the Service Line Procedure Code[s] is not valid for this claim!");
 							}
 
-							status = STATUS.ERROR.getStatus();
+							status = Status.ERROR;
 							log.info("PCP Assignment status for claim id {} is {}.",
 									contractMemberClaimsEntity.getClaimId(), errorBuilder);
 						}
 					} else {
 						errorBuilder.append("Service Line Items are empty for claim# ")
 								.append(contractMemberClaimsEntity.getClaimId());
-						status = STATUS.ERROR.getStatus();
+						status = Status.ERROR;
 					}
 				} else {
 					if (!exclusionFlag) {
@@ -116,24 +103,25 @@ public class PCPValidatorService {
 								.append(memberClaimResponse.getGroupNumber())
 								.append(", Division {} is listed in inclusion list.");
 					}
-					status = STATUS.ERROR.getStatus();
+					status = Status.ERROR;
 				}
 			} else {
 				if (memberClaimResponse == null) {
 					errorBuilder.append("Claim information not found for claim# ")
 							.append(contractMemberClaimsEntity.getClaimId());
-					status = STATUS.ERROR.getStatus();
+					status = Status.ERROR;
 				} else {
 					errorBuilder.append(memberClaimResponse.getErrorCode()).append(":")
 							.append(memberClaimResponse.getErrorMessage());
-					status = STATUS.ERROR.getStatus();
+					status = Status.ERROR;
 				}
 			}
 		} catch (Exception e) {
 			log.error("Exception occured during retriving member claim information from Metavance Sync Service.", e);
 			errorBuilder.append(
 					" Exception occured during retriving member claim information from Metavance Sync Service.");
-			status = STATUS.RETRY.getStatus();
+			status = Status.RETRY;
+			contractMemberClaimsEntity.incrementRetryCount();
 		}
 		String errorMessage = errorBuilder.toString();
 		contractMemberClaimsEntity.setErrorMessage(errorMessage);
@@ -146,8 +134,8 @@ public class PCPValidatorService {
 	public void validatePending() {
 		log.info("START PCPValidatorService.validatePending()");
 
-		List<ContractMemberClaimsEntity> recordsToValidate = repo.findRecordsToValidate(serviceInstanceId,
-				statusValidateList);
+		List<ContractMemberClaimEntity> recordsToValidate = repo.findRecordsToValidate(serviceInstanceId,
+				SEARCH_STATUS_VALIDATE);
 
 		recordsToValidate.forEach(i -> validateContractMemberClaim(i));
 

@@ -1,7 +1,6 @@
 package com.deltadental.pcp.calculation.worker;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -15,10 +14,10 @@ import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.deltadental.pcp.calculation.entities.ContractMemberClaimsEntity;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
 import com.deltadental.pcp.calculation.entities.PCPCalculationActivityEntity;
-import com.deltadental.pcp.calculation.enums.STATUS;
-import com.deltadental.pcp.calculation.repos.ContractMemberClaimsRepo;
+import com.deltadental.pcp.calculation.enums.Status;
+import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
 import com.deltadental.pcp.calculation.repos.PCPCalculationServiceActivityRepo;
 
 import lombok.AllArgsConstructor;
@@ -33,6 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 public class PCPCalculationServiceWorker {
 
+	private static final List<Status> SEARCH_STATUS = List.of(Status.RETRY, Status.STAGED, Status.VALIDATED);
+
 	@Value("${pcp.assignment.process.workers.count:5}")
 	private int pcpAssignmentProcessWorkersCount;
 
@@ -40,9 +41,9 @@ public class PCPCalculationServiceWorker {
 	private String serviceInstanceId;
 
 	private Executor executor;
-	
+
 	@Autowired
-	private ContractMemberClaimsRepo contractMemberClaimsRepo;
+	private ContractMemberClaimRepo contractMemberClaimsRepo;
 
 	@Autowired
 	private PCPCalculationServiceActivityRepo activityRepo;
@@ -57,11 +58,11 @@ public class PCPCalculationServiceWorker {
 		return null;
 	}
 
-	public void submitTask(ContractMemberClaimsEntity contractMemberClaimsEntity) {
+	public void submitTask(ContractMemberClaimEntity contractMemberClaimsEntity) {
 		log.info("START PCPCalculationServiceWorker.submitTask()");
 		if (null != contractMemberClaimsEntity) {
 			PCPAssignmentTask pcpAssignmentTask = createTask();
-			pcpAssignmentTask.setContractMemberClaimsEntity(contractMemberClaimsEntity);
+			pcpAssignmentTask.setContractMemberClaimEntity(contractMemberClaimsEntity);
 			executor.execute(pcpAssignmentTask);
 		}
 		log.info("END PCPCalculationServiceWorker.submitTask()");
@@ -69,33 +70,29 @@ public class PCPCalculationServiceWorker {
 
 	public void processPCPAssignmentRequests() {
 		log.info("START PCPCalculationServiceWorker.processPCPAssignmentRequests()");
-		List<String> statusList = new ArrayList<>();
-		statusList.add(STATUS.RETRY.getStatus());
-		statusList.add(STATUS.STAGED.getStatus());
-		statusList.add(STATUS.VALIDATED.getStatus());
-		List<ContractMemberClaimsEntity> contractMemberClaimsEntities = contractMemberClaimsRepo.findByInstanceIdWhereStatusInList(serviceInstanceId, statusList);
+		List<ContractMemberClaimEntity> contractMemberClaimsEntities = contractMemberClaimsRepo
+				.findByInstanceIdWhereStatusInList(serviceInstanceId, SEARCH_STATUS);
 		if (CollectionUtils.isNotEmpty(contractMemberClaimsEntities)) {
 			long startTime = System.currentTimeMillis();
 			log.info("Processing total {} pcp assignment requests on service instance {} ",
 					contractMemberClaimsEntities.size(), serviceInstanceId);
 			contractMemberClaimsEntities.forEach(contractMemberClaimEntity -> {
 				try {
-					log.info("Processing pcp assignment request for contract member claim {}", contractMemberClaimEntity.toString());
+					log.info("Processing pcp assignment request for contract member claim {}",
+							contractMemberClaimEntity.toString());
 					submitTask(contractMemberClaimEntity);
 				} catch (Exception e) {
-					log.error("Exception processing pcp assingment request for contract member claim {} ", contractMemberClaimEntity.toString(), e);
+					log.error("Exception processing pcp assingment request for contract member claim {} ",
+							contractMemberClaimEntity.toString(), e);
 				}
 			});
 			long endTime = System.currentTimeMillis();
 			long minutes = TimeUnit.MILLISECONDS.toMinutes((endTime - startTime));
-		    log.info(" Thread Name + {}  taken to complete process :  {} minute[s]",Thread.currentThread().getName(), minutes);
-			PCPCalculationActivityEntity activity = PCPCalculationActivityEntity.builder()
-					.instanceId(serviceInstanceId)
-					.numOfRecords(contractMemberClaimsEntities.size())
-					.timeToProcess(minutes)
-					.startTime(new Timestamp(startTime))
-					.endTime(new Timestamp(endTime))
-					.build();
+			log.info(" Thread Name + {}  taken to complete process :  {} minute[s]", Thread.currentThread().getName(),
+					minutes);
+			PCPCalculationActivityEntity activity = PCPCalculationActivityEntity.builder().instanceId(serviceInstanceId)
+					.numOfRecords(contractMemberClaimsEntities.size()).timeToProcess(minutes)
+					.startTime(new Timestamp(startTime)).endTime(new Timestamp(endTime)).build();
 			activityRepo.save(activity);
 		} else {
 			log.info("No pending requests for pcp assignment.");

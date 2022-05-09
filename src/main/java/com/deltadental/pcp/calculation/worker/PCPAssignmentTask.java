@@ -19,14 +19,14 @@ import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
 import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentRequest;
 import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentResponse;
 import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
-import com.deltadental.pcp.calculation.entities.ContractMemberClaimsEntity;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
 import com.deltadental.pcp.calculation.entities.MemberClaimEntity;
 import com.deltadental.pcp.calculation.entities.MemberClaimServicesEntity;
 import com.deltadental.pcp.calculation.entities.MemberProviderEntity;
-import com.deltadental.pcp.calculation.enums.STATUS;
+import com.deltadental.pcp.calculation.enums.Status;
 import com.deltadental.pcp.calculation.error.PCPCalculationServiceErrors;
 import com.deltadental.pcp.calculation.interservice.PCPConfigData;
-import com.deltadental.pcp.calculation.repos.ContractMemberClaimsRepo;
+import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
 import com.deltadental.pcp.calculation.repos.MemberClaimRepo;
 import com.deltadental.pcp.calculation.repos.MemberClaimServicesRepo;
 import com.deltadental.pcp.calculation.repos.MemberProviderRepo;
@@ -89,9 +89,9 @@ public class PCPAssignmentTask implements Runnable {
 	private MemberClaimRepo memberClaimRepo;
 	
 	@Autowired
-	private ContractMemberClaimsRepo contractMemberClaimsRepo; 
+	private ContractMemberClaimRepo contractMemberClaimRepo; 
 
-	private ContractMemberClaimsEntity contractMemberClaimsEntity;
+	private ContractMemberClaimEntity contractMemberClaimEntity;
 
 	private String getPCPValidationMessage(PCPValidateResponse pcpValidateResponse) {
 		String pcpValidationMessage = null;
@@ -152,7 +152,7 @@ public class PCPAssignmentTask implements Runnable {
 		return providerAssignmentRequest;
 	}
 
-	private MemberClaimEntity saveMemberClaimEntity(ContractMemberClaimsEntity contractMemberClaimsEntity, MemberClaimResponse memberClaimResponse) {		
+	private MemberClaimEntity saveMemberClaimEntity(ContractMemberClaimEntity contractMemberClaimsEntity, MemberClaimResponse memberClaimResponse) {		
 		MemberClaimEntity memberClaimEntity = MemberClaimEntity.builder()
 				.billingProvId(memberClaimResponse.getBillingProvId())
 				.businessLevel4(memberClaimResponse.getBusinessLevel4())
@@ -170,7 +170,7 @@ public class PCPAssignmentTask implements Runnable {
 				.receivedTs(getTimestamp(memberClaimResponse.getReceivedTs().getNanos()))
 				.resolvedTs(getTimestamp(memberClaimResponse.getResolvedTs().getNanos()))
 				.servicesNumber(memberClaimResponse.getServicesNumber())
-				.contractMemberClaimsId(contractMemberClaimsEntity.getContractMemberClaimId())
+				//FIXME .contractMemberClaimsId(contractMemberClaimsEntity.getId())
 				.operatorId(OPERATORID_PCPCALS)
 				.build();
 		memberClaimRepo.save(memberClaimEntity);
@@ -197,7 +197,7 @@ public class PCPAssignmentTask implements Runnable {
 		}
 	}
 	
-	private MemberProviderEntity saveMemberProvider(Integer contractMemberClaimId, MemberClaimResponse memberClaimResponse, String pcpEffectiveDate, String status) {
+	private MemberProviderEntity saveMemberProvider(String id, MemberClaimResponse memberClaimResponse, String pcpEffectiveDate, Status status) {
 		MemberProviderEntity memberProviderEntity = MemberProviderEntity.builder()
 				.claimStatus(memberClaimResponse.getClaimStatus())
 				.personId(memberClaimResponse.getPersonId())
@@ -208,8 +208,8 @@ public class PCPAssignmentTask implements Runnable {
 				.status(PCP_STATUS_INITIAL)
 				.operatorId(OPERATORID_PCPCALS)
 				.contractId(memberClaimResponse.getContractId())
-				.contractMemberClaimsId(contractMemberClaimsEntity.getContractMemberClaimId())
-				.status(status)
+				//FIXME .contractMemberClaimsId(contractMemberClaimsEntity.getId())
+				.status(status.name())
 				.providerId(memberClaimResponse.getProviderId())
 //				.businessLevelAssnId(memberClaimResponse.getb)
 //				.practiceLocationId(memberClaimResponse.getpr)
@@ -234,11 +234,11 @@ public class PCPAssignmentTask implements Runnable {
 	}
 
 	public void processPCPAssignment() {
-		ContractMemberClaimsEntity contractMemberClaimsEntity = getContractMemberClaimsEntity();
+		ContractMemberClaimEntity contractMemberClaimsEntity = getContractMemberClaimEntity();
 		log.info("START PCPCalculationService.processPCPAssignment processing " + contractMemberClaimsEntity.toString());
 		String pcpEffectiveDate = pcpConfigData.calculatePCPEffectiveDate();
 		String errorMessage = null;
-		String status = STATUS.VALIDATED.getStatus();
+		Status status = Status.VALIDATED;
 		try {
 			MemberClaimRequest memberClaimRequest = MemberClaimRequest.builder()
 																	  .memberClaimId(contractMemberClaimsEntity.getClaimId())
@@ -267,15 +267,15 @@ public class PCPAssignmentTask implements Runnable {
 									try {
 										ProviderAssignmentResponse providerAssignmentResponse = mtvSyncService.providerAssignment(providerAssignmentRequest);
 										if (StringUtils.equals(providerAssignmentResponse.getReturnCode(), PCP_ASSIGNMENT_OK)) {
-											status = STATUS.PCP_ASSIGNED.getStatus();
-											saveMemberProvider(contractMemberClaimsEntity.getContractMemberClaimId(), memberClaimResponse, pcpEffectiveDate, status);
+											status = Status.PCP_ASSIGNED;
+											saveMemberProvider(contractMemberClaimsEntity.getId(), memberClaimResponse, pcpEffectiveDate, status);
 											log.info("PCP Assignment status for claim id {} status is {}.", contractMemberClaimsEntity.getClaimId(), status);
 										} else {
 											errorMessage = providerAssignmentResponse.getErrorMessage();
 											if (StringUtils.equals(errorMessage, "string")) {
 												errorMessage = "pcp update service provider assignmnet returned error, please check logs.";
 											}
-											status = STATUS.ERROR.getStatus();
+											status = Status.ERROR;
 											errorMessage = String.join(":", providerAssignmentResponse.getErrorCode(), providerAssignmentResponse.getErrorMessage());
 											log.info("PCP Assignment status for claim id {} status is {} and error message is {}.", contractMemberClaimsEntity.getClaimId(), status, errorMessage);
 										}										
@@ -283,17 +283,17 @@ public class PCPAssignmentTask implements Runnable {
 										String stacktrace = ExceptionUtils.getStackTrace(e);
 										log.error("Exception occured during provider assignment from metavance sync Service.", stacktrace);
 										errorMessage = "Exception occured during provider assignment from metavance sync Service.";
-										status = STATUS.RETRY.getStatus();
+										status = Status.RETRY;
 									}
 								} else {
 									errorMessage = pcpValidationMessage;
-									status = STATUS.ERROR.getStatus();
+									status = Status.ERROR;
 								}
 							} catch (Exception e) {
 								String stacktrace = ExceptionUtils.getStackTrace(e);
 								log.error("Exception occured during pcp valiation from pcp search Service.", stacktrace);
 								errorMessage = "Exception occured during pcp valiation from pcp search Service.";
-								status = STATUS.RETRY.getStatus();
+								status = Status.RETRY;
 							}
 						} else {
 							if (!isClaimStatusValid) {
@@ -313,13 +313,13 @@ public class PCPAssignmentTask implements Runnable {
 									errorMessage = "One of the Service Line Procedure Code[s] is not valid for this claim!";
 								}
 							}
-							status = STATUS.ERROR.getStatus();
+							status = Status.ERROR;
 							log.info("PCP Assignment status for claim id {} is {}.", contractMemberClaimsEntity.getClaimId(), errorMessage);
 						}
 					} else {
 						errorMessage = String.format("Service Line Items are empty for claim# %s ",
 								contractMemberClaimsEntity.getClaimId());
-						status = STATUS.ERROR.getStatus();
+						status = Status.ERROR;
 					}
 				} else {
 					if (!exclusionFlag) {
@@ -330,7 +330,7 @@ public class PCPAssignmentTask implements Runnable {
 							errorMessage = String.join(", ", errorMessage, String.format("Provider {}, Group {}, Division {} is listed in inclusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), ""));
 						}
 					}
-					status = STATUS.ERROR.getStatus();
+					status = Status.ERROR;
 				}
 			} else {
 				if (memberClaimResponse == null) {
@@ -338,17 +338,17 @@ public class PCPAssignmentTask implements Runnable {
 				} else {
 					errorMessage = String.join(" : ", memberClaimResponse.getErrorCode(), memberClaimResponse.getErrorMessage());
 				}
-				status = STATUS.ERROR.getStatus();
+				status = Status.ERROR;
 			}
 		} catch (Exception e) {
 			String stacktrace = ExceptionUtils.getStackTrace(e);
 			log.error("Exception occured during retriving member claim information from Metavance Sync Service.", stacktrace);
 			errorMessage = "Exception occured during retriving member claim information from Metavance Sync Service.";
-			status = STATUS.RETRY.getStatus();
+			status = Status.RETRY;
 		}
 		contractMemberClaimsEntity.setErrorMessage(errorMessage);
 		contractMemberClaimsEntity.setStatus(status);
-		contractMemberClaimsRepo.save(contractMemberClaimsEntity);
+		contractMemberClaimRepo.save(contractMemberClaimsEntity);
 		log.info("END PCPCalculationService.processPCPAssignment");
 	}
 

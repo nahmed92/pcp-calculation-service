@@ -2,16 +2,12 @@ package com.deltadental.pcp.calculation.entities;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -24,10 +20,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "MEMBER_CLAIM", schema = "dbo")
-@org.hibernate.annotations.Entity(
-        dynamicUpdate = true
-)
+@Table(name = "member_claim", schema = "dbo")
 public class MemberClaimEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -99,14 +92,5 @@ public class MemberClaimEntity implements Serializable {
 	@Column(name = "CONTRACT_MEMBER_CLAIMS_ID")
 	private Integer contractMemberClaimsId;
 	
-	@PrePersist
-    public void onInsert() {
-		crationTs = Timestamp.from(ZonedDateTime.now(ZoneId.of("America/Los_Angeles")).toInstant());
-		lastMaintTs = crationTs;
-    }
-
-    @PreUpdate
-    public void onUpdate() {
-    	lastMaintTs = Timestamp.from(ZonedDateTime.now(ZoneId.of("America/Los_Angeles")).toInstant());
-    }
+	 
 }

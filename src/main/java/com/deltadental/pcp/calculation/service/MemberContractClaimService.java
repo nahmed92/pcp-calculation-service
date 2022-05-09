@@ -1,7 +1,7 @@
 package com.deltadental.pcp.calculation.service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -10,10 +10,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
-import com.deltadental.pcp.calculation.entities.ContractMemberClaimsEntity;
-import com.deltadental.pcp.calculation.enums.STATUS;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
+import com.deltadental.pcp.calculation.enums.Status;
 import com.deltadental.pcp.calculation.mapper.Mapper;
-import com.deltadental.pcp.calculation.repos.ContractMemberClaimsRepo;
+import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MemberContractClaimService {
 
 	@Autowired
-	private ContractMemberClaimsRepo repo;
+	private ContractMemberClaimRepo repo;
 
 	@Autowired
 	private Mapper mapper;
@@ -30,34 +30,26 @@ public class MemberContractClaimService {
 	@Value("${service.instance.id}")
 	private String serviceInstanceId;
 
-	private static final List<String> status = new ArrayList<>();
+	private static final List<Status> SEARCH_STATUS = List.of(Status.RETRY, Status.STAGED, Status.VALIDATED,
+			Status.PCP_ASSIGNED);
 
-	static {
-		status.add(STATUS.RETRY.getStatus());
-		status.add(STATUS.STAGED.getStatus());
-		status.add(STATUS.VALIDATED.getStatus());
-		status.add(STATUS.PCP_ASSIGNED.getStatus());
-	}
-
-	private void save(MemberContractClaimRequest memberContractClaimRequest) {
+	private void save(MemberContractClaimRequest request) {
 		log.info("START MemberContractClaimService.save");
-		List<ContractMemberClaimsEntity> memberClaimsEntities = repo
+		List<ContractMemberClaimEntity> memberClaimsEntities = repo
 				.findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
-						StringUtils.trimToNull(memberContractClaimRequest.getClaimId()), // check this and remove
-						StringUtils.trimToNull(memberContractClaimRequest.getContractId()),
-						StringUtils.trimToNull(memberContractClaimRequest.getMemberId()),
-						StringUtils.trimToNull(memberContractClaimRequest.getProviderId()),
-						StringUtils.trimToNull(memberContractClaimRequest.getState()), status);
+						StringUtils.trimToNull(request.getClaimId()), // check this and remove
+						StringUtils.trimToNull(request.getContractId()), StringUtils.trimToNull(request.getMemberId()),
+						StringUtils.trimToNull(request.getProviderId()), StringUtils.trimToNull(request.getState()),
+						SEARCH_STATUS);
 
 		if (CollectionUtils.isEmpty(memberClaimsEntities)) {
-			log.info("Inserting  {} ", memberContractClaimRequest);
-			ContractMemberClaimsEntity contractMemberClaimsEntity = mapper.map(memberContractClaimRequest,
-					serviceInstanceId);
-
+			log.info("Inserting  {} ", request);
+			ContractMemberClaimEntity contractMemberClaimsEntity = mapper.map(request, serviceInstanceId);
+			contractMemberClaimsEntity.setId(UUID.randomUUID().toString());
 			repo.save(contractMemberClaimsEntity);
 
 		} else {
-			log.warn("Record already exists in contract member claims table : {} ", memberContractClaimRequest);
+			log.warn("Record already exists in contract member claims table : {} ", request);
 		}
 		log.info("END MemberContractClaimService.save");
 	}

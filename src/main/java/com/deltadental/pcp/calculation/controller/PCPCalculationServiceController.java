@@ -27,8 +27,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @CrossOrigin(exposedHeaders = "Content-Disposition")
@@ -36,9 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping(value = "/pcp-calculation")
 @Api(value = "/pcp-calculation")
 @Slf4j
-@Data
 @Validated
-@NoArgsConstructor
 public class PCPCalculationServiceController {
 
 	@Autowired

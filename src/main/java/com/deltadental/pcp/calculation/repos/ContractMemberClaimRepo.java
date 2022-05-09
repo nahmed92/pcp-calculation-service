@@ -8,26 +8,26 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.deltadental.pcp.calculation.entities.ContractMemberClaimsEntity;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
+import com.deltadental.pcp.calculation.enums.Status;
 
 @Repository
 @Transactional(readOnly = false)
-public interface ContractMemberClaimsRepo extends JpaRepository<ContractMemberClaimsEntity, Integer> {
+public interface ContractMemberClaimRepo extends JpaRepository<ContractMemberClaimEntity, Integer> {
 
-	//FIXME: remove query
+	// FIXME: remove query
 	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE  cmc.claimId = :claimId AND  cmc.contractId = :contractId AND  cmc.memberId = :memberId AND  cmc.providerId = :providerId AND cmc.state = :state AND cmc.status in :status")
-	List<ContractMemberClaimsEntity> findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(@Param("claimId") String claimId, 
-			@Param("contractId") String contractId, 
-			@Param("memberId") String memberId, 
-			@Param("providerId") String providerId,
-			@Param("state") String state,
-			@Param("status") List<String> status);
+	List<ContractMemberClaimEntity> findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
+			@Param("claimId") String claimId, @Param("contractId") String contractId,
+			@Param("memberId") String memberId, @Param("providerId") String providerId, @Param("state") String state,
+			@Param("status") List<Status> status);
 
 	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE cmc.instanceId = :instanceId AND cmc.status in :status")
-	List<ContractMemberClaimsEntity> findByInstanceIdWhereStatusInList(@Param("instanceId") String instanceId, @Param("status") List<String> status);
-	
-	
+	List<ContractMemberClaimEntity> findByInstanceIdWhereStatusInList(@Param("instanceId") String instanceId,
+			@Param("status") List<Status> status);
+
 	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE cmc.instanceId = :instanceId AND cmc.status in :status")
-	List<ContractMemberClaimsEntity> findRecordsToValidate(@Param("instanceId") String instanceId, @Param("status") List<String> status);
+	List<ContractMemberClaimEntity> findRecordsToValidate(@Param("instanceId") String instanceId,
+			@Param("status") List<Status> status);
 
 }
