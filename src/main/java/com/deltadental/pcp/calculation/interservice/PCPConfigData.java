@@ -1,5 +1,9 @@
 package com.deltadental.pcp.calculation.interservice;
 
+import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.CLAIM_STATUS;
+import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.EXPLANATION_CODE;
+import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.PROCEDURE_CODE;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -97,25 +101,32 @@ public class PCPConfigData implements InitializingBean {
 	}
 
 	private void claimStatuses() {
-		String jsonClaimStatusStr = pcpConfigServiceClient.claimStatus();
+		log.info("START PCPConfigData.claimStatuses");
+		String jsonClaimStatusStr = pcpConfigServiceClient.getPCPConfigData(CLAIM_STATUS);
 		List<PcpConfigResponse> pcpConfigResponses = getPcpConfigResponseList(jsonClaimStatusStr);
 		setClaimStatusList(pcpConfigResponses);
+		log.info("END PCPConfigData.claimStatuses");
 	}
 
 	private void explanationCodes() {
-		String jsonExplanationCodeStr = pcpConfigServiceClient.explanationCode();
+		log.info("START PCPConfigData.explanationCodes");
+		String jsonExplanationCodeStr = pcpConfigServiceClient.getPCPConfigData(EXPLANATION_CODE);
 		List<PcpConfigResponse> pcpConfigResponses = getPcpConfigResponseList(jsonExplanationCodeStr);
 		setExplanationCodes(pcpConfigResponses);
+		log.info("END PCPConfigData.explanationCodes");
 	}
 
 	private void procedureCodes() {
-		String jsonProcedureCodeStr = pcpConfigServiceClient.procedureCode();
+		log.info("START PCPConfigData.procedureCodes");
+		String jsonProcedureCodeStr = pcpConfigServiceClient.getPCPConfigData(PROCEDURE_CODE);
 		List<PcpConfigResponse> pcpConfigResponses = getPcpConfigResponseList(jsonProcedureCodeStr);
 		setProcedureCodes(pcpConfigResponses);
+		log.info("END PCPConfigData.procedureCodes");
 	}
 	
 	
 	public boolean isClaimStatusValid(String claimStatus) {
+		log.info("START PCPConfigData.isClaimStatusValid");
 		try {
 			List<PcpConfigResponse> claimStatusList = this.getClaimStatusList();
 			return claimStatusList.stream().anyMatch(pcpConfigResponse -> StringUtils.equals(pcpConfigResponse.getCodeValue(), claimStatus));
@@ -125,6 +136,7 @@ public class PCPConfigData implements InitializingBean {
 	}
 	
 	public boolean isExplanationCodeValid(List<ServiceLine> serviceLines) {
+		log.info("START PCPConfigData.isExplanationCodeValid");
 		boolean isExplanationCodeValid = false;
 		if (serviceLines != null && !serviceLines.isEmpty()) {
 			for(ServiceLine serviceLine : serviceLines) {
@@ -139,10 +151,12 @@ public class PCPConfigData implements InitializingBean {
 				}
 			}
 		}
+		log.info("END PCPConfigData.isExplanationCodeValid");
 		return isExplanationCodeValid;
 	}
 	
 	public boolean isProcedureCodeValid(List<ServiceLine> serviceLines) {
+		log.info("START PCPConfigData.isProcedureCodeValid");
 		boolean isProcedureCodeValid = true;
 		if (serviceLines != null && !serviceLines.isEmpty()) {
 			for (ServiceLine serviceLine : serviceLines) {
@@ -157,10 +171,12 @@ public class PCPConfigData implements InitializingBean {
 				}
 			}
 		}
+		log.info("END PCPConfigData.isProcedureCodeValid");
 		return isProcedureCodeValid;
 	}
 	
 	public boolean isProviderInInclusionList(String providerId, String group, String division) {
+		log.info("START PCPConfigData.isProviderInInclusionList {}, {}, {}", providerId, group, division);
 		Boolean inclusionFlag = Boolean.TRUE;
 		InclusionExclusion[] inclusions = pcpConfigServiceClient.inclusions(providerId);
 		List<InclusionExclusion> inclusionList = Arrays.asList(inclusions);
@@ -176,10 +192,12 @@ public class PCPConfigData implements InitializingBean {
 			inclusionFlag = Boolean.TRUE;
 			log.info("Provider {}, Group {}, Division {} is not listed in inclusion list.", providerId, group, division);
 		}
+		log.info("END PCPConfigData.isProviderInInclusionList {}, {}, {}", providerId, group, division);
 		return inclusionFlag.booleanValue();
 	}
 	
 	public boolean isProviderInExclusionList(String providerId, String group, String division) {
+		log.info("START PCPConfigData.isProviderInExclusionList {}, {}, {}", providerId, group, division);
 		Boolean exclusionFlag = Boolean.FALSE;
 		InclusionExclusion[] exclusions = pcpConfigServiceClient.exclusions(providerId);
 		List<InclusionExclusion> exclusionList = Arrays.asList(exclusions);
@@ -197,6 +215,7 @@ public class PCPConfigData implements InitializingBean {
 			log.info("Provider {}, Group {}, Division {} is not listed in exlusion list.", providerId, group, division);
 			exclusionFlag = Boolean.TRUE;
 		}
+		log.info("END PCPConfigData.isProviderInExclusionList {}, {}, {}", providerId, group, division);
 		return exclusionFlag;
 	}
 	

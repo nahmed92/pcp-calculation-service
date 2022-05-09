@@ -1,6 +1,9 @@
 package com.deltadental.pcp.interservice;
 
-import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.*;
+import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.EXCLUSIONS_PROVIDER;
+import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.INCLUSIONS_PROVIDER;
+import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.PROVIDER_LOOKAHEAD_DAYS;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -26,17 +29,15 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service("pcpConfigService")
 @Slf4j
-public class PCPConfigServiceClient{
+public class PCPConfigServiceClient {
 
 	@Value("${pcp.config.service.endpoint}")
 	private String pcpConfigServiceEndpoint;
 
 	@Autowired(required=true)
 	private RestTemplate restTemplate;
-	
-	//FIXME: Generalize to one Method
-	
-	public String pcpConfigData(String serviceEndPoint) {
+
+	public String getPCPConfigData(String serviceEndPoint) {
 		log.info("START PCPConfigServiceClient.pcpConfigData {} ", serviceEndPoint);
 		String providerLookaheadDaysEndPoint = pcpConfigServiceEndpoint.concat(serviceEndPoint);
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(providerLookaheadDaysEndPoint);
@@ -80,71 +81,71 @@ public class PCPConfigServiceClient{
 		return null;
 	}
 	
-	public String explanationCode() {
-		log.info("START PCPConfigServiceClient.explanationcode");
-		final String explanationCode = pcpConfigServiceEndpoint.concat(EXPLANATION_CODE);
-		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(explanationCode);
-		String uriBuilder = builder.build().encode().toUriString();
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		try {
-			ResponseEntity<String> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
-			if(responseEntity.getStatusCode() == HttpStatus.OK) {
-				return responseEntity.getBody();
-			}else {
-				log.error("Got {} response code from PCP Config API {} ",responseEntity.getStatusCode(),EXPLANATION_CODE);
-			}
-		} catch (RestClientException | URISyntaxException e) {
-			log.error("Unable to call PCP Config for API {} ",EXPLANATION_CODE,e);
-			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(e);
-		}
-		log.info("END PCPConfigServiceClient.explanationcode");
-		return null;
-	}
-	
-	public String procedureCode() {
-		log.info("START PCPConfigServiceClient.explanationcode");
-		final String procedureCode = pcpConfigServiceEndpoint.concat(PROCEDURE_CODE);
-		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(procedureCode);
-		String uriBuilder = builder.build().encode().toUriString();
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		try {
-			ResponseEntity<String> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
-			if(responseEntity.getStatusCode() == HttpStatus.OK) {
-				return responseEntity.getBody();
-			}else {
-				log.error("Got {} response code from PCP Config API {} ",responseEntity.getStatusCode(),PROCEDURE_CODE);
-			}
-		} catch (RestClientException | URISyntaxException e) {
-			log.error("Unable to call PCP Config for API {} ",PROCEDURE_CODE,e);
-			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException();
-		}
-		log.info("END PCPConfigServiceClient.explanationcode");
-		return null;
-	}
-	
-	public String claimStatus() {
-		log.info("START PCPConfigServiceClient.claimStatus");
-		final String claimStatusUrl = pcpConfigServiceEndpoint.concat(CLAIM_STATUS);
-		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(claimStatusUrl);
-		String uriBuilder = builder.build().encode().toUriString();
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		try {
-			ResponseEntity<String> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
-			if(responseEntity.getStatusCode() == HttpStatus.OK) {
-				return responseEntity.getBody();
-			} else {
-				log.error("Got {} response code from PCP Config API {} ",responseEntity.getStatusCode(),CLAIM_STATUS);
-			}
-		} catch (RestClientException | URISyntaxException e) {
-			log.error("Unable to call PCP Config for API {} ",CLAIM_STATUS,e);
-			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException();
-		}
-		log.info("END PCPConfigServiceClient.claimStatus");
-		return null;
-	}
+//	public String explanationCode() {
+//		log.info("START PCPConfigServiceClient.explanationcode");
+//		final String explanationCode = pcpConfigServiceEndpoint.concat(EXPLANATION_CODE);
+//		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(explanationCode);
+//		String uriBuilder = builder.build().encode().toUriString();
+//		HttpHeaders headers = new HttpHeaders();
+//		headers.setContentType(MediaType.APPLICATION_JSON);
+//		try {
+//			ResponseEntity<String> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
+//			if(responseEntity.getStatusCode() == HttpStatus.OK) {
+//				return responseEntity.getBody();
+//			}else {
+//				log.error("Got {} response code from PCP Config API {} ",responseEntity.getStatusCode(),EXPLANATION_CODE);
+//			}
+//		} catch (RestClientException | URISyntaxException e) {
+//			log.error("Unable to call PCP Config for API {} ",EXPLANATION_CODE,e);
+//			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(e);
+//		}
+//		log.info("END PCPConfigServiceClient.explanationcode");
+//		return null;
+//	}
+//	
+//	public String procedureCode() {
+//		log.info("START PCPConfigServiceClient.explanationcode");
+//		final String procedureCode = pcpConfigServiceEndpoint.concat(PROCEDURE_CODE);
+//		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(procedureCode);
+//		String uriBuilder = builder.build().encode().toUriString();
+//		HttpHeaders headers = new HttpHeaders();
+//		headers.setContentType(MediaType.APPLICATION_JSON);
+//		try {
+//			ResponseEntity<String> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
+//			if(responseEntity.getStatusCode() == HttpStatus.OK) {
+//				return responseEntity.getBody();
+//			}else {
+//				log.error("Got {} response code from PCP Config API {} ",responseEntity.getStatusCode(),PROCEDURE_CODE);
+//			}
+//		} catch (RestClientException | URISyntaxException e) {
+//			log.error("Unable to call PCP Config for API {} ",PROCEDURE_CODE,e);
+//			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException();
+//		}
+//		log.info("END PCPConfigServiceClient.explanationcode");
+//		return null;
+//	}
+//	
+//	public String claimStatus() {
+//		log.info("START PCPConfigServiceClient.claimStatus");
+//		final String claimStatusUrl = pcpConfigServiceEndpoint.concat(CLAIM_STATUS);
+//		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(claimStatusUrl);
+//		String uriBuilder = builder.build().encode().toUriString();
+//		HttpHeaders headers = new HttpHeaders();
+//		headers.setContentType(MediaType.APPLICATION_JSON);
+//		try {
+//			ResponseEntity<String> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
+//			if(responseEntity.getStatusCode() == HttpStatus.OK) {
+//				return responseEntity.getBody();
+//			} else {
+//				log.error("Got {} response code from PCP Config API {} ",responseEntity.getStatusCode(),CLAIM_STATUS);
+//			}
+//		} catch (RestClientException | URISyntaxException e) {
+//			log.error("Unable to call PCP Config for API {} ",CLAIM_STATUS,e);
+//			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException();
+//		}
+//		log.info("END PCPConfigServiceClient.claimStatus");
+//		return null;
+//	}
 	
 	public InclusionExclusion[] exclusions(String providerId) {
 		log.info("START PCPConfigServiceClient.exclusions");
