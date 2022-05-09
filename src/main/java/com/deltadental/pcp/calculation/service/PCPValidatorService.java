@@ -134,8 +134,7 @@ public class PCPValidatorService {
 	public void validatePending() {
 		log.info("START PCPValidatorService.validatePending()");
 
-		List<ContractMemberClaimEntity> recordsToValidate = repo.findRecordsToValidate(serviceInstanceId,
-				SEARCH_STATUS_VALIDATE);
+		List<ContractMemberClaimEntity> recordsToValidate = repo.findByInstanceIdWhereStatusInList(serviceInstanceId, SEARCH_STATUS_VALIDATE);
 
 		recordsToValidate.forEach(i -> validateContractMemberClaim(i));
 

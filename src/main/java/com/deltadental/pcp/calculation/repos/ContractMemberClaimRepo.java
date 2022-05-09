@@ -26,8 +26,4 @@ public interface ContractMemberClaimRepo extends JpaRepository<ContractMemberCla
 	List<ContractMemberClaimEntity> findByInstanceIdWhereStatusInList(@Param("instanceId") String instanceId,
 			@Param("status") List<Status> status);
 
-	@Query("SELECT cmc FROM ContractMemberClaimsEntity cmc WHERE cmc.instanceId = :instanceId AND cmc.status in :status")
-	List<ContractMemberClaimEntity> findRecordsToValidate(@Param("instanceId") String instanceId,
-			@Param("status") List<Status> status);
-
 }
