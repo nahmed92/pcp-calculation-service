@@ -57,6 +57,7 @@ public class PCPConfigData implements InitializingBean {
 
 	@Override
     public void afterPropertiesSet() throws Exception {
+		log.info("START PCPConfigData.afterPropertiesSet");
 		claimStatusList.clear();
 		procedureCodes.clear();
 		explanationCodes.clear();
@@ -67,17 +68,20 @@ public class PCPConfigData implements InitializingBean {
 		log.info("Explanation codes : {} ",explanationCodes);
 		procedureCodes();
 		log.info("Procedure codes : ",procedureCodes);
+		log.info("END PCPConfigData.afterPropertiesSet");
 	}
 	
 	@Scheduled(cron = "* * 2 * * *", zone = ZONE_ID)
 	@Synchronized
 	//FIXME: remove scheduler and cache config data
 	public void refreshPCPConfigData() {
+		log.info("START PCPConfigData.refreshPCPConfigData");
 		try {
 			afterPropertiesSet();
 		} catch (Exception e) {
 			log.error("Unable to refresh pcp config",e);
 		}
+		log.info("START PCPConfigData.refreshPCPConfigData");
 	}
 
 	private List<PcpConfigResponse> getPcpConfigResponseList(String jsonString) {
@@ -197,18 +201,22 @@ public class PCPConfigData implements InitializingBean {
 	}
 	
 	public String calculatePCPEffectiveDate() {
+		log.info("START : PCPConfigData.calculatePCPEffectiveDate");
 		ZoneId defaultZoneId = ZoneId.of(ZONE_ID);
 		LocalDate now = LocalDate.now(defaultZoneId);		
 		int currentDateDay = now.getDayOfMonth();
+		String pcpEffectiveDate = null;
         if (currentDateDay < 16) {
         	LocalDate firstDayOfMonth = LocalDate.now(defaultZoneId).with(TemporalAdjusters.firstDayOfMonth());
         	Date firstDateOfMonth = Date.from(firstDayOfMonth.atStartOfDay(defaultZoneId).toInstant());
-        	return mmddyyyyFormatter.format(firstDateOfMonth);
+        	pcpEffectiveDate = mmddyyyyFormatter.format(firstDateOfMonth);
         } else {
         	LocalDate firstDayOfNextMonth = LocalDate.now(defaultZoneId).with(TemporalAdjusters.firstDayOfNextMonth());
         	Date firstDateOfNextMonth = Date.from(firstDayOfNextMonth.atStartOfDay(defaultZoneId).toInstant());
-        	return mmddyyyyFormatter.format(firstDateOfNextMonth);
+        	pcpEffectiveDate = mmddyyyyFormatter.format(firstDateOfNextMonth);
         }
+        log.info("END : PCPConfigData.calculatePCPEffectiveDate {} !", pcpEffectiveDate);
+        return pcpEffectiveDate;
 	}
 	
 	private boolean matchInclusion(InclusionExclusion inclusionExclusion, String providerId, String group, String division) {
