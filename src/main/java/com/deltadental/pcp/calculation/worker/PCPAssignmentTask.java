@@ -5,6 +5,7 @@ import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -154,7 +155,7 @@ public class PCPAssignmentTask implements Runnable {
 
 	private MemberClaimEntity saveMemberClaimEntity(ContractMemberClaimEntity contractMemberClaimsEntity, MemberClaimResponse memberClaimResponse) {		
 		MemberClaimEntity memberClaimEntity = MemberClaimEntity.builder()
-				.billingProvId(memberClaimResponse.getBillingProvId())
+				.billingProviderId(memberClaimResponse.getBillingProvId())
 				.businessLevel4(memberClaimResponse.getBusinessLevel4())
 				.businessLevel5(memberClaimResponse.getBusinessLevel5())
 				.businessLevel6(memberClaimResponse.getBusinessLevel6())
@@ -165,13 +166,14 @@ public class PCPAssignmentTask implements Runnable {
 				.groupNumber(memberClaimResponse.getGroupNumber())
 				.memberFirstName(memberClaimResponse.getMemberFirstName())
 				.memberLastName(memberClaimResponse.getMemberLastName())
-				.paidTs(getTimestamp(memberClaimResponse.getPaidTs().getNanos()))
+				.paidAt(getTimestamp(memberClaimResponse.getPaidTs().getNanos()))
 				.personId(memberClaimResponse.getPersonId())
-				.receivedTs(getTimestamp(memberClaimResponse.getReceivedTs().getNanos()))
-				.resolvedTs(getTimestamp(memberClaimResponse.getResolvedTs().getNanos()))
+				.receivedAt(getTimestamp(memberClaimResponse.getReceivedTs().getNanos()))
+				.resolvedAt(getTimestamp(memberClaimResponse.getResolvedTs().getNanos()))
 				.servicesNumber(memberClaimResponse.getServicesNumber())
-				//FIXME .contractMemberClaimsId(contractMemberClaimsEntity.getId())
+				.contractMemberClaimsId(contractMemberClaimsEntity.getId())
 				.operatorId(OPERATORID_PCPCALS)
+				.id(UUID.randomUUID().toString())
 				.build();
 		memberClaimRepo.save(memberClaimEntity);
 		return memberClaimEntity;
@@ -187,10 +189,11 @@ public class PCPAssignmentTask implements Runnable {
 						.procedureCode(serviceLine.getProcedureCode())
 						.sequenceNumber(serviceLine.getSequenceNumber())
 						.serviceNumber(serviceLine.getServiceNumber())
-						.servicePaidTs(getTimestamp(serviceLine.getServicePaidTs().getNanos()))
-						.serviceResolutionTs(getTimestamp(serviceLine.getServiceResolutionTs().getNanos()))
-						.memberClaimId(memberClaimEntity.getMemberClaimId())
+						.servicePaidAt(getTimestamp(serviceLine.getServicePaidTs().getNanos()))
+						.serviceResolutionAt(getTimestamp(serviceLine.getServiceResolutionTs().getNanos()))
+						.memberClaimId(memberClaimEntity.getId())
 						.operatorId(OPERATORID_PCPCALS)
+						.id(UUID.randomUUID().toString())
 						.build();
 				memberClaimServicesRepo.save(memberClaimServicesEntity);
 			});
@@ -203,12 +206,12 @@ public class PCPAssignmentTask implements Runnable {
 				.personId(memberClaimResponse.getPersonId())
 				.memberId(memberClaimResponse.getMemberID())
 				.pcpEffectiveDate(pcpEffectiveDate)
-				.reasonCd(REASON_CODE_5NEW)
+				.reasonCode(REASON_CODE_5NEW)
 				.sourceSystem(DCM_SOURCESYSTEM)
 				.status(PCP_STATUS_INITIAL)
 				.operatorId(OPERATORID_PCPCALS)
 				.contractId(memberClaimResponse.getContractId())
-				//FIXME .contractMemberClaimsId(contractMemberClaimsEntity.getId())
+				.contractMemberClaimId(id) //Fixme:Verify
 				.status(status.name())
 				.providerId(memberClaimResponse.getProviderId())
 //				.businessLevelAssnId(memberClaimResponse.getb)

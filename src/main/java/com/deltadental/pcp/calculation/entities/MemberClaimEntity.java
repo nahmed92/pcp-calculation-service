@@ -5,10 +5,11 @@ import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,74 +24,73 @@ import lombok.NoArgsConstructor;
 @Table(name = "member_claim", schema = "dbo")
 public class MemberClaimEntity implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -2354571047299351744L;
 
 	@Id
-	@Column(name = "MEMBER_CLAIM_ID", nullable = false, unique = true)
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer memberClaimId;
+	@Column(name = "id", nullable = false, unique = true)
+	private String id;
 	
-	@Column(name = "BILLING_PROV_ID")
-	private String billingProvId;
+	@Column(name = "billing_provider_id")
+	private String billingProviderId;
 	
-	@Column(name = "BUSINESS_LEVEL_4")
+	@Column(name = "business_level_4")
     private String businessLevel4;
 	
-	@Column(name = "BUSINESS_LEVEL_5")
+	@Column(name = "business_level_5")
     private String businessLevel5;
 	
-	@Column(name = "BUSINESS_LEVEL_6")
+	@Column(name = "business_level_6")
     private String businessLevel6;
 	
-	@Column(name = "BUSINESS_LEVEL_7")
+	@Column(name = "business_level_7")
     private String businessLevel7;
 	
-	@Column(name = "CLAIM_SOURCE")
+	@Column(name = "claim_source")
     private String claimSource;
 	
-	@Column(name = "CLAIM_STATUS")
+	@Column(name = "claim_status")
     private String claimStatus;
 	
-	@Column(name = "CLAIM_TYPE")
+	@Column(name = "claim_type")
     private String claimType;
 	
-	@Column(name = "GROUP_NUMBER")
+	@Column(name = "group_number")
     private String groupNumber;
 	
-	@Column(name = "MEMBER_FIRST_NAME")
+	@Column(name = "member_first_name")
     private String memberFirstName;
 
-	@Column(name = "MEMBER_LAST_NAME")
+	@Column(name = "member_last_name")
 	private String memberLastName;
 	
-	@Column(name = "PAID_TS")
-    private Timestamp paidTs;
+	@Column(name = "paid_at")
+    private Timestamp paidAt;
 	
-	@Column(name = "PERSON_ID")
+	@Column(name = "person_id")
     private String personId;
 	
-	@Column(name = "RECEIVED_TS")
-    private Timestamp receivedTs;
+	@Column(name = "received_at")
+    private Timestamp receivedAt;
 	
-	@Column(name = "RESOLVED_TS")
-    private Timestamp resolvedTs;
+	@Column(name = "resolved_at")
+    private Timestamp resolvedAt;
 
-	@Column(name = "SERVICES_NUMBER")
+	@Column(name = "services_number")
     private String servicesNumber;
 	
-//	@CreationTimestamp
-	@Column(name = "CREATION_TS", nullable = false, updatable = false)
-	private Timestamp crationTs;
+	@Column(name = "creation_at")
+	@CreationTimestamp
+	private Timestamp crationAt;
 
-//	@UpdateTimestamp
-	@Column(name = "LAST_MAINT_TS", nullable = false)
-	private Timestamp lastMaintTs;
+	@Column(name = "last_updated_at")
+	@UpdateTimestamp
+	private Timestamp lastUpdatedAt;
 	
-	@Column(name = "OPERATOR_ID")
+	@Column(name = "operator_id")
 	private String operatorId;
 
-	@Column(name = "CONTRACT_MEMBER_CLAIMS_ID")
-	private Integer contractMemberClaimsId;
+	@Column(name = "contract_member_claim_id")
+	private String contractMemberClaimsId;
 	
 	 
 }

@@ -1,19 +1,15 @@
 package com.deltadental.pcp.calculation.entities;
 
 import java.sql.Timestamp;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.transaction.Transactional;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import lombok.AllArgsConstructor;
@@ -30,58 +26,38 @@ import lombok.NonNull;
 @EqualsAndHashCode
 @Builder
 @Transactional
-@Table(name = PCPCalculationActivityEntity.TABLE_NAME,  schema = "dbo")
 @EnableJpaAuditing
-@org.hibernate.annotations.Entity(
-        dynamicUpdate = true
-)
-public class PCPCalculationActivityEntity implements java.io.Serializable{
-	
-	/**
-	 * Serialization Key
-	 */
+@Table(name = "pcp_calculation_activity", schema = "dbo")
+public class PCPCalculationActivityEntity implements java.io.Serializable {
+
 	private static final long serialVersionUID = -6512137487572476886L;
 
-	protected static final String TABLE_NAME = "pcp_calculation_activity";
-	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id", nullable = false, unique = true)
-	private Integer id;
+	private String id;
 
 	@NonNull
-	@Column(name = "instance_Wise_Data_Load")
+	@Column(name = "instance_wise_data_load")
 	private String instanceId;
-	
+
 	@NonNull
-	@Column(name = "num_Of_records")
+	@Column(name = "num_of_records")
 	private Integer numOfRecords;
-	
+
 	@Column(name = "time_to_process")
 	private long timeToProcess;
-	
+
 	@Column(name = "start_time")
 	private Timestamp startTime;
-	
-	@Column(name="end_time")
+
+	@Column(name = "end_time")
 	private Timestamp endTime;
-	
-	@Column(name= "created_date", updatable = false)
-//	@CreationTimestamp
-	private Timestamp createdDate;
 
-	@Column(name = "last_updated_date")
-//	@UpdateTimestamp
-	private Timestamp lastUpdatedDate;
+	@Column(name = "created_at")
+	@CreationTimestamp
+	private Timestamp createdAt;
 
-	@PrePersist
-    public void onInsert() {
-		createdDate = Timestamp.from(ZonedDateTime.now(ZoneId.of("America/Los_Angeles")).toInstant());
-		lastUpdatedDate = createdDate;
-    }
+	@Column(name = "last_updated_at")
+	@UpdateTimestamp
+	private Timestamp lastUpdatedAt;
 
-    @PreUpdate
-    public void onUpdate() {
-    	lastUpdatedDate = Timestamp.from(ZonedDateTime.now(ZoneId.of("America/Los_Angeles")).toInstant());
-    }
 }

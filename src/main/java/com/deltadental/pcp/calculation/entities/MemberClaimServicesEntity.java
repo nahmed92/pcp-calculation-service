@@ -28,67 +28,53 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Entity
-@org.hibernate.annotations.Entity(
-        dynamicUpdate = true
-)
-@Table(name = "MEMBER_CLAIM_SERVICES", schema = "dbo")
+@Table(name = "member_claim_service", schema = "dbo")  //FIXME: remove service sufix
 public class MemberClaimServicesEntity implements Serializable {
 
 	private static final long serialVersionUID = 2757500429236458720L;
 
 	@Id
-	@Column(name = "MEMBER_CLAIM_SERVICES_ID", nullable = false, unique = true)
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer memberClaimServicesId;
+	@Column(name = "id", nullable = false, unique = true)
+	private String id;
 
-	@Column(name = "CLAIM_TYPE")
+	@Column(name = "claim_type")
 	private String claimType;
-	
-	@Column(name = "ENCOUNTER_FLAG")
+
+	@Column(name = "encounter_flag")
 	private String encounterFlag;
 
-	@Column(name = "EXPLN_CODE")
+	@Column(name = "expln_code")
 	private String explnCode;
-	
-	@Column(name = "PROCEDURE_CODE")
+
+	@Column(name = "procedure_code")
 	private String procedureCode;
-	
-	@Column(name = "SEQUENCE_NUMBER")
+
+	@Column(name = "sequence_number")
 	private String sequenceNumber;
-	
-	@Column(name = "SERVICE_NUMBER")
+
+	@Column(name = "service_number")
 	private String serviceNumber;
-	
-	@Column(name = "SERVICE_PAID_TS")
+
+	@Column(name = "service_paid_at")
 	@CreationTimestamp
-	private Date servicePaidTs;
+	private Date servicePaidAt;
 
-	@Column(name = "SERVICE_RESOLUTION_TS")
+	@Column(name = "service_resolution_at")
 	@UpdateTimestamp
-	private Date serviceResolutionTs;
+	private Date serviceResolutionAt;
 
-//	@CreationTimestamp
-	@Column(name = "CREATION_TS", nullable = false, updatable = false)
-	private Timestamp crationTs;
+	@CreationTimestamp
+	@Column(name = "creation_at")
+	private Timestamp crationAt;
 
-//	@UpdateTimestamp
-	@Column(name = "LAST_MAINT_TS", nullable = false)
-	private Timestamp lastMaintTs;
+	@UpdateTimestamp
+	@Column(name = "last_update_at")
+	private Timestamp lastUpdatedAt;
 
-	@Column(name = "OPERATOR_ID")
+	@Column(name = "operator_id")
 	private String operatorId;
-	
-	@Column(name = "MEMBER_CLAIM_ID")
-	private Integer memberClaimId;	
-	
-	@PrePersist
-    public void onInsert() {
-		crationTs = Timestamp.from(ZonedDateTime.now(ZoneId.of("America/Los_Angeles")).toInstant());
-		lastMaintTs = crationTs;
-    }
 
-    @PreUpdate
-    public void onUpdate() {
-    	lastMaintTs = Timestamp.from(ZonedDateTime.now(ZoneId.of("America/Los_Angeles")).toInstant());
-    }
+	@Column(name = "member_claim_id")
+	private String memberClaimId;
+
 }

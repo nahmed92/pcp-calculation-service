@@ -2,17 +2,14 @@ package com.deltadental.pcp.calculation.entities;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,77 +21,63 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Entity
-@org.hibernate.annotations.Entity(
-        dynamicUpdate = true
-)
-@Table(name = "MEMBER_PROVIDER", schema = "dbo")
+
+@Table(name = "member_provider", schema = "dbo")
 public class MemberProviderEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name = "MEMBER_PROVIDER_ID", nullable = false, unique = true)
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer memberProviderId;
-	
-	@Column(name = "CLAIM_STATUS")
+	private String id;
+
+	@Column(name = "claim_status")
 	private String claimStatus;
 
-	@Column(name = "PCP_EFFECTIVE_DATE")
+	@Column(name = "pcp_effective_date")
 	private String pcpEffectiveDate;
-	
-	@Column(name = "REASON_CD")
-	private String reasonCd;
 
-	@Column(name = "SOURCE_SYSTEM")
+	@Column(name = "reason_code")
+	private String reasonCode;
+
+	@Column(name = "source_system")
 	private String sourceSystem;
 
-	@Column(name = "STATUS")
+	@Column(name = "status")
 	private String status;
-	
-//	@CreationTimestamp
-	@Column(name = "CREATION_TS", nullable = false, updatable = false)
-	private Timestamp crationTs;
 
-//	@UpdateTimestamp
-	@Column(name = "LAST_MAINT_TS", nullable = false)
-	private Timestamp lastMaintTs;
-	
-	@Column(name = "OPERATOR_ID")
+	@Column(name = "operator_id")
 	private String operatorId;
-	
-	@Column(name = "CONTRACT_MEMBER_CLAIMS_ID")
-	private Integer contractMemberClaimsId;	
-	
-	@Column(name = "PERSON_ID")
-    private String personId;
-	
-	@Column(name = "MEMBER_ID")
+
+	@Column(name = "contract_member_claim_id")
+	private String contractMemberClaimId;
+
+	@Column(name = "person_id")
+	private String personId;
+
+	@Column(name = "member_id")
 	private String memberId;
 
-	@Column(name = "CONTRACT_ID")
+	@Column(name = "contract_id")
 	private String contractId;
-	
-	@Column(name = "PROVIDER_ID")
-	private String providerId;
-	
-	@Column(name = "PRACTICE_LOCATION_ID")
-	private String practiceLocationId;
-	
-	@Column(name = "PROVIDER_CONTRACT_ID")
-	private String providerContractId;
-	
-	@Column(name = "BUSINESS_LEVEL_ASSN_ID")
-	private String businessLevelAssnId;
-	
-	@PrePersist
-    public void onInsert() {
-		crationTs = Timestamp.from(ZonedDateTime.now(ZoneId.of("America/Los_Angeles")).toInstant());
-		lastMaintTs = crationTs;
-    }
 
-    @PreUpdate
-    public void onUpdate() {
-    	lastMaintTs = Timestamp.from(ZonedDateTime.now(ZoneId.of("America/Los_Angeles")).toInstant());
-    }
+	@Column(name = "provider_id")
+	private String providerId;
+
+	@Column(name = "practice_location_id")
+	private String practiceLocationId;
+
+	@Column(name = "provider_contract_id")
+	private String providerContractId;
+
+	@Column(name = "business_level_assn_id")
+	private String businessLevelAssnId;
+
+	@CreationTimestamp
+	@Column(name = "creation_at")
+	private Timestamp crationAt;
+
+	@UpdateTimestamp
+	@Column(name = "LAST_updated_at")
+	private Timestamp lastUpdatedAt;
+
 }
