@@ -6,7 +6,7 @@ FROM openjdk:11-jre
 
 MAINTAINER Delta Dental Group Member Online - DCM
 VOLUME /tmp
-ADD pcp-calculation-service-3.0.0.jar pcp-calculation-service-3.0.0.jar
+COPY pcp-calculation-service-3.0.0.jar pcp-calculation-service-3.0.0.jar
 ADD contrast.jar contrast.jar
 RUN sh -c 'touch /pcp-calculation-service-3.0.0.jar'
 RUN sh -c 'touch /contrast.jar'
