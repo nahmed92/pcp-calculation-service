@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
-import com.deltadental.mtv.sync.interservice.dto.MemberClaimRequest;
 import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
 import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
@@ -20,7 +19,6 @@ import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
 import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 
 import lombok.NoArgsConstructor;
-import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -50,10 +48,7 @@ public class PCPValidatorService {
 		StringBuilder errorBuilder = new StringBuilder();
 		Status status = Status.VALIDATED;
 		try {
-			MemberClaimRequest memberClaimRequest = MemberClaimRequest.builder()
-					.memberClaimId(contractMemberClaimsEntity.getClaimId()).build();
-			MemberClaimResponse memberClaimResponse = mtvSyncService.memberClaim(memberClaimRequest);
-
+			MemberClaimResponse memberClaimResponse = mtvSyncService.memberClaim(contractMemberClaimsEntity.getClaimId());
 			if (null != memberClaimResponse
 					&& (memberClaimResponse.getErrorCode() == null || memberClaimResponse.getErrorMessage() == null)) {
 				boolean exclusionFlag = pcpConfigData.isProviderInExclusionList(memberClaimResponse.getProviderId(),
@@ -118,8 +113,7 @@ public class PCPValidatorService {
 			}
 		} catch (Exception e) {
 			log.error("Exception occured during retriving member claim information from Metavance Sync Service.", e);
-			errorBuilder.append(
-					" Exception occured during retriving member claim information from Metavance Sync Service.");
+			errorBuilder.append(" Exception occured {} "+e.getMessage());
 			status = Status.RETRY;
 			contractMemberClaimsEntity.incrementRetryCount();
 		}
@@ -130,7 +124,6 @@ public class PCPValidatorService {
 		log.info("END PCPValidatorService.validateContractMemberClaim");
 	}
 
-	@Synchronized
 	public void validatePending() {
 		log.info("START PCPValidatorService.validatePending()");
 

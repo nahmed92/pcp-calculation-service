@@ -1,5 +1,7 @@
 package com.deltadental.pcp.calculation.mapper;
 
+import java.util.UUID;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +14,7 @@ public class Mapper {
 
 	public ContractMemberClaimEntity map(MemberContractClaimRequest request,String serviceInstanceId) {
 		ContractMemberClaimEntity contractMemberClaimsEntity = ContractMemberClaimEntity.builder()
+				.id(UUID.randomUUID().toString())
 				.claimId(StringUtils.trimToNull(request.getClaimId()))
 				.contractId(StringUtils.trimToNull(request.getContractId()))
 				.memberId(StringUtils.trimToNull(request.getMemberId()))

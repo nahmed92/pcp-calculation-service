@@ -33,6 +33,7 @@ public class PCPCalculationActivityEntity implements java.io.Serializable {
 	private static final long serialVersionUID = -6512137487572476886L;
 
 	@Id
+	@Column(name = "id", nullable = false, unique = true)
 	private String id;
 
 	@NonNull

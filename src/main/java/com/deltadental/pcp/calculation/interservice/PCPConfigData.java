@@ -127,22 +127,28 @@ public class PCPConfigData implements InitializingBean {
 	
 	public boolean isClaimStatusValid(String claimStatus) {
 		log.info("START PCPConfigData.isClaimStatusValid");
+		boolean isClaimStatusValid = false;
 		try {
 			List<PcpConfigResponse> claimStatusList = this.getClaimStatusList();
-			return claimStatusList.stream().anyMatch(pcpConfigResponse -> StringUtils.equals(pcpConfigResponse.getCodeValue(), claimStatus));
+			if(CollectionUtils.isNotEmpty(claimStatusList)) {
+				isClaimStatusValid = claimStatusList.stream().anyMatch(pcpConfigResponse -> StringUtils.equals(pcpConfigResponse.getCodeValue(), claimStatus));
+			}			
 		} catch (Exception e) {
-			return false;
+			isClaimStatusValid = false;
 		}
+		log.info("Claim Status Valid {} ",isClaimStatusValid);
+		return isClaimStatusValid;
 	}
 	
 	public boolean isExplanationCodeValid(List<ServiceLine> serviceLines) {
 		log.info("START PCPConfigData.isExplanationCodeValid");
 		boolean isExplanationCodeValid = false;
-		if (serviceLines != null && !serviceLines.isEmpty()) {
+		if (CollectionUtils.isNotEmpty(serviceLines)) {
 			for(ServiceLine serviceLine : serviceLines) {
 				for (PcpConfigResponse pcpConfigResponse : getExplanationCodes()) {
 					if( StringUtils.equals(StringUtils.trim(pcpConfigResponse.getCodeValue()), StringUtils.trim(serviceLine.getExplnCode()))) {
 						isExplanationCodeValid = true;
+						log.info("Explanation Code matched for {} ", serviceLine.getExplnCode());
 						break;
 					}
 				}
@@ -158,11 +164,12 @@ public class PCPConfigData implements InitializingBean {
 	public boolean isProcedureCodeValid(List<ServiceLine> serviceLines) {
 		log.info("START PCPConfigData.isProcedureCodeValid");
 		boolean isProcedureCodeValid = true;
-		if (serviceLines != null && !serviceLines.isEmpty()) {
+		if (CollectionUtils.isNotEmpty(serviceLines)) {
 			for (ServiceLine serviceLine : serviceLines) {
 				for (PcpConfigResponse pcpConfigResponse : getProcedureCodes()) {
 					if (StringUtils.equals(StringUtils.trim(pcpConfigResponse.getCodeValue()), StringUtils.trim(serviceLine.getProcedureCode()))) {
 						isProcedureCodeValid = false;
+						log.info("Procedure Code matched for {} ", serviceLine.getProcedureCode());
 						break;
 					}
 				}
@@ -178,19 +185,21 @@ public class PCPConfigData implements InitializingBean {
 	public boolean isProviderInInclusionList(String providerId, String group, String division) {
 		log.info("START PCPConfigData.isProviderInInclusionList {}, {}, {}", providerId, group, division);
 		Boolean inclusionFlag = Boolean.TRUE;
-		InclusionExclusion[] inclusions = pcpConfigServiceClient.inclusions(providerId);
-		List<InclusionExclusion> inclusionList = Arrays.asList(inclusions);
-		if (CollectionUtils.isNotEmpty(inclusionList)) {
-			if (inclusionList.size() == 1) {
-				inclusionFlag = Boolean.valueOf(matchInclusion(inclusionList.get(0), providerId, group, division));
-				log.info("Provider {}, Group {}, Division {} is listed in inclusion list.", providerId, group, division);
+		if(StringUtils.isNotBlank(providerId) && StringUtils.isNotBlank(group) && StringUtils.isNotBlank(division)) {
+			InclusionExclusion[] inclusions = pcpConfigServiceClient.inclusions(providerId);
+			List<InclusionExclusion> inclusionList = Arrays.asList(inclusions);
+			if (CollectionUtils.isNotEmpty(inclusionList)) {
+				if (inclusionList.size() == 1) {
+					inclusionFlag = Boolean.valueOf(matchInclusion(inclusionList.get(0), providerId, group, division));
+					log.info("Provider {}, Group {}, Division {} is listed in inclusion list.", providerId, group, division);
+				} else {
+					inclusionFlag = Boolean.valueOf(inclusionList.stream().anyMatch(inclusion -> matchInclusion(inclusion, providerId, group, division)));
+					log.info("Provider {}, Group {}, Division {} is listed in inclusion list.", providerId, group, division);
+				}
 			} else {
-				inclusionFlag = Boolean.valueOf(inclusionList.stream().anyMatch(inclusion -> matchInclusion(inclusion, providerId, group, division)));
-				log.info("Provider {}, Group {}, Division {} is listed in inclusion list.", providerId, group, division);
+				inclusionFlag = Boolean.TRUE;
+				log.info("Provider {}, Group {}, Division {} is not listed in inclusion list.", providerId, group, division);
 			}
-		} else {
-			inclusionFlag = Boolean.TRUE;
-			log.info("Provider {}, Group {}, Division {} is not listed in inclusion list.", providerId, group, division);
 		}
 		log.info("END PCPConfigData.isProviderInInclusionList {}, {}, {}", providerId, group, division);
 		return inclusionFlag.booleanValue();
@@ -199,24 +208,26 @@ public class PCPConfigData implements InitializingBean {
 	public boolean isProviderInExclusionList(String providerId, String group, String division) {
 		log.info("START PCPConfigData.isProviderInExclusionList {}, {}, {}", providerId, group, division);
 		Boolean exclusionFlag = Boolean.FALSE;
-		InclusionExclusion[] exclusions = pcpConfigServiceClient.exclusions(providerId);
-		List<InclusionExclusion> exclusionList = Arrays.asList(exclusions);
-		if (CollectionUtils.isNotEmpty(exclusionList)) {
-			if (exclusionList.size() == 1) {
-				exclusionFlag = Boolean.valueOf(matchExclusion(exclusionList.get(0), providerId, group, division));
-				if (!exclusionFlag) {
+		if(StringUtils.isNotBlank(providerId) && StringUtils.isNotBlank(group) && StringUtils.isNotBlank(division)) {
+			InclusionExclusion[] exclusions = pcpConfigServiceClient.exclusions(providerId);
+			List<InclusionExclusion> exclusionList = Arrays.asList(exclusions);
+			if (CollectionUtils.isNotEmpty(exclusionList)) {
+				if (exclusionList.size() == 1) {
+					exclusionFlag = Boolean.valueOf(matchExclusion(exclusionList.get(0), providerId, group, division));
+					if (!exclusionFlag) {
+						log.info("Provider {}, Group {}, Division {} is listed in exlusion list.", providerId, group, division);
+					}
+				} else {
+					exclusionFlag = Boolean.valueOf(exclusionList.stream().anyMatch(exclusion -> matchInclusion(exclusion, providerId, group, division)));
 					log.info("Provider {}, Group {}, Division {} is listed in exlusion list.", providerId, group, division);
 				}
 			} else {
-				exclusionFlag = Boolean.valueOf(exclusionList.stream().anyMatch(exclusion -> matchInclusion(exclusion, providerId, group, division)));
-				log.info("Provider {}, Group {}, Division {} is listed in exlusion list.", providerId, group, division);
+				log.info("Provider {}, Group {}, Division {} is not listed in exlusion list.", providerId, group, division);
+				exclusionFlag = Boolean.TRUE;
 			}
-		} else {
-			log.info("Provider {}, Group {}, Division {} is not listed in exlusion list.", providerId, group, division);
-			exclusionFlag = Boolean.TRUE;
 		}
 		log.info("END PCPConfigData.isProviderInExclusionList {}, {}, {}", providerId, group, division);
-		return exclusionFlag;
+		return exclusionFlag.booleanValue();
 	}
 	
 	public String calculatePCPEffectiveDate() {
@@ -225,7 +236,7 @@ public class PCPConfigData implements InitializingBean {
 		LocalDate now = LocalDate.now(defaultZoneId);		
 		int currentDateDay = now.getDayOfMonth();
 		String pcpEffectiveDate = null;
-        if (currentDateDay < 16) {
+        if (currentDateDay < 16) { // FIXME : Move to config file
         	LocalDate firstDayOfMonth = LocalDate.now(defaultZoneId).with(TemporalAdjusters.firstDayOfMonth());
         	Date firstDateOfMonth = Date.from(firstDayOfMonth.atStartOfDay(defaultZoneId).toInstant());
         	pcpEffectiveDate = mmddyyyyFormatter.format(firstDateOfMonth);

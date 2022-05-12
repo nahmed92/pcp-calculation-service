@@ -20,7 +20,7 @@ public class PCPValidateScheduler {
 	@Autowired
 	private PCPValidatorService pcpValidatorService;
 
-	@Scheduled(cron = "* */30 * * * *", zone = "America/Los_Angeles")
+	@Scheduled(cron = "* */5 * * * *", zone = "America/Los_Angeles")
 	// FIXME: move to properties
 	@Synchronized
 	public void process() {
