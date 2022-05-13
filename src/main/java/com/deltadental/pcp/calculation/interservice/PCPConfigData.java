@@ -20,6 +20,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -45,6 +46,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PCPConfigData implements InitializingBean {
 
+	@Value("${pcp.wash.rule.cutoff.day}")
+	private Integer washRuleCutoffDay;
+	
 	@Autowired
 	private ObjectMapper objectMapper;
 
@@ -72,6 +76,8 @@ public class PCPConfigData implements InitializingBean {
 		log.info("Explanation codes : {} ",explanationCodes);
 		procedureCodes();
 		log.info("Procedure codes : ",procedureCodes);
+		log.info("Wash rule cutoff day {} ",washRuleCutoffDay);
+		log.info("PCP Effectice Date {} ",calculatePCPEffectiveDate());
 		log.info("END PCPConfigData.afterPropertiesSet");
 	}
 	
@@ -236,7 +242,7 @@ public class PCPConfigData implements InitializingBean {
 		LocalDate now = LocalDate.now(defaultZoneId);		
 		int currentDateDay = now.getDayOfMonth();
 		String pcpEffectiveDate = null;
-        if (currentDateDay < 16) { // FIXME : Move to config file
+        if (currentDateDay < washRuleCutoffDay) {
         	LocalDate firstDayOfMonth = LocalDate.now(defaultZoneId).with(TemporalAdjusters.firstDayOfMonth());
         	Date firstDateOfMonth = Date.from(firstDayOfMonth.atStartOfDay(defaultZoneId).toInstant());
         	pcpEffectiveDate = mmddyyyyFormatter.format(firstDateOfMonth);

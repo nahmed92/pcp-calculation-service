@@ -45,7 +45,6 @@ public class MemberContractClaimService {
 			log.info("Inserting  {} ", request);
 			ContractMemberClaimEntity contractMemberClaimsEntity = mapper.map(request, serviceInstanceId);
 			repo.save(contractMemberClaimsEntity);
-
 		} else {
 			log.warn("Record already exists in contract member claims table : {} ", request);
 		}

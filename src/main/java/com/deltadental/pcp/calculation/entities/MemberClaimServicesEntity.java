@@ -50,11 +50,9 @@ public class MemberClaimServicesEntity implements Serializable {
 	private String serviceNumber;
 
 	@Column(name = "service_paid_at")
-	@CreationTimestamp
 	private Date servicePaidAt;
 
 	@Column(name = "service_resolution_at")
-	@UpdateTimestamp
 	private Date serviceResolutionAt;
 
 	@CreationTimestamp

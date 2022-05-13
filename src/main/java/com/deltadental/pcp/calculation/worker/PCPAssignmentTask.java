@@ -67,7 +67,7 @@ public class PCPAssignmentTask implements Runnable {
 
 	private static final String DC_PRODUCT = "DC";
 	
-	public static String PCP_VALID_FOR_ENROLLEE = " Input PCP is Valid for the Enrollee "; 
+	public static String PCP_VALID_FOR_ENROLLEE = "Input PCP is Valid for the Enrollee"; 
 	
 	@Autowired
 	private PCPSearchServiceClient pcpSearchService;
@@ -96,12 +96,12 @@ public class PCPAssignmentTask implements Runnable {
 		String pcpValidationMessage = null;
 		if(pcpValidateResponse != null) {
 			List<PCPResponse> pcpResponses = pcpValidateResponse.getPcpResponses();
-			if(!pcpResponses.isEmpty()) {
+			if(CollectionUtils.isNotEmpty(pcpResponses)) {
 				for (PCPResponse pcpResponse : pcpResponses) {
 					List<EnrolleeDetail> enrollees = pcpResponse.getEnrollees();
 					for (EnrolleeDetail enrolleeDetail : enrollees) {
 						List<String> errorMessages = enrolleeDetail.getErrorMessages();
-						boolean pcpValidationFlag = errorMessages.stream().anyMatch(error -> StringUtils.equals(StringUtils.trimToEmpty(error), StringUtils.trimToEmpty(PCP_VALID_FOR_ENROLLEE)));
+						boolean pcpValidationFlag = errorMessages.stream().anyMatch(error -> StringUtils.equals(StringUtils.trimToEmpty(error), PCP_VALID_FOR_ENROLLEE));
 						if(pcpValidationFlag) {
 							pcpValidationMessage = StringUtils.trimToEmpty(PCP_VALID_FOR_ENROLLEE);
 							break;

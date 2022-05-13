@@ -43,6 +43,7 @@ class PCPConfigDataTest {
 		MockitoAnnotations.initMocks(this);
 		pcpConfigData = new PCPConfigData();
 		pcpConfigData.setPcpConfigServiceClient(mockPCPConfigService);
+		pcpConfigData.setWashRuleCutoffDay(16);
 	}
 	
 	@DisplayName("Test provider inclusion")

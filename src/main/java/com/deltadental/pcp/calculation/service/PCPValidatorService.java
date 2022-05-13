@@ -66,7 +66,7 @@ public class PCPValidatorService {
 							status = Status.VALIDATED;
 						} else {
 							if (!isClaimStatusValid) {
-								errorBuilder.append("Claim status").append(memberClaimResponse.getClaimStatus())
+								errorBuilder.append("Claim status ").append(memberClaimResponse.getClaimStatus())
 										.append("is not valid for PCP assignment!, ");
 							}
 							if (!isExplanationCodeValid) {

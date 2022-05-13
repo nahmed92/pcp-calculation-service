@@ -44,8 +44,7 @@ ENTRYPOINT java $JAVA_OPTS \
     -Dspring.jpa.hibernate.c3p0.max.size=${JPA_MAX_SIZE} \
     -Dspring.jpa.hibernate.c3p0.timeout=${JPA_TIMEOUT} \
     -Dservice.instance.id=${SERVICE_INSTANCE_ID} \
-    -Dspring.servlet.multipart.max-file-size=${MULTIPART_MAX_FILE} \
-    -Dspring.servlet.multipart.max-request-size=${MULTIPART_MAX_REQUEST_SIZE} \
+    -Dpcp.wash.rule.cutoff.day=${WASH_RULE_CUTOFF_DAY} \
 	-Dpcp.search.service.endpoint=${PCP_SEARCH_SERVICE_ENDPOINT} \
 	-Dpcp.config.service.endpoint=${PCP_CONFIG_SERVICE_ENDPOINT} \
 	-Dpcp.mtv.sync.service.endpoint=${PCP_MTV_SYNC_SERVICE_ENDPOINT} \

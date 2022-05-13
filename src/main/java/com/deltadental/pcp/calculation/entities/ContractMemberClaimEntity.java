@@ -77,7 +77,6 @@ public class ContractMemberClaimEntity implements Serializable {
 		if( this.retryCount == null) {
 			this.retryCount = 0;
 		}
-		
 		this.retryCount++;
 	}
 }
