@@ -243,8 +243,7 @@ public class PCPAssignmentTask implements Runnable {
 		Status status = Status.VALIDATED;
 		try {
 			MemberClaimResponse memberClaimResponse = mtvSyncService.memberClaim(contractMemberClaimEntity.getClaimId());
-			if (null != memberClaimResponse
-					&& (StringUtils.isNotBlank(memberClaimResponse.getErrorCode()) || StringUtils.isNotBlank(memberClaimResponse.getErrorMessage()))) {
+			if (null != memberClaimResponse && (StringUtils.isBlank(memberClaimResponse.getErrorCode()) || StringUtils.isBlank(memberClaimResponse.getErrorMessage()))) {
 				boolean exclusionFlag = pcpConfigData.isProviderInExclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber());
 				boolean inclusionFlag = pcpConfigData.isProviderInInclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber());
 				if (exclusionFlag || inclusionFlag) {
