@@ -74,6 +74,7 @@ public class MTVSyncServiceClient {
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			HttpEntity<ProviderAssignmentRequest> request = new HttpEntity<>(providerAssignmentRequest, headers);
 			ResponseEntity<ProviderAssignmentResponse> responseEntity = restTemplate.postForEntity(new URI(uriBuilder), request, ProviderAssignmentResponse.class);
+			log.info("MTV Sync Service request {} and response {} for provider assignment", providerAssignmentRequest, responseEntity);
 			if(responseEntity.getStatusCode() != HttpStatus.OK) {
 				throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException("Unknown exception occured during provider assignment for provider assignment request {} and Response code {} ",providerAssignmentRequest, responseEntity.getStatusCode());
 			} else {
