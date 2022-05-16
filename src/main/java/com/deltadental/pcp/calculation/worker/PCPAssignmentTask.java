@@ -138,12 +138,12 @@ public class PCPAssignmentTask implements Runnable {
 
 	private ProviderAssignmentRequest buildProviderAssignment(MemberClaimResponse memberClaimResponse, String pcpEffectiveDate) {
 		ProviderAssignmentRequest providerAssignmentRequest = ProviderAssignmentRequest.builder()
-																.contractID(memberClaimResponse.getContractId())
+																.contractId(memberClaimResponse.getContractId())
 																.enrolleeNumber(memberClaimResponse.getMemberID())
 																.pcpEffectiveDate(pcpEffectiveDate)
-																.personID(memberClaimResponse.getPersonId())
+																.personId(memberClaimResponse.getPersonId())
 																.providerContFlag("N")
-																.providerID(memberClaimResponse.getProviderId())
+																.providerId(memberClaimResponse.getProviderId())
 																.reasonCode(REASON_CODE_5NEW)
 																.sourceSystem(DCM_SOURCESYSTEM)
 																.userId(OPERATORID_PCPCALS)

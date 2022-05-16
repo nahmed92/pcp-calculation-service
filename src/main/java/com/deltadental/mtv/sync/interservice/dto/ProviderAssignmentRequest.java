@@ -16,17 +16,13 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProviderAssignmentRequest {
 
-	private String contractID;
-    private String errorCode;
-    private String errorMessage;
-    private String personID;
-    private String returnCode;
+	private String contractId;
 	private String enrolleeNumber;
-    private String pcpEffectiveDate;
-    private String pcpEndDate;
+	private String pcpEffectiveDate;
+	private String personId;
     private String practiceLocation;
     private String providerContFlag;
-    private String providerID;
+    private String providerId;
     private String reasonCode;
     private String sourceSystem;
     private String userId;
