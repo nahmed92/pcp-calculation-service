@@ -90,8 +90,6 @@ public class PCPValidatorService {
 	@Value("${service.instance.id}")
 	public String serviceInstanceId;
 
-	public ContractMemberClaimEntity contractMemberClaimEntity;
-	
 	private static final List<Status> SEARCH_STATUS_VALIDATE = List.of(Status.RETRY, Status.STAGED);
 
 	@MethodExecutionTime
@@ -126,14 +124,14 @@ public class PCPValidatorService {
 										ProviderAssignmentResponse providerAssignmentResponse = mtvSyncService.providerAssignment(providerAssignmentRequest);
 										if (StringUtils.equals(providerAssignmentResponse.getReturnCode(), PCP_ASSIGNMENT_OK) || StringUtils.equals(providerAssignmentResponse.getErrorCode(), PCP_ASSIGN_DCM_701)) {
 											status = Status.PCP_ASSIGNED;
-											MemberClaimEntity memberClaimEntity = saveMemberClaimEntity(this.contractMemberClaimEntity, memberClaimResponse);
+											MemberClaimEntity memberClaimEntity = saveMemberClaimEntity(contractMemberClaimsEntity, memberClaimResponse);
 											saveMemberClaimServices(memberClaimEntity, serviceLines);
-											saveMemberProvider(contractMemberClaimEntity.getId(), memberClaimResponse, pcpEffectiveDate, status);
-											log.info("PCP Assignment status for claim id {} status is {}.", contractMemberClaimEntity.getClaimId(), status);
+											saveMemberProvider(contractMemberClaimsEntity.getId(), memberClaimResponse, pcpEffectiveDate, status);
+											log.info("PCP Assignment status for claim id {} status is {}.", contractMemberClaimsEntity.getClaimId(), status);
 										} else {
 											status = Status.RETRY;
 											errorBuilder.append(providerAssignmentResponse.getErrorCode()).append(" : ").append(providerAssignmentResponse.getErrorMessage());
-											log.info("PCP Assignment status for claim id {} status is {} and error message is {}.", contractMemberClaimEntity.getClaimId(), status, errorMessage);
+											log.info("PCP Assignment status for claim id {} status is {} and error message is {}.", contractMemberClaimsEntity.getClaimId(), status, errorMessage);
 										}										
 									} catch (Exception e) {
 										log.error("Exception occured during provider assignment from metavance sync Service.", e);
