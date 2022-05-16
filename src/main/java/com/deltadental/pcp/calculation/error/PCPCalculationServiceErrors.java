@@ -9,6 +9,7 @@ import lombok.Getter;
 @Getter
 public enum PCPCalculationServiceErrors {
 
+	PCP_MTV_SYNC_CLAIM_SERVICE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR),
 	PCP_MTV_SYNC_SERVICE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR),
 	PCP_SEARCH_SERVICE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR),
 	PCP_CONFIG_ERROR(HttpStatus.INTERNAL_SERVER_ERROR),
@@ -19,7 +20,6 @@ public enum PCPCalculationServiceErrors {
 	PROVIDER_NOT_VALIDATED(HttpStatus.NOT_FOUND), 
 	UNAUTHORIZED(HttpStatus.UNAUTHORIZED);
 	
-
 	private final HttpStatus statusCode;
 
 	PCPCalculationServiceErrors(HttpStatus statusCode) {

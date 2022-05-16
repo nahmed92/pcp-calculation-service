@@ -2,17 +2,11 @@ package com.deltadental.pcp.calculation.entities;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -56,11 +50,9 @@ public class MemberClaimServicesEntity implements Serializable {
 	private String serviceNumber;
 
 	@Column(name = "service_paid_at")
-	@CreationTimestamp
 	private Date servicePaidAt;
 
 	@Column(name = "service_resolution_at")
-	@UpdateTimestamp
 	private Date serviceResolutionAt;
 
 	@CreationTimestamp

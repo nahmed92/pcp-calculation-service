@@ -67,8 +67,10 @@ pipeline {
 				#Contrast-Security
 				 curl -o contrast.jar -X GET https://app.contrastsecurity.com/Contrast/api/ng/6baceb38-de69-4696-b97f-7e60cf196c5b/agents/default/JAVA -H 'Authorization: UEd1cHRhQGRlbHRhLm9yZzpYM1lXVU5QN0ZMSE0yM1lL' -H 'API-Key: 5vz0MU1Ey5vcJCLN0ui1H1tSB7NQx9X1' -H 'Accept: application/json' -OJ
 				#BUILD DOCKER IMAGE
+				ls -lrtah
 				cp -f target/*.jar .
 				cp src/main/docker/Dockerfile .
+				ls -lrtah
 				docker build -t ${DOCKER_REGISTRY}/${JOB_NAME%%/*}:${SERVICE}_${BRANCH_NAME}_${BUILD_NUMBER} .
 				#verify docker image
 				docker images

@@ -165,7 +165,7 @@ public class PCPConfigServiceClient {
 				log.error("Got {} response code from PCP Config API {} ",responseEntity.getStatusCode(),EXCLUSIONS_PROVIDER);
 			}
 		} catch (RestClientException e) {
-			log.error("Unable to call PCP Config for API {} ",EXCLUSIONS_PROVIDER,e);
+			log.error("Unable to call PCP Config for API {} ",EXCLUSIONS_PROVIDER, e);
 			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException();
 		}		
 		log.info("END PCPConfigServiceClient.exclusions");
@@ -190,7 +190,7 @@ public class PCPConfigServiceClient {
 				log.error("Got {} response code from PCP Config API {} ",responseEntity.getStatusCode(),INCLUSIONS_PROVIDER);
 			}
 		} catch (RestClientException e) {
-			log.error("Unable to call PCP Config for API {} ",INCLUSIONS_PROVIDER,e);
+			log.error("Unable to call PCP Config for API {} ",INCLUSIONS_PROVIDER, e);
 			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException();
 		}		
 		log.info("END PCPConfigServiceClient.inclusions");

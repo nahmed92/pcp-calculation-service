@@ -13,11 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 @EnableAsync
 @Slf4j
 @ComponentScan(basePackages = { "com.deltadental.*" })
-public class PCPCalculationServiceApplication {
+public class App {
 
 	public static void main(String[] args) {
 		log.info("Starting PCP Calculation Service");
-		SpringApplication.run(PCPCalculationServiceApplication.class, args);
+		SpringApplication.run(App.class, args);
 	}
 
 }

@@ -1,7 +1,8 @@
 package com.deltadental.pcp.calculation.controller;
 
-import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
-import com.deltadental.pcp.calculation.service.MemberContractClaimService;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,8 +15,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
+import com.deltadental.pcp.calculation.service.MemberContractClaimService;
 
 //@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @RunWith(MockitoJUnitRunner.class)

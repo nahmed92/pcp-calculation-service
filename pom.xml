@@ -347,15 +347,16 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
+	<!-- 	<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
 			<version>${mockito.version}</version>
 			<scope>test</scope>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
+			<version>3.2.4</version>
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>

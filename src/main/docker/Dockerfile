@@ -6,7 +6,7 @@ FROM openjdk:11-jre
 
 MAINTAINER Delta Dental Group Member Online - DCM
 VOLUME /tmp
-ADD pcp-calculation-service-3.0.0.jar pcp-calculation-service-3.0.0.jar
+ADD pcp-calculation-service-1.0.0.jar pcp-calculation-service-1.0.0.jar
 ADD contrast.jar contrast.jar
 RUN sh -c 'touch /pcp-calculation-service-3.0.0.jar'
 RUN sh -c 'touch /contrast.jar'
@@ -44,8 +44,7 @@ ENTRYPOINT java $JAVA_OPTS \
     -Dspring.jpa.hibernate.c3p0.max.size=${JPA_MAX_SIZE} \
     -Dspring.jpa.hibernate.c3p0.timeout=${JPA_TIMEOUT} \
     -Dservice.instance.id=${SERVICE_INSTANCE_ID} \
-    -Dspring.servlet.multipart.max-file-size=${MULTIPART_MAX_FILE} \
-    -Dspring.servlet.multipart.max-request-size=${MULTIPART_MAX_REQUEST_SIZE} \
+    -Dpcp.wash.rule.cutoff.day=${WASH_RULE_CUTOFF_DAY} \
 	-Dpcp.search.service.endpoint=${PCP_SEARCH_SERVICE_ENDPOINT} \
 	-Dpcp.config.service.endpoint=${PCP_CONFIG_SERVICE_ENDPOINT} \
 	-Dpcp.mtv.sync.service.endpoint=${PCP_MTV_SYNC_SERVICE_ENDPOINT} \
@@ -55,4 +54,4 @@ ENTRYPOINT java $JAVA_OPTS \
 	-Dmanagement.endpoint.health.show-details=${MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS} \
 	-Dpcp.assignment.process.workers.count=${PCP_ASSIGNMENT_PROCESS_WORKERS_COUNT} \
 	-Denvironment=${ENVIRONMENT} \
-	-jar /pcp-calculation-service-3.0.0.jar
+	-jar /pcp-calculation-service-1.0.0.jar

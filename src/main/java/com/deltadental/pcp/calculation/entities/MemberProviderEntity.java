@@ -28,6 +28,7 @@ public class MemberProviderEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@Column(name = "id", nullable = false, unique = true)
 	private String id;
 
 	@Column(name = "claim_status")
@@ -77,7 +78,7 @@ public class MemberProviderEntity implements Serializable {
 	private Timestamp crationAt;
 
 	@UpdateTimestamp
-	@Column(name = "LAST_updated_at")
+	@Column(name = "last_updated_at")
 	private Timestamp lastUpdatedAt;
 
 }

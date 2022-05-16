@@ -3,7 +3,7 @@ package com.deltadental.pcp.calculation.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.text.DateFormat;
@@ -22,7 +22,7 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.deltadental.pcp.calculation.interservice.PCPConfigData;
 import com.deltadental.pcp.config.interservice.pojo.GroupRestrictions;
@@ -43,6 +43,7 @@ class PCPConfigDataTest {
 		MockitoAnnotations.initMocks(this);
 		pcpConfigData = new PCPConfigData();
 		pcpConfigData.setPcpConfigServiceClient(mockPCPConfigService);
+		pcpConfigData.setWashRuleCutoffDay(16);
 	}
 	
 	@DisplayName("Test provider inclusion")

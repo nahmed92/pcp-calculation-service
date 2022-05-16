@@ -2,18 +2,22 @@ package com.deltadental.mtv.sync.interservice;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.deltadental.mtv.sync.interservice.dto.MemberClaimRequest;
 import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
 import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentRequest;
 import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentResponse;
@@ -35,45 +39,51 @@ public class MTVSyncServiceClient {
 	@Autowired(required = true)
 	private RestTemplate restTemplate;
 
-	public MemberClaimResponse memberClaim(MemberClaimRequest memberClaimRequest) {
+	public MemberClaimResponse memberClaim(String claimId) {
 		log.info("START MTVSyncServiceClient.memberClaim");
-		MemberClaimResponse responseEntity = null;
+		MemberClaimResponse memberClaimResponse = null;
 		try {
 			String updatePCPMemberEndPoint = pcpMtvSyncServiceEndpoint.concat(MTVSyncServiceConstants.MEMBER_CLAIM);
 			UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(updatePCPMemberEndPoint);
-			String uriBuilder = builder.build().encode().toUriString();
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.APPLICATION_JSON);
-			HttpEntity<MemberClaimRequest> request = new HttpEntity<MemberClaimRequest>(memberClaimRequest, headers);
-			responseEntity = restTemplate.postForObject(new URI(uriBuilder), request, MemberClaimResponse.class);
-
-		} catch (RestClientException | URISyntaxException e) {
-			log.error("Error calling MTV member claim for request {}", memberClaimRequest);
+			final Map<String, String> params = new HashMap<>();
+			params.put("claim-id", StringUtils.trimToNull(claimId));
+			URI exclusionsUri = builder.buildAndExpand(params).toUri();
+			log.info("Request uri : {} ", exclusionsUri);
+			ResponseEntity<MemberClaimResponse> responseEntity = restTemplate.getForEntity(exclusionsUri, MemberClaimResponse.class);
+			if(responseEntity.getStatusCode() != HttpStatus.OK) {
+				throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException("Unable to retrive claim information for claim id {} and Response code {} ",claimId, responseEntity.getStatusCode());
+			} else {
+				memberClaimResponse = responseEntity.getBody();
+			}
+		} catch (RestClientException e) {
+			log.error("Error calling MTV member claim for request claim id {}", claimId);
 			throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException();
 		}
 		log.info("END MTVSyncServiceClient.memberClaim()");
-		return responseEntity;
-
+		return memberClaimResponse;
 	}
 
 	public ProviderAssignmentResponse providerAssignment(ProviderAssignmentRequest providerAssignmentRequest) {
-		log.info("START MTVSyncServiceClient.providerAssignment");
-		ProviderAssignmentResponse responseEntity = null;
+		log.info("START MTVSyncServiceClient.providerAssignment()");
+		ProviderAssignmentResponse providerAssignmentResponse = null;
 		try {
-			String updatePCPMemberEndPoint = pcpMtvSyncServiceEndpoint
-					.concat(MTVSyncServiceConstants.PROVIDER_ASSIGNMENT);
+			String updatePCPMemberEndPoint = pcpMtvSyncServiceEndpoint.concat(MTVSyncServiceConstants.PROVIDER_ASSIGNMENT);
 			UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(updatePCPMemberEndPoint);
 			String uriBuilder = builder.build().encode().toUriString();
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			HttpEntity<ProviderAssignmentRequest> request = new HttpEntity<>(providerAssignmentRequest, headers);
-			responseEntity = restTemplate.postForObject(new URI(uriBuilder), request, ProviderAssignmentResponse.class);
-
+			ResponseEntity<ProviderAssignmentResponse> responseEntity = restTemplate.postForEntity(new URI(uriBuilder), request, ProviderAssignmentResponse.class);
+			if(responseEntity.getStatusCode() != HttpStatus.OK) {
+				throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException("Unknown exception occured during provider assignment for provider assignment request {} and Response code {} ",providerAssignmentRequest, responseEntity.getStatusCode());
+			} else {
+				providerAssignmentResponse = responseEntity.getBody();
+			}
 		} catch (RestClientException | URISyntaxException e) {
 			log.error("Error calling MTV member claim for request {}", providerAssignmentRequest);
 			throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException();
 		}
 		log.info("END MTVSyncServiceClient.providerAssignment()");
-		return responseEntity;
+		return providerAssignmentResponse;
 	}
 }
