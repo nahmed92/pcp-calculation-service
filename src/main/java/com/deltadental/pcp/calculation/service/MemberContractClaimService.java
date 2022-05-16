@@ -13,6 +13,7 @@ import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
 import com.deltadental.pcp.calculation.enums.Status;
 import com.deltadental.pcp.calculation.mapper.Mapper;
 import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
+import com.deltadental.pcp.calculation.worker.PCPCalculationServiceWorker;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,13 +25,15 @@ public class MemberContractClaimService {
 	private ContractMemberClaimRepo repo;
 
 	@Autowired
+	private PCPValidatorService pcpValidatorService;
+	
+	@Autowired
 	private Mapper mapper;
 
 	@Value("${service.instance.id}")
 	private String serviceInstanceId;
 
-	private static final List<Status> SEARCH_STATUS = List.of(Status.RETRY, Status.STAGED, Status.VALIDATED,
-			Status.PCP_ASSIGNED);
+	private static final List<Status> SEARCH_STATUS = List.of(Status.RETRY, Status.STAGED, Status.VALIDATED, Status.PCP_ASSIGNED);
 
 	private void save(MemberContractClaimRequest request) {
 		log.info("START MemberContractClaimService.save");
@@ -45,6 +48,7 @@ public class MemberContractClaimService {
 			log.info("Inserting  {} ", request);
 			ContractMemberClaimEntity contractMemberClaimsEntity = mapper.map(request, serviceInstanceId);
 			repo.save(contractMemberClaimsEntity);
+			pcpValidatorService.validateAndAssignPCP(contractMemberClaimsEntity);
 		} else {
 			log.warn("Record already exists in contract member claims table : {} ", request);
 		}
