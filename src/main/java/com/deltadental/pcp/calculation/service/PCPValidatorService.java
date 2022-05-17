@@ -239,7 +239,7 @@ public class PCPValidatorService {
 				.receivedAt(getTimestamp(memberClaimResponse.getReceivedTs().getNanos()))
 				.resolvedAt(getTimestamp(memberClaimResponse.getResolvedTs().getNanos()))
 				.servicesNumber(memberClaimResponse.getServicesNumber())
-				.contractMemberClaimsId(contractMemberClaimsEntity.getId())
+				.contractMemberClaimId(contractMemberClaimsEntity.getId())
 				.operatorId(OPERATORID_PCPCALS)
 				.id(UUID.randomUUID().toString())
 				.build();
