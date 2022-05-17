@@ -173,7 +173,7 @@ pipeline {
 						script {
 							def parameterMap=new HashMap();
 							def tag=DOCKER_REGISTRY+"/"+JOB_NAME+":"+SERVICE+"_"+BRANCH_NAME+"_"+BUILD_NUMBER
-
+							def ApplicationArea="GMMO"
 							parameterMap.put("PROJECT","CM");
 							parameterMap.put("TAG",tag);
 							parameterMap.put("APP",APP);
@@ -238,6 +238,7 @@ pipeline {
 				script {
 					def parameterMap=new HashMap();
 					def tag=DOCKER_REGISTRY+"/"+JOB_NAME+":"+SERVICE+"_"+BRANCH_NAME+"_"+BUILD_NUMBER
+					def ApplicationArea="GMMO"
 					parameterMap.put("PROJECT","CM");
 					parameterMap.put("TAG",tag);
 					parameterMap.put("APP",APP);
@@ -322,6 +323,7 @@ pipeline {
 				script {
 					def parameterMap=new HashMap();
 					def tag=DOCKER_REGISTRY+"/"+JOB_NAME+":"+SERVICE+"_"+BRANCH_NAME+"_"+BUILD_NUMBER
+					def ApplicationArea="GMMO"
 					parameterMap.put("PROJECT","CM");
 					parameterMap.put("TAG",tag);
 					parameterMap.put("APP",APP);
@@ -404,6 +406,7 @@ pipeline {
 				checkpoint 'Create CM Record-PROD';
 				script {
 					CMIMPLEMENTOR=input(message: "Do you want to promote build to Higher Enviornment , click PROCEED or ABORT ?", submitterParameter: 'approver')
+            		def ApplicationArea="GMMO"
             		def parameterMap=new HashMap();
 					parameterMap.put("PROJECT","CM");
            	 		parameterMap.put("APP","${APP}");
@@ -539,15 +542,15 @@ pipeline {
 	SCANNER_HOME= tool 'SonarQubeScanner'
     //Application Area  and App as defined in Jira Change Management Project
 
-	ApplicationArea=""
+	def ApplicationArea="GMMO"
     APP=""
     //team Dl and Release Management Team
-    SEND_MAIL = "ITSSReleaseTeam@delta.org, KBasireddy@delta.org,akosana@delta.org,pkumar2@delta.org"
+    SEND_MAIL = "ITSSReleaseTeam@delta.org,KBasireddy@delta.org,skalahasthi2@delta.org,pkumar2@delta.org,nahmed@delta.org"
 
     //Application type
 		SERVICE_TYPE="JAVA"
-    //PO who will approve Prod CM Record in new Jira Workflow France Huttela
-	    PO="ca32098"
+    //PO who will approve Prod CM Record in new Jira Workflow Meg
+	    PO="ca27567"
     //Github Repository which contains automation test suites
    //TEST_REPO="https://rc-github.deltads.ent/DEVPROJECTS/jasmine-apitest-automation"
 	 TEST_REPO="https://rc-github.deltads.ent/DEVPROJECTS/GroupConnectServiceTestAutomationJS"
