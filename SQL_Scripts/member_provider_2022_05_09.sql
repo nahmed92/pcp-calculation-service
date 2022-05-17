@@ -21,4 +21,3 @@ CREATE TABLE dbo.member_provider (
 );
 
 
--- [PCP-Calculation].dbo.MEMBER_PROVIDER foreign keys
