@@ -21,4 +21,7 @@ public class ProviderAssignmentResponse {
     private String errorMessage;
     private String personId;
     private String returnCode;
+    private String businessLevelAsnId;
+    private String providerLocationId;
+    private String providerQualifierId;
 }

@@ -189,7 +189,7 @@ public class PCPConfigData implements InitializingBean {
 	}
 	
 	public boolean isProviderInInclusionList(String providerId, String group, String division) {
-		log.info("START PCPConfigData.isProviderInInclusionList {}, {}, {}", providerId, group, division);
+		log.info("START PCPConfigData.isProviderInInclusionList()");
 		Boolean inclusionFlag = Boolean.TRUE;
 		if(StringUtils.isNotBlank(providerId) && StringUtils.isNotBlank(group) && StringUtils.isNotBlank(division)) {
 			InclusionExclusion[] inclusions = pcpConfigServiceClient.inclusions(providerId);
@@ -207,7 +207,7 @@ public class PCPConfigData implements InitializingBean {
 				log.info("Provider {}, Group {}, Division {} is not listed in inclusion list.", providerId, group, division);
 			}
 		}
-		log.info("END PCPConfigData.isProviderInInclusionList {}, {}, {}", providerId, group, division);
+		log.info("END PCPConfigData.isProviderInInclusionList()");
 		return inclusionFlag.booleanValue();
 	}
 	
