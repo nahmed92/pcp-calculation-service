@@ -67,10 +67,8 @@ pipeline {
 				#Contrast-Security
 				 curl -o contrast.jar -X GET https://app.contrastsecurity.com/Contrast/api/ng/6baceb38-de69-4696-b97f-7e60cf196c5b/agents/default/JAVA -H 'Authorization: UEd1cHRhQGRlbHRhLm9yZzpYM1lXVU5QN0ZMSE0yM1lL' -H 'API-Key: 5vz0MU1Ey5vcJCLN0ui1H1tSB7NQx9X1' -H 'Accept: application/json' -OJ
 				#BUILD DOCKER IMAGE
-				ls -lrtah
 				cp -f target/*.jar .
 				cp src/main/docker/Dockerfile .
-				ls -lrtah
 				docker build -t ${DOCKER_REGISTRY}/${JOB_NAME%%/*}:${SERVICE}_${BRANCH_NAME}_${BUILD_NUMBER} .
 				#verify docker image
 				docker images
@@ -97,7 +95,7 @@ pipeline {
 				script {
 
 					 gitTagging("${SERVICE}_${BRANCH_NAME}_${BUILD_NUMBER}","Development/dd_cx_docker-dev")
-					 gitTagging("${SERVICE}_${BRANCH_NAME}_${BUILD_NUMBER}","development-private/dd_cx_docker-dev")
+					 gitTagging("${SERVICE}_${BRANCH_NAME}_${BUILD_NUMBER}","Development-private/dd_cx_docker-dev")
 				     rundeckLibrary.deployJob()
                     }
 			}
@@ -138,7 +136,7 @@ pipeline {
 				}
 			}
 		}
-		stage('Test Automation- DIT')
+		/*stage('Test Automation- DIT')
 		{
 			environment{
 				DEPLOYMENT_ENVIRONMENT = 'DIT'
@@ -150,7 +148,7 @@ pipeline {
 					echo "DIT Testing"
 					}
 			}
-		}
+		}*/
 	    stage('Pre Deployment ') {
 			parallel {
 				stage('Create Build Note') {
@@ -173,7 +171,8 @@ pipeline {
 						script {
 							def parameterMap=new HashMap();
 							def tag=DOCKER_REGISTRY+"/"+JOB_NAME+":"+SERVICE+"_"+BRANCH_NAME+"_"+BUILD_NUMBER
-							def ApplicationArea="GMMO"
+							ApplicationArea="Provider Services" 
+							APP="ps-refdata-rd-service"
 							parameterMap.put("PROJECT","CM");
 							parameterMap.put("TAG",tag);
 							parameterMap.put("APP",APP);
@@ -224,7 +223,7 @@ pipeline {
 
 
 
-    		stage('Deploy -PIT')
+    	/*stage('Deploy -PIT')
 		{
 			environment {
 				DEPLOYMENT_ENVIRONMENT = 'PIT'
@@ -238,7 +237,8 @@ pipeline {
 				script {
 					def parameterMap=new HashMap();
 					def tag=DOCKER_REGISTRY+"/"+JOB_NAME+":"+SERVICE+"_"+BRANCH_NAME+"_"+BUILD_NUMBER
-					def ApplicationArea="GMMO"
+					ApplicationArea="Provider Services"
+					APP="ps-refdata-rd-service"
 					parameterMap.put("PROJECT","CM");
 					parameterMap.put("TAG",tag);
 					parameterMap.put("APP",APP);
@@ -308,7 +308,7 @@ pipeline {
 					}
 				}
 			}
-		}
+		}*/
 		stage('Deploy - MOT')
 		{
 			environment {
@@ -322,8 +322,9 @@ pipeline {
 		   		checkpoint 'Deploy - MOT';
 				script {
 					def parameterMap=new HashMap();
+					ApplicationArea="Provider Services"
+					APP="ps-refdata-rd-service"
 					def tag=DOCKER_REGISTRY+"/"+JOB_NAME+":"+SERVICE+"_"+BRANCH_NAME+"_"+BUILD_NUMBER
-					def ApplicationArea="GMMO"
 					parameterMap.put("PROJECT","CM");
 					parameterMap.put("TAG",tag);
 					parameterMap.put("APP",APP);
@@ -368,7 +369,7 @@ pipeline {
 			}
 		}
 
-		stage('Test Automation- MOT')
+		/*stage('Test Automation- MOT')
 		{
 			environment{
 				DEPLOYMENT_ENVIRONMENT = 'MOT'
@@ -394,7 +395,7 @@ pipeline {
 					}
 				}
 			}
-		}
+		}*/
 
 		stage('Create CM Record-PROD') {
 			environment{
@@ -406,7 +407,8 @@ pipeline {
 				checkpoint 'Create CM Record-PROD';
 				script {
 					CMIMPLEMENTOR=input(message: "Do you want to promote build to Higher Enviornment , click PROCEED or ABORT ?", submitterParameter: 'approver')
-            		def ApplicationArea="GMMO"
+					ApplicationArea="Provider Services"
+					APP="ps-refdata-rd-service"
             		def parameterMap=new HashMap();
 					parameterMap.put("PROJECT","CM");
            	 		parameterMap.put("APP","${APP}");
@@ -542,11 +544,10 @@ pipeline {
 	SCANNER_HOME= tool 'SonarQubeScanner'
     //Application Area  and App as defined in Jira Change Management Project
 
-	def ApplicationArea="GMMO"
-    APP=""
-    //team Dl and Release Management Team
-    SEND_MAIL = "ITSSReleaseTeam@delta.org,KBasireddy@delta.org,skalahasthi2@delta.org,pkumar2@delta.org,nahmed@delta.org"
-
+	ApplicationArea="Provider Services"
+	APP="ps-refdata-rd-service"
+	//team Dl and Release Management Team
+	SEND_MAIL = "ITSSReleaseTeam@delta.org,KBasireddy@delta.org,skalahasthi2@delta.org,pkumar2@delta.org,nahmed@delta.org"
     //Application type
 		SERVICE_TYPE="JAVA"
     //PO who will approve Prod CM Record in new Jira Workflow Meg
