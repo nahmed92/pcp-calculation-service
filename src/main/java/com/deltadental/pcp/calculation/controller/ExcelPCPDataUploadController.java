@@ -2,6 +2,7 @@ package com.deltadental.pcp.calculation.controller;
 
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -54,10 +55,7 @@ public class ExcelPCPDataUploadController {
 		ResponseEntity<String> responseEntity = null;
 		if (excelService.hasExcelFormat(pcpMemberClaimsDataFile)) {
 			List<MemberContractClaimRequest> memberContractClaimRequests = excelService.extractPCPMemberClaimsData(pcpMemberClaimsDataFile);
-			if (!memberContractClaimRequests.isEmpty()) {
-				memberContractClaimRequests.forEach(validateProviderRequest -> {
-					validateProviderRequest.setOperatorId("FILE_UPLOAD");
-				});
+			if (CollectionUtils.isNotEmpty(memberContractClaimRequests)) {				
 				memberContractClaimService.stageMemberContractClaimRecords(memberContractClaimRequests);
 				responseEntity = new ResponseEntity<>("Successfully uploaded member contract claims!", HttpStatus.CREATED);
 				log.info("Successfully uploaded member contract claims!");

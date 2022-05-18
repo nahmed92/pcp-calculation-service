@@ -1,6 +1,5 @@
 package com.deltadental.pcp.calculation.service;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -12,8 +11,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,7 +20,6 @@ import com.deltadental.platform.common.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
-@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 @Slf4j
 public class ExcelService {
 
@@ -40,9 +36,7 @@ public class ExcelService {
 	public List<MemberContractClaimRequest> extractPCPMemberClaimsData(MultipartFile pcpMemberClaimsDataFile) {
 		log.info("START ExcelService.extractPCPMemberClaimsData()");
 		List<MemberContractClaimRequest> memberContractClaims = new ArrayList<MemberContractClaimRequest>();
-		try {
-			InputStream is = pcpMemberClaimsDataFile.getInputStream();
-			Workbook workbook = new XSSFWorkbook(is);
+		try(InputStream is = pcpMemberClaimsDataFile.getInputStream(); Workbook workbook = new XSSFWorkbook(is)) {
 			Sheet firstSheet = workbook.getSheetAt(0);
 			Iterator<Row> rows = firstSheet.iterator();
 			while (rows.hasNext()) {
@@ -52,6 +46,7 @@ public class ExcelService {
 					continue; // just skip the rows if row number is 0
 				}
 				MemberContractClaimRequest memberContractClaim = new MemberContractClaimRequest();
+				memberContractClaim.setOperatorId("FILE_UPLOAD");
 				Iterator<Cell> cellsInRow = currentRow.iterator();
 				int cellIdx = 0;
 				while (cellsInRow.hasNext()) {
@@ -86,11 +81,11 @@ public class ExcelService {
 						break;
 					}
 					cellIdx++;
-				}
+				}				
 				memberContractClaims.add(memberContractClaim);
 			}
-			workbook.close();
-		} catch (IOException e) {
+		} catch (Exception e) {
+			log.error("Unable to process to excel data ", e);
 			throw new ServiceException("Fail to parse Excel file: " + e.getMessage());
 		}
 		log.info("END ExcelService.extractPCPMemberClaimsData()");
