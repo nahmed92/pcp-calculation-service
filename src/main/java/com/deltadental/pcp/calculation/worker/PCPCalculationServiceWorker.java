@@ -33,10 +33,10 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 public class PCPCalculationServiceWorker {
 
-	private static final List<Status> SEARCH_STATUS = List.of(Status.RETRY, Status.STAGED, Status.VALIDATED);
+	private static final List<Status> SEARCH_STATUS = List.of(Status.RETRY, Status.STAGED, Status.VALIDATED, Status.PCP_EXCLUDED, Status.PCP_NOT_INCLUDED);
 
 	@Value("${pcp.assignment.process.workers.count:5}")
-	private int pcpAssignmentProcessWorkersCount;
+	private Integer pcpAssignmentProcessWorkersCount;
 
 	@Value("${service.instance.id}")
 	private String serviceInstanceId;
@@ -51,7 +51,10 @@ public class PCPCalculationServiceWorker {
 
 	@PostConstruct
 	public void setup() {
-		executor = Executors.newFixedThreadPool(pcpAssignmentProcessWorkersCount);
+		log.info("START PCPCalculationServiceWorker.setup()");
+		log.info("PCP Assignment Workers Count {}.", pcpAssignmentProcessWorkersCount);
+		executor = Executors.newFixedThreadPool(pcpAssignmentProcessWorkersCount);		
+		log.info("END PCPCalculationServiceWorker.setup()");
 	}
 
 	@Lookup

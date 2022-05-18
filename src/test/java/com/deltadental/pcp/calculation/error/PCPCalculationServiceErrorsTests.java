@@ -1,6 +1,7 @@
 package com.deltadental.pcp.calculation.error;
 
-import com.deltadental.platform.common.exception.ServiceException;
+import static org.hamcrest.Matchers.is;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,7 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.hamcrest.Matchers.is;
+import com.deltadental.platform.common.exception.ServiceException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PCPCalculationServiceErrorsTests {
