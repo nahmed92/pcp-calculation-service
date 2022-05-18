@@ -75,7 +75,7 @@ public class PCPConfigData implements InitializingBean {
 		explanationCodes();
 		log.info("Explanation codes : {} ",explanationCodes);
 		procedureCodes();
-		log.info("Procedure codes : ",procedureCodes);
+		log.info("Procedure codes : {} ",procedureCodes);
 		log.info("Wash rule cutoff day {} ",washRuleCutoffDay);
 		log.info("PCP Effectice Date {} ",calculatePCPEffectiveDate());
 		log.info("END PCPConfigData.afterPropertiesSet");
