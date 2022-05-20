@@ -1,29 +1,23 @@
 package com.deltadental.pcp.calculation.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.jupiter.api.BeforeAll;
+import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
+import com.deltadental.pcp.calculation.service.MemberContractClaimService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
-import com.deltadental.pcp.calculation.service.MemberContractClaimService;
+import java.util.ArrayList;
+import java.util.List;
 
-//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@TestInstance(Lifecycle.PER_CLASS)
-@RunWith(MockitoJUnitRunner.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@ExtendWith(MockitoExtension.class)
 public class PCPCalculationServiceControllerTests {
     
     @InjectMocks
@@ -32,10 +26,8 @@ public class PCPCalculationServiceControllerTests {
     @Mock
     MemberContractClaimService mockMemberContractClaimService;
 
-    @BeforeAll
-    public void initialize(){
-
-        MockitoAnnotations.initMocks(this);
+    @BeforeEach
+    public void setup(){
     }
 
     @Test
@@ -45,8 +37,8 @@ public class PCPCalculationServiceControllerTests {
         Mockito.doNothing().when(mockMemberContractClaimService)
                 .stageMemberContractClaimRecords(memberContractClaimRequests);
         ResponseEntity<Boolean> expectedResponse = mockController.stageMembersContractsAndClaims(memberContractClaimRequests);
-        Assert.assertEquals(HttpStatus.CREATED, expectedResponse.getStatusCode());
-        Assert.assertEquals(Boolean.TRUE, expectedResponse.getBody().booleanValue());
+        assertEquals(HttpStatus.CREATED, expectedResponse.getStatusCode());
+        assertEquals(Boolean.TRUE, expectedResponse.getBody().booleanValue());
 
     }
 
@@ -54,11 +46,9 @@ public class PCPCalculationServiceControllerTests {
     void testStageMembersContractsAndClaims_BadRequest(){
 
         List<MemberContractClaimRequest> memberContractClaimRequests = new ArrayList<>();
-        Mockito.doNothing().when(mockMemberContractClaimService)
-                .stageMemberContractClaimRecords(memberContractClaimRequests);
         ResponseEntity<Boolean> expectedResponse = mockController.stageMembersContractsAndClaims(memberContractClaimRequests);
-        Assert.assertEquals(HttpStatus.BAD_REQUEST, expectedResponse.getStatusCode());
-        Assert.assertEquals(Boolean.FALSE, expectedResponse.getBody().booleanValue());
+        assertEquals(HttpStatus.BAD_REQUEST, expectedResponse.getStatusCode());
+        assertEquals(Boolean.FALSE, expectedResponse.getBody().booleanValue());
 
     }
 

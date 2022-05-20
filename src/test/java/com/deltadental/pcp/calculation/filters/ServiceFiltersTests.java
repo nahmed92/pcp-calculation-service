@@ -1,15 +1,14 @@
 package com.deltadental.pcp.calculation.filters;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 
-@RunWith(MockitoJUnitRunner.class)
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+
 public class ServiceFiltersTests {
 
     @InjectMocks
@@ -23,6 +22,6 @@ public class ServiceFiltersTests {
     @Test
     public void testLoggerFilterRegistrationBean(){
         FilterRegistrationBean expectedBean = mockServiceFilters.loggerFilterRegistrationBean();
-        Assert.assertNotNull(expectedBean);
+        assertNotNull(expectedBean);
     }
 }
