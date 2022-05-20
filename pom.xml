@@ -30,7 +30,7 @@
 		<lombok.version>1.18.16</lombok.version>
 		<sqlserver.version>9.2.0.jre11</sqlserver.version>
 		<!-- Testing framework -->
-		<junit.version>4.12</junit.version>
+		<junit.version>4.13.2</junit.version>
 		<!-- <junit.version>5.5.2</junit.version> -->
 		<junit.platform.version>1.7.1</junit.platform.version>
 
@@ -51,7 +51,7 @@
 		<jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
 		<jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
 		<sonar.projectKey>${project.name}</sonar.projectKey>
-		<sonar.projectName>PCP Search Service</sonar.projectName>
+		<sonar.projectName>PCP Canculation Service</sonar.projectName>
 		<sonar.language>java</sonar.language>
 		<sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
@@ -64,13 +64,24 @@
 		</sonar.jacoco.itReportPath>
 		<easymock.version>2.4</easymock.version>
 		<objenesis.version>2.5</objenesis.version>
-		<mockito.version>1.9.5</mockito.version>
+		<mockito.version>4.4.0</mockito.version>
 		<checkstyle.version>8.4</checkstyle.version>
 
 		<!-- Logger versions -->
 		<log4j2.version>2.14.0</log4j2.version>
 		<slf4j.version>1.7.25</slf4j.version>
 		<jackson.version>2.13.0</jackson.version>
+		<sonar.exclustions>
+			src/main/java/com/deltadental/pcp/calculation/application/App.java,
+			src/main/java/com/deltadental/pcp/calculation/config/**/*,
+			src/main/java/com/deltadental/pcp/calculation/constants/**/*,
+			src/main/java/com/deltadental/pcp/calculation/domain/**/*,
+			src/main/java/com/deltadental/pcp/calculation/entities/**/*,
+			src/main/java/com/deltadental/pcp/calculation/enums/**/*,
+			src/main/java/com/deltadental/pcp/config/interservice/pojo/**/*,
+			src/main/java/com/deltadental/pcp/search/interservice/pojo/**/*,
+			src/main/java/com/deltadental/mtv/sync/interservice/dto/**/*
+		</sonar.exclustions>
 
 	</properties>
 
@@ -297,6 +308,11 @@
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<!--<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>4.5.1</version>
+			<scope>test</scope> </dependency>-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -330,22 +346,22 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-junit-jupiter</artifactId>
-			<version>4.4.0</version>
+			<version>${mockito.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>org.objenesis</groupId>
 			<artifactId>objenesis</artifactId>
 			<version>${objenesis.version}</version>
 			<scope>test</scope>
-		</dependency>
+		</dependency>-->
 
-		<dependency>
+		<!--<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymock</artifactId>
 			<version>${easymock.version}</version>
 			<scope>test</scope>
-		</dependency>
+		</dependency>-->
 
 	<!-- 	<dependency>
 			<groupId>org.mockito</groupId>
@@ -356,7 +372,7 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>3.2.4</version>
+			<version>${mockito.version}</version>
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>

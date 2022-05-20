@@ -72,6 +72,9 @@ public class MemberProviderEntity implements Serializable {
 
 	@Column(name = "business_level_assn_id")
 	private String businessLevelAssnId;
+	
+	@Column(name = "provider_qualifier_id")
+	private String providerQualifierId;
 
 	@CreationTimestamp
 	@Column(name = "creation_at")

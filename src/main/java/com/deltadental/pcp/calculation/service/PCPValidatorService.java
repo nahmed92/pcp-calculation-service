@@ -56,9 +56,9 @@ public class PCPValidatorService {
 					List<ServiceLine> serviceLines = memberClaimResponse.getServiceLines();
 					if (CollectionUtils.isNotEmpty(serviceLines)) {
 						boolean isClaimStatusValid = pcpConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus()));
-						log.info("Claim status {} is valid {} for claim {}",memberClaimResponse.getClaimStatus(),isClaimStatusValid,memberClaimResponse.getClaimId());
 						boolean isExplanationCodeValid = pcpConfigData.isExplanationCodeValid(serviceLines);
 						boolean isProcedureCodeValid = pcpConfigData.isProcedureCodeValid(serviceLines);
+						log.info("Claim id {} , isClaimStatusValid {}, isProcedureCodeValid {} and isExplanationCodeValid {} ",memberClaimResponse.getClaimId(),isClaimStatusValid,isProcedureCodeValid,isExplanationCodeValid);
 						if (isClaimStatusValid && isExplanationCodeValid && isProcedureCodeValid) {
 							pcpAssignmentService.process(contractMemberClaimsEntity, memberClaimResponse);
 						}

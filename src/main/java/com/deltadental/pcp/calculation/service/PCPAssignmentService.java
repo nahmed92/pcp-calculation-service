@@ -247,7 +247,8 @@ public class PCPAssignmentService {
 				.providerId(memberClaimResponse.getProviderId())
 				.businessLevelAssnId(providerAssignmentResponse.getBusinessLevelAsnId())
 				.practiceLocationId(providerAssignmentResponse.getProviderLocationId())
-				.providerContractId(providerAssignmentResponse.getProviderQualifierId())
+				.providerContractId(providerAssignmentResponse.getProviderContractId())
+				.providerQualifierId(providerAssignmentResponse.getProviderQualifierId())
 				.build();
 		memberProviderRepo.save(memberProviderEntity);
 		log.info("END PCPAssignmentService.saveMemberProvider()");
