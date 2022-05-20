@@ -29,7 +29,6 @@ public class MemberContractClaimRequest {
 	@Size(max = 2, min = 2, message = "Member ID length must be two(2).")
 	private String memberId;
 
-	@NotBlank(message = "Provider Id cannot be null or empty!")
 	private String providerId;
 
 	@NotBlank(message = "State cannot be null or empty!")
