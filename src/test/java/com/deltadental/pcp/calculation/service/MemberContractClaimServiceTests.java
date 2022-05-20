@@ -6,20 +6,18 @@ import com.deltadental.pcp.calculation.enums.Status;
 import com.deltadental.pcp.calculation.mapper.Mapper;
 import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
 import org.apache.commons.lang.StringUtils;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@RunWith(MockitoJUnitRunner.class)
 public class MemberContractClaimServiceTests {
 
     @InjectMocks
@@ -62,7 +60,7 @@ public class MemberContractClaimServiceTests {
                 ))
                 .thenReturn(memberClaimsEntities);
         mockMemberContractClaimService.stageMemberContractClaimRecords(requestList);
-        Assert.assertEquals(memberClaimsEntities.size(), 0);
+        assertEquals(memberClaimsEntities.size(), 0);
     }
 
     @Test
@@ -85,7 +83,7 @@ public class MemberContractClaimServiceTests {
                         ))
                 .thenReturn(memberClaimsEntities);
         mockMemberContractClaimService.stageMemberContractClaimRecords(requestList);
-        Assert.assertEquals(memberClaimsEntities.size(), 1);
+        assertEquals(memberClaimsEntities.size(), 1);
     }
 
     private ContractMemberClaimEntity buildContractMemberClaimEntity() {

@@ -1,17 +1,14 @@
 package com.deltadental.pcp.calculation.error;
 
-import static org.hamcrest.Matchers.is;
-
-import org.junit.Assert;
+import com.deltadental.platform.common.exception.ServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 
-import com.deltadental.platform.common.exception.ServiceException;
-import org.mockito.junit.MockitoJUnitRunner;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@RunWith(MockitoJUnitRunner.class)
+
 public class PCPCalculationServiceErrorsTests {
 
     PCPCalculationServiceErrors mockPCPCalculationServiceErrors;
@@ -27,9 +24,9 @@ public class PCPCalculationServiceErrorsTests {
 
         mockPCPCalculationServiceErrors = PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR;
         ServiceException ex = mockPCPCalculationServiceErrors.createException(new Object());
-        Assert.assertNotNull(ex);
-        Assert.assertThat(ex.getErrorCode(),
-                is(PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.toString()));
+        assertNotNull(ex);
+        assertEquals(ex.getErrorCode(),
+                PCPCalculationServiceErrors.INTERNAL_SERVER_ERROR.toString());
 
     }
 }
