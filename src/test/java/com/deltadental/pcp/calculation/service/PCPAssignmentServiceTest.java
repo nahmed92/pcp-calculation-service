@@ -22,6 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.client.RestClientException;
 
 import java.awt.desktop.SystemEventListener;
 import java.time.LocalDate;
@@ -63,8 +64,6 @@ public class PCPAssignmentServiceTest {
     @Test
     public void testProcess_success(){
         ContractMemberClaimEntity contractMemberClaimEntity = buildContractMemberClaimEntity();
-        //System.out.println(LocalDateTime.now().getNano());
-        //System.out.println();
         MemberClaimResponse memberClaimResponse =buildMemberClaimResponse();
         //PCPValidateRequest pcpValidateRequest = buildPCPValidateRequest(memberClaimResponse, "20022022");
         PCPValidateResponse pcpValidateResponse = buildPCPValidateResponse();
@@ -75,6 +74,69 @@ public class PCPAssignmentServiceTest {
         Mockito.when(memberClaimRepo.save(Mockito.any())).thenReturn(new MemberClaimEntity());
         Mockito.when(memberClaimServicesRepo.save(Mockito.any())).thenReturn(new MemberClaimServicesEntity());
         Mockito.when(memberProviderRepo.save(Mockito.any())).thenReturn(new MemberProviderEntity());
+        mockPCPAssignmentService.process(contractMemberClaimEntity, memberClaimResponse);
+
+
+    }
+
+    @Test
+    public void testProcess_throwException(){
+        ContractMemberClaimEntity contractMemberClaimEntity = buildContractMemberClaimEntity();
+        MemberClaimResponse memberClaimResponse =buildMemberClaimResponse();
+        PCPValidateResponse pcpValidateResponse = buildPCPValidateResponse();
+        Mockito.when(pcpConfigData.calculatePCPEffectiveDate()).thenReturn("20022022");
+        Mockito.when(pcpSearchService.pcpValidate(Mockito.any())).thenReturn(pcpValidateResponse);
+        Mockito.when(mtvSyncService.providerAssignment(Mockito.any())).thenReturn(null);
+        mockPCPAssignmentService.process(contractMemberClaimEntity, memberClaimResponse);
+    }
+
+
+    @Test
+    public void testProcess_PCPValidationFailure(){
+        ContractMemberClaimEntity contractMemberClaimEntity = buildContractMemberClaimEntity();
+        MemberClaimResponse memberClaimResponse =buildMemberClaimResponse();
+        PCPValidateResponse pcpValidateResponse = buildPCPValidateResponse();
+        pcpValidateResponse.setProcessStatusCode("Failed");
+        Mockito.when(pcpConfigData.calculatePCPEffectiveDate()).thenReturn("20022022");
+        Mockito.when(pcpSearchService.pcpValidate(Mockito.any())).thenReturn(pcpValidateResponse);
+        mockPCPAssignmentService.process(contractMemberClaimEntity, memberClaimResponse);
+    }
+
+    @Test
+    public void testProcess_PCPValidationEnrolleeError(){
+        ContractMemberClaimEntity contractMemberClaimEntity = buildContractMemberClaimEntity();
+        MemberClaimResponse memberClaimResponse =buildMemberClaimResponse();
+        PCPValidateResponse pcpValidateResponse = buildPCPValidateResponse();
+        List<String> errorMessage = new ArrayList<>();
+        errorMessage.add("Input PCP is Not Valid for the Enrollee");
+        pcpValidateResponse.getPcpResponses().get(0).getEnrollees().get(0).setErrorMessages(errorMessage);
+        pcpValidateResponse.setProcessStatusCode("Failed");
+        Mockito.when(pcpConfigData.calculatePCPEffectiveDate()).thenReturn("20022022");
+        Mockito.when(pcpSearchService.pcpValidate(Mockito.any())).thenReturn(pcpValidateResponse);
+        mockPCPAssignmentService.process(contractMemberClaimEntity, memberClaimResponse);
+    }
+
+    @Test
+    public void testProcess_PCPValidationResponseNull(){
+        ContractMemberClaimEntity contractMemberClaimEntity = buildContractMemberClaimEntity();
+        MemberClaimResponse memberClaimResponse =buildMemberClaimResponse();
+        Mockito.when(pcpConfigData.calculatePCPEffectiveDate()).thenReturn("20022022");
+        Mockito.when(pcpSearchService.pcpValidate(Mockito.any())).thenReturn(null);
+        mockPCPAssignmentService.process(contractMemberClaimEntity, memberClaimResponse);
+    }
+    @Test
+    public void testProcess_PCPAssignmentNotOK(){
+        ContractMemberClaimEntity contractMemberClaimEntity = buildContractMemberClaimEntity();
+        //System.out.println(LocalDateTime.now().getNano());
+        //System.out.println();
+        MemberClaimResponse memberClaimResponse =buildMemberClaimResponse();
+        //PCPValidateRequest pcpValidateRequest = buildPCPValidateRequest(memberClaimResponse, "20022022");
+        PCPValidateResponse pcpValidateResponse = buildPCPValidateResponse();
+        ProviderAssignmentResponse providerAssignmentResponse = buildProviderAssignmentResponse();
+        providerAssignmentResponse.setReturnCode("NOTOK");
+        Mockito.when(pcpConfigData.calculatePCPEffectiveDate()).thenReturn("20022022");
+        Mockito.when(pcpSearchService.pcpValidate(Mockito.any())).thenReturn(pcpValidateResponse);
+        Mockito.when(mtvSyncService.providerAssignment(Mockito.any())).thenReturn(providerAssignmentResponse);
         mockPCPAssignmentService.process(contractMemberClaimEntity, memberClaimResponse);
 
 
