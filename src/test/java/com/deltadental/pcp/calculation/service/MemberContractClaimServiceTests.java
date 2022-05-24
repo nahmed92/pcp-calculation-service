@@ -50,6 +50,7 @@ public class MemberContractClaimServiceTests {
 
         List<ContractMemberClaimEntity> memberClaimsEntities = new ArrayList<>();
         ContractMemberClaimEntity contractMemberClaimsEntity = buildContractMemberClaimEntity();
+        memberClaimsEntities.add(contractMemberClaimsEntity);
 
         Mockito.when(mockRepo
                 .findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
@@ -57,10 +58,12 @@ public class MemberContractClaimServiceTests {
                         StringUtils.trimToNull(request.getContractId()), StringUtils.trimToNull(request.getMemberId()),
                         StringUtils.trimToNull(request.getProviderId()), StringUtils.trimToNull(request.getState()),
                         SEARCH_STATUS
-                ))
-                .thenReturn(memberClaimsEntities);
+                )).thenReturn(memberClaimsEntities);
         mockMemberContractClaimService.stageMemberContractClaimRecords(requestList);
-        assertEquals(memberClaimsEntities.size(), 0);
+        Mockito.verify(mockRepo).
+                findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
+                        Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),Mockito.any(), Mockito.any());
+        assertEquals(memberClaimsEntities.size(), 1);
     }
 
     @Test
