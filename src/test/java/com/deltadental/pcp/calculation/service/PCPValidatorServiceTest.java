@@ -65,13 +65,11 @@ public class PCPValidatorServiceTest {
                 .thenReturn(true);
         Mockito.when(mockPCPConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus())))
                 .thenReturn(true);
-        List<ServiceLine> spyServiceLineList = Mockito.spy(memberClaimResponse.getServiceLines());
         Mockito.when(mockPCPConfigData.isExplanationCodeValid(Mockito.any()))
                 .thenReturn(true);
         Mockito.when(mockPCPConfigData.isProcedureCodeValid(Mockito.any()))
                 .thenReturn(true);
         Mockito.doNothing().when(mockPCPAssignmentService).process(contractEntity, memberClaimResponse);
-        //List<ContractMemberClaimEntity> expectedRecords = mockContractMemberClaimRepo.findByInstanceIdWhereStatusInList(serviceInstanceId, SEARCH_STATUS_VALIDATE);
         mockPCPValidatorService.validatePending();
         assertEquals(1, spyList.size());
 
@@ -93,15 +91,6 @@ public class PCPValidatorServiceTest {
                 .thenReturn(false);
         Mockito.when(mockPCPConfigData.isProviderInInclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()))
                 .thenReturn(false);
-        /*Mockito.when(mockPCPConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus())))
-                .thenReturn(true);
-        List<ServiceLine> spyServiceLineList = Mockito.spy(memberClaimResponse.getServiceLines());
-        Mockito.when(mockPCPConfigData.isExplanationCodeValid(spyServiceLineList))
-                .thenReturn(true);
-        Mockito.when(mockPCPConfigData.isProcedureCodeValid(spyServiceLineList))
-                .thenReturn(true);
-        Mockito.doNothing().when(mockPCPAssignmentService).process(contractEntity, memberClaimResponse);
-        *///List<ContractMemberClaimEntity> expectedRecords = mockContractMemberClaimRepo.findByInstanceIdWhereStatusInList(serviceInstanceId, SEARCH_STATUS_VALIDATE);
         mockPCPValidatorService.validatePending();
         assertEquals(1, spyList.size());
 
@@ -123,10 +112,7 @@ public class PCPValidatorServiceTest {
                 .thenReturn(true);
         Mockito.when(mockPCPConfigData.isProviderInInclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()))
                 .thenReturn(true);
-/*        Mockito.when(mockPCPConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus())))
-                .thenReturn(true);*/
         memberClaimResponse.setServiceLines(null);
-        //List<ServiceLine> spyServiceLineList = Mockito.spy(memberClaimResponse.getServiceLines());
         mockPCPValidatorService.validatePending();
         assertEquals(1, spyList.size());
 
