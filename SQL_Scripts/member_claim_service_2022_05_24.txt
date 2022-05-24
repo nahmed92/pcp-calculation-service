@@ -1,0 +1,10 @@
+
+
+ALTER TABLE [dbo].[member_claim_service]
+    ADD [from_date] date;
+	
+ALTER TABLE [dbo].[member_claim_service]
+    ADD [thru_date] date;
+	
+ALTER TABLE [dbo].[member_claim_service]
+    ADD [received_timestamp] datetime;	

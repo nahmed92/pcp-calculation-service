@@ -3,7 +3,11 @@ package com.deltadental.pcp.calculation.service;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.UUID;
 
@@ -76,6 +80,8 @@ public class PCPAssignmentService {
 	
 	@Autowired
 	private MemberClaimRepo memberClaimRepo;
+	
+	private final DateFormat mmddyyyyFormatter = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
 	
 	public void process(ContractMemberClaimEntity contractMemberClaimEntity, MemberClaimResponse memberClaimResponse) {
 		log.info("START PCPAssignmentService.process()");

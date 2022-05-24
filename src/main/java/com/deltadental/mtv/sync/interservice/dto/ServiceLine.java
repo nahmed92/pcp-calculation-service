@@ -23,4 +23,6 @@ public class ServiceLine {
     private String serviceNumber;
     private ServicePaidTs servicePaidTs;
     private ServiceResolutionTs serviceResolutionTs;
+    private String fromDate;
+    private String thruDate;
 }
