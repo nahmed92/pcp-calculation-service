@@ -50,7 +50,7 @@ public class PCPSearchServiceClient {
 			}
 		} catch (RestClientException | URISyntaxException e) {
 			log.error("Error calling PCP search service pcp validate for request {}", pcpValidateRequest);
-			throw PCPCalculationServiceErrors.PCP_SEARCH_SERVICE_ERROR.createException();
+			throw PCPCalculationServiceErrors.PCP_VALIDATE_SERVICE_ERROR.createException();
 		}
 		log.info("END PCPSearchServiceClient.validateProvider");
 		return null;
