@@ -58,7 +58,6 @@ public class MTVSyncServiceClient {
 				log.info("Response for claim id {} is {} ",claimId, memberClaimResponse);
 			}
 		} catch (RestClientException e) {
-			e.printStackTrace();
 			log.error("Error calling MTV member claim for request claim id {}", claimId);
 			throw PCPCalculationServiceErrors.PCP_MTV_SYNC_SERVICE_ERROR.createException();
 		}
