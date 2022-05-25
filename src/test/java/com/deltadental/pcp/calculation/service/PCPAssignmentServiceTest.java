@@ -1,7 +1,23 @@
 package com.deltadental.pcp.calculation.service;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Date;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
-import com.deltadental.mtv.sync.interservice.dto.*;
+import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
+import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentResponse;
+import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
 import com.deltadental.pcp.calculation.entities.MemberClaimEntity;
 import com.deltadental.pcp.calculation.entities.MemberClaimServicesEntity;
@@ -12,22 +28,9 @@ import com.deltadental.pcp.calculation.repos.MemberClaimRepo;
 import com.deltadental.pcp.calculation.repos.MemberClaimServicesRepo;
 import com.deltadental.pcp.calculation.repos.MemberProviderRepo;
 import com.deltadental.pcp.search.interservice.PCPSearchServiceClient;
-import com.deltadental.pcp.search.interservice.PCPValidateRequest;
 import com.deltadental.pcp.search.interservice.PCPValidateResponse;
 import com.deltadental.pcp.search.interservice.pojo.EnrolleeDetail;
 import com.deltadental.pcp.search.interservice.pojo.PCPResponse;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 public class PCPAssignmentServiceTest {
@@ -142,19 +145,6 @@ public class PCPAssignmentServiceTest {
                 .returnCode("OK").build();
     }
 
-    private PCPValidateRequest buildPCPValidateRequest(MemberClaimResponse memberClaimResponse, String pcpEffectiveDate) {
-                return PCPValidateRequest.builder()
-                        .contractId(memberClaimResponse.getContractId())
-                        .lookAheadDays("90")
-                        .memberType(memberClaimResponse.getMemberID())
-                        .mtvPersonId(memberClaimResponse.getPersonId())
-                        .pcpEffDate(pcpEffectiveDate)
-                        .pcpEndDate("12-31-9999")
-                        .providerId(memberClaimResponse.getProviderId())
-                        .recordIdentifier("3")
-                        .sourceSystem("DCM").build();
-    }
-
     private PCPValidateResponse buildPCPValidateResponse() {
         PCPValidateResponse response = new PCPValidateResponse();
         List<PCPResponse> pcpResponses = new ArrayList<>();
@@ -197,12 +187,12 @@ public class PCPAssignmentServiceTest {
         ServiceLine serviceLine = new ServiceLine();
         serviceLine.setSequenceNumber("1");
         serviceLine.setServiceNumber("S001");
-        serviceLine.setServicePaidTs(ServicePaidTs.builder().nanos(LocalDateTime.now().getNano()).build());
-        serviceLine.setServiceResolutionTs(ServiceResolutionTs.builder().nanos(LocalDateTime.now().getNano()).build());
+        serviceLine.setServicePaidTs(new Timestamp((new Date()).getTime()));
+        serviceLine.setServiceResolutionTs(new Timestamp((new Date()).getTime()));
         serviceLines.add(serviceLine);
-        response.setPaidTs(PaidTs.builder().nanos(LocalDateTime.now().getNano()).build());
-        response.setReceivedTs(ReceivedTs.builder().nanos(LocalDateTime.now().getNano()).build());
-        response.setResolvedTs(ResolvedTs.builder().nanos(LocalDateTime.now().getNano()).build());
+        response.setPaidTs(new Timestamp((new Date()).getTime()));
+        response.setReceivedTs(new Timestamp((new Date()).getTime()));
+        response.setResolvedTs(new Timestamp((new Date()).getTime()));
         response.setServiceLines(serviceLines);
         return response;
     }

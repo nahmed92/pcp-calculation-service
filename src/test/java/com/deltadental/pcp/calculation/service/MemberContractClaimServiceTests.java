@@ -1,22 +1,24 @@
 package com.deltadental.pcp.calculation.service;
 
-import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
-import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
-import com.deltadental.pcp.calculation.enums.Status;
-import com.deltadental.pcp.calculation.mapper.Mapper;
-import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
+import com.deltadental.pcp.calculation.enums.Status;
+import com.deltadental.pcp.calculation.mapper.Mapper;
+import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
 
 public class MemberContractClaimServiceTests {
 
@@ -62,7 +64,7 @@ public class MemberContractClaimServiceTests {
         mockMemberContractClaimService.stageMemberContractClaimRecords(requestList);
         Mockito.verify(mockRepo).
                 findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
-                        Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),Mockito.any(), Mockito.any());
+                        ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any());
         assertEquals(memberClaimsEntities.size(), 1);
     }
 

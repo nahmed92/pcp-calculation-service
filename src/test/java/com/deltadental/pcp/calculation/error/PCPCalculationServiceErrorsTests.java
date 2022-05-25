@@ -1,12 +1,13 @@
 package com.deltadental.pcp.calculation.error;
 
-import com.deltadental.platform.common.exception.ServiceException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import com.deltadental.platform.common.exception.ServiceException;
 
 
 public class PCPCalculationServiceErrorsTests {

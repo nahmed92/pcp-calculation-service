@@ -1,5 +1,21 @@
 package com.deltadental.pcp.calculation.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.client.RestClientException;
+
 import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
 import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
 import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
@@ -7,20 +23,6 @@ import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
 import com.deltadental.pcp.calculation.enums.Status;
 import com.deltadental.pcp.calculation.interservice.PCPConfigData;
 import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
-import org.apache.commons.lang.StringUtils;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.client.RestClientException;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 public class PCPValidatorServiceTest {
     
@@ -65,9 +67,9 @@ public class PCPValidatorServiceTest {
                 .thenReturn(true);
         Mockito.when(mockPCPConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus())))
                 .thenReturn(true);
-        Mockito.when(mockPCPConfigData.isExplanationCodeValid(Mockito.any()))
+        Mockito.when(mockPCPConfigData.isExplanationCodeValid(ArgumentMatchers.any()))
                 .thenReturn(true);
-        Mockito.when(mockPCPConfigData.isProcedureCodeValid(Mockito.any()))
+        Mockito.when(mockPCPConfigData.isProcedureCodeValid(ArgumentMatchers.any()))
                 .thenReturn(true);
         Mockito.doNothing().when(mockPCPAssignmentService).process(contractEntity, memberClaimResponse);
         mockPCPValidatorService.validatePending();
@@ -93,9 +95,9 @@ public class PCPValidatorServiceTest {
                 .thenReturn(false);
         Mockito.when(mockPCPConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus())))
                 .thenReturn(true);
-        Mockito.when(mockPCPConfigData.isExplanationCodeValid(Mockito.any()))
+        Mockito.when(mockPCPConfigData.isExplanationCodeValid(ArgumentMatchers.any()))
                 .thenReturn(true);
-        Mockito.when(mockPCPConfigData.isProcedureCodeValid(Mockito.any()))
+        Mockito.when(mockPCPConfigData.isProcedureCodeValid(ArgumentMatchers.any()))
                 .thenReturn(true);
         Mockito.doNothing().when(mockPCPAssignmentService).process(contractEntity, memberClaimResponse);
         mockPCPValidatorService.validatePending();
@@ -121,9 +123,9 @@ public class PCPValidatorServiceTest {
                 .thenReturn(true);
         Mockito.when(mockPCPConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus())))
                 .thenReturn(true);
-        Mockito.when(mockPCPConfigData.isExplanationCodeValid(Mockito.any()))
+        Mockito.when(mockPCPConfigData.isExplanationCodeValid(ArgumentMatchers.any()))
                 .thenReturn(true);
-        Mockito.when(mockPCPConfigData.isProcedureCodeValid(Mockito.any()))
+        Mockito.when(mockPCPConfigData.isProcedureCodeValid(ArgumentMatchers.any()))
                 .thenReturn(true);
         mockPCPValidatorService.validatePending();
         assertEquals(1, spyList.size());
@@ -148,9 +150,9 @@ public class PCPValidatorServiceTest {
                 .thenReturn(true);
         Mockito.when(mockPCPConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus())))
                 .thenReturn(false);
-        Mockito.when(mockPCPConfigData.isExplanationCodeValid(Mockito.any()))
+        Mockito.when(mockPCPConfigData.isExplanationCodeValid(ArgumentMatchers.any()))
                 .thenReturn(true);
-        Mockito.when(mockPCPConfigData.isProcedureCodeValid(Mockito.any()))
+        Mockito.when(mockPCPConfigData.isProcedureCodeValid(ArgumentMatchers.any()))
                 .thenReturn(true);
         mockPCPValidatorService.validatePending();
         assertEquals(1, spyList.size());
@@ -175,9 +177,9 @@ public class PCPValidatorServiceTest {
                 .thenReturn(true);
         Mockito.when(mockPCPConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus())))
                 .thenReturn(true);
-        Mockito.when(mockPCPConfigData.isExplanationCodeValid(Mockito.any()))
+        Mockito.when(mockPCPConfigData.isExplanationCodeValid(ArgumentMatchers.any()))
                 .thenReturn(false);
-        Mockito.when(mockPCPConfigData.isProcedureCodeValid(Mockito.any()))
+        Mockito.when(mockPCPConfigData.isProcedureCodeValid(ArgumentMatchers.any()))
                 .thenReturn(true);
         mockPCPValidatorService.validatePending();
         assertEquals(1, spyList.size());
@@ -202,9 +204,9 @@ public class PCPValidatorServiceTest {
                 .thenReturn(false);
         Mockito.when(mockPCPConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus())))
                 .thenReturn(true);
-        Mockito.when(mockPCPConfigData.isExplanationCodeValid(Mockito.any()))
+        Mockito.when(mockPCPConfigData.isExplanationCodeValid(ArgumentMatchers.any()))
                 .thenReturn(true);
-        Mockito.when(mockPCPConfigData.isProcedureCodeValid(Mockito.any()))
+        Mockito.when(mockPCPConfigData.isProcedureCodeValid(ArgumentMatchers.any()))
                 .thenReturn(false);
         mockPCPValidatorService.validatePending();
         assertEquals(1, spyList.size());
