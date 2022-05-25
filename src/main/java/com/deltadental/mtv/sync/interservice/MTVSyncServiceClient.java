@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,6 +21,7 @@ import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
 import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentRequest;
 import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentResponse;
 import com.deltadental.pcp.calculation.error.PCPCalculationServiceErrors;
+import com.deltadental.pcp.calculation.error.RestTemplateErrorHandler;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,6 +38,9 @@ public class MTVSyncServiceClient {
 
 	@Autowired(required = true)
 	private RestTemplate restTemplate;
+	
+	@Autowired
+	private RestTemplateErrorHandler restTemplateErrorHandler;
 
 	public MemberClaimResponse memberClaim(String claimId) {
 		log.info("START MTVSyncServiceClient.memberClaim");
@@ -49,14 +52,12 @@ public class MTVSyncServiceClient {
 			params.put("claim-id", StringUtils.trimToNull(claimId));
 			URI exclusionsUri = builder.buildAndExpand(params).toUri();
 			log.info("Request uri : {} ", exclusionsUri);
+			restTemplate.setErrorHandler(restTemplateErrorHandler);
 			ResponseEntity<MemberClaimResponse> responseEntity = restTemplate.getForEntity(exclusionsUri, MemberClaimResponse.class);
-			if(responseEntity.getStatusCode() != HttpStatus.OK) {
-				log.error("Unable to retrive claim information for claim id {} and Response code {} ",claimId, responseEntity.getStatusCode());
-				throw PCPCalculationServiceErrors.MTV_SYNC_CLAIM_SERVICE_ERROR.createException("Unable to retrive claim information for claim id {} and Response code {} ",claimId, responseEntity.getStatusCode());
-			} else {
+			if(responseEntity != null && responseEntity.getBody() != null) {
 				memberClaimResponse = responseEntity.getBody();
 				log.info("Response for claim id {} is {} ",claimId, memberClaimResponse);
-			}
+			}			
 		} catch (RestClientException e) {
 			log.error("Error calling MTV member claim for request claim id {}", claimId);
 			throw PCPCalculationServiceErrors.MTV_SYNC_CLAIM_SERVICE_ERROR.createException();
@@ -75,19 +76,18 @@ public class MTVSyncServiceClient {
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			HttpEntity<ProviderAssignmentRequest> request = new HttpEntity<>(providerAssignmentRequest, headers);
+			// set custom error handler
+			restTemplate.setErrorHandler(restTemplateErrorHandler);
 			ResponseEntity<ProviderAssignmentResponse> responseEntity = restTemplate.postForEntity(new URI(uriBuilder), request, ProviderAssignmentResponse.class);
 			log.info("MTV Sync Service request {} and response {} for provider assignment", providerAssignmentRequest, responseEntity);
-			if(responseEntity.getStatusCode() != HttpStatus.OK) {
-				log.error("Unknown exception occured during provider assignment for provider assignment request {} and Response code {} ",providerAssignmentRequest, responseEntity.getStatusCode());
-				throw PCPCalculationServiceErrors.PROVIDER_ASSIGNMENT_SERVICE_ERROR.createException("Unknown exception occured during provider assignment for provider assignment request {} and Response code {} ",providerAssignmentRequest, responseEntity.getStatusCode());
-			} else {
+			if(responseEntity != null && responseEntity.getBody() != null) {
 				providerAssignmentResponse = responseEntity.getBody();
 				log.info("Response for pcp assignment request {} is {} ",providerAssignmentRequest, providerAssignmentResponse);
 			}
 		} catch (RestClientException | URISyntaxException e) {
 			log.error("Error calling MTV provider assignment for request {}", providerAssignmentRequest, e);
 			throw PCPCalculationServiceErrors.PROVIDER_ASSIGNMENT_SERVICE_ERROR.createException();
-		}
+		} 
 		log.info("END MTVSyncServiceClient.providerAssignment()");
 		return providerAssignmentResponse;
 	}
