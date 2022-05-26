@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.deltadental.pcp.calculation.error.PCPCalculationServiceErrors;
+import com.deltadental.pcp.calculation.error.RestTemplateErrorHandler;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,26 +34,35 @@ public class PCPSearchServiceClient {
 	
 	public static String PCP_VALIDATION = "/pcp/validate";
 
+	@Autowired
+	private RestTemplateErrorHandler restTemplateErrorHandler;
+	
 	@Autowired(required = true)
 	private RestTemplate restTemplate;
 
 	public PCPValidateResponse pcpValidate(PCPValidateRequest pcpValidateRequest) {
 		log.info("START PCPSearchServiceClient.validateProvider");
+		PCPValidateResponse pcpValidateResponse = null;
 		String providerValidateEndPoint = pcpSearchServiceEndpoint.concat(PCP_VALIDATION);
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(providerValidateEndPoint);
 		String uriBuilder = builder.build().encode().toUriString();
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		try {
+			restTemplate.setErrorHandler(restTemplateErrorHandler);
 			ResponseEntity<PCPValidateResponse> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.POST,  new HttpEntity<>(pcpValidateRequest, headers), PCPValidateResponse.class);
 			if(responseEntity.getStatusCode() == HttpStatus.OK) {
 				return responseEntity.getBody();
 			}
+			if(responseEntity != null && responseEntity.getBody() != null) {
+				pcpValidateResponse = responseEntity.getBody();
+				log.info("Response for pcp validate response for request {} is {} ",pcpValidateRequest, pcpValidateResponse);
+			}
 		} catch (RestClientException | URISyntaxException e) {
 			log.error("Error calling PCP search service pcp validate for request {}", pcpValidateRequest);
-			throw PCPCalculationServiceErrors.PCP_SEARCH_SERVICE_ERROR.createException();
+			throw PCPCalculationServiceErrors.PCP_VALIDATE_SERVICE_ERROR.createException();
 		}
 		log.info("END PCPSearchServiceClient.validateProvider");
-		return null;
+		return pcpValidateResponse;
 	}
 }

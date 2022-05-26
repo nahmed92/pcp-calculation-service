@@ -1,22 +1,24 @@
 package com.deltadental.pcp.calculation.service;
 
-import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
-import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
-import com.deltadental.pcp.calculation.enums.Status;
-import com.deltadental.pcp.calculation.mapper.Mapper;
-import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
+import com.deltadental.pcp.calculation.enums.Status;
+import com.deltadental.pcp.calculation.mapper.Mapper;
+import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
 
 public class MemberContractClaimServiceTests {
 
@@ -50,6 +52,7 @@ public class MemberContractClaimServiceTests {
 
         List<ContractMemberClaimEntity> memberClaimsEntities = new ArrayList<>();
         ContractMemberClaimEntity contractMemberClaimsEntity = buildContractMemberClaimEntity();
+        memberClaimsEntities.add(contractMemberClaimsEntity);
 
         Mockito.when(mockRepo
                 .findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
@@ -57,10 +60,12 @@ public class MemberContractClaimServiceTests {
                         StringUtils.trimToNull(request.getContractId()), StringUtils.trimToNull(request.getMemberId()),
                         StringUtils.trimToNull(request.getProviderId()), StringUtils.trimToNull(request.getState()),
                         SEARCH_STATUS
-                ))
-                .thenReturn(memberClaimsEntities);
+                )).thenReturn(memberClaimsEntities);
         mockMemberContractClaimService.stageMemberContractClaimRecords(requestList);
-        assertEquals(memberClaimsEntities.size(), 0);
+        Mockito.verify(mockRepo).
+                findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
+                        ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any());
+        assertEquals(memberClaimsEntities.size(), 1);
     }
 
     @Test

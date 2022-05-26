@@ -1,7 +1,10 @@
 package com.deltadental.mtv.sync.interservice.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.sql.Timestamp;
+
+import com.deltadental.pcp.calculation.util.TimestampDeserializer;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +15,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ServiceLine {
 	private String claimType;
@@ -21,8 +23,10 @@ public class ServiceLine {
     private String procedureCode;
     private String sequenceNumber;
     private String serviceNumber;
-    private ServicePaidTs servicePaidTs;
-    private ServiceResolutionTs serviceResolutionTs;
+    @JsonDeserialize(using = TimestampDeserializer.class)
+    private Timestamp servicePaidTs;
+    @JsonDeserialize(using = TimestampDeserializer.class)
+    private Timestamp serviceResolutionTs;
     private String fromDate;
     private String thruDate;
 }

@@ -1,8 +1,11 @@
 package com.deltadental.mtv.sync.interservice.dto;
 
+import java.sql.Timestamp;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.deltadental.pcp.calculation.util.TimestampDeserializer;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)	
 public class MemberClaimResponse {
 
     private String billingProvId;
@@ -31,15 +34,23 @@ public class MemberClaimResponse {
     private String errorMessage;
     private String divisionNumber;
     private String groupNumber;
-  //  private XMLGregorianCalendar memberDOB;
     private String memberFirstName;
     private String memberID;
     private String memberLastName;
-    private PaidTs paidTs;
+    
+//    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss.SSSXXX")
+    
+    @JsonDeserialize(using = TimestampDeserializer.class)    
+    private Timestamp paidTs;
     private String personId;
     private String providerId;
-    private ReceivedTs receivedTs;
-    private ResolvedTs resolvedTs;
+    
+    @JsonDeserialize(using = TimestampDeserializer.class)
+    private Timestamp receivedTs;
+    
+    @JsonDeserialize(using = TimestampDeserializer.class)
+    private Timestamp resolvedTs;
+    
     private String returnCode;
     private List<ServiceLine> serviceLines;
     private String servicesNumber;

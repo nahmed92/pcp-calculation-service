@@ -59,20 +59,8 @@
 		<mockito.version>4.4.0</mockito.version>
 		<checkstyle.version>8.4</checkstyle.version>
 
-		<!-- Sonar exclusions-->
-		<sonar.exclusions>
-			src/main/java/com/deltadental/pcp/calculation/application/App.java,
-			src/main/java/com/deltadental/pcp/calculation/config/**/*,
-			src/main/java/com/deltadental/pcp/calculation/constants/**/*,
-			src/main/java/com/deltadental/pcp/calculation/domain/**/*,
-			src/main/java/com/deltadental/pcp/calculation/entities/**/*,
-			src/main/java/com/deltadental/pcp/calculation/enums/**/*,
-			src/main/java/com/deltadental/pcp/config/interservice/pojo/**/*,
-			src/main/java/com/deltadental/pcp/search/interservice/pojo/**/*,
-			src/main/java/com/deltadental/mtv/sync/interservice/dto/**/*
-		</sonar.exclusions>
 		<!-- Logger versions -->
-		<log4j2.version>2.17.0</log4j2.version>
+		<log4j2.version>2.17.2</log4j2.version>
 		<slf4j.version>1.7.25</slf4j.version>
 		<jackson.version>2.13.0</jackson.version>
 		<sqlserver.version>4.0</sqlserver.version>
@@ -148,13 +136,6 @@
 			<artifactId>commons-collections4</artifactId>
 			<version>4.4</version>
 		</dependency>
-
-
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-c3p0</artifactId>
-		</dependency>
-		
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>sqljdbc4</artifactId>
@@ -164,13 +145,12 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<version>5.3.7.Final</version>
-		</dependency>
+			</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-c3p0</artifactId>
 			<version>5.3.6.Final</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.objenesis</groupId>
 			<artifactId>objenesis</artifactId>
@@ -354,19 +334,6 @@
 			<version>${junit.platform.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.objenesis</groupId>
-			<artifactId>objenesis</artifactId>
-			<version>${objenesis.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<!--<dependency>
-			<groupId>org.junit.vintage</groupId>
-			<artifactId>junit-vintage-engine</artifactId>
-			<version>5.8.2</version>
-			<scope>test</scope>
-		</dependency>-->
-
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>

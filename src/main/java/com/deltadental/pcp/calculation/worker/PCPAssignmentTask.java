@@ -1,6 +1,7 @@
 package com.deltadental.pcp.calculation.worker;
 
 import java.util.List;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import com.deltadental.pcp.calculation.repos.MemberClaimServicesRepo;
 import com.deltadental.pcp.calculation.repos.MemberProviderRepo;
 import com.deltadental.pcp.calculation.service.PCPAssignmentService;
 import com.deltadental.pcp.search.interservice.PCPSearchServiceClient;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
