@@ -67,7 +67,6 @@ public class PCPValidatorService {
 			}
 		} catch (Exception e) {
 			log.error("Exception occured during retriving member claim information from Metavance Sync Service.", e);
-			contractMemberClaimsEntity.incrementRetryCount();
 			contractMemberClaimsEntity.setErrorMessage("Exception occured during retriving member claim information from Metavance Sync Service. "+e.getMessage());
 			contractMemberClaimsEntity.setStatus(Status.RETRY);
 		}
