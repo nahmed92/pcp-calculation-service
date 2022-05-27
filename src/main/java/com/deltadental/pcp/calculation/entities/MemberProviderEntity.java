@@ -50,7 +50,7 @@ public class MemberProviderEntity implements Serializable {
 	private String operatorId;
 
 	@Column(name = "contract_member_claim_id")
-	private String contractMemberClaimId;
+	private ContractMemberClaimPK contractMemberClaimId;
 
 	@Column(name = "person_id")
 	private String personId;

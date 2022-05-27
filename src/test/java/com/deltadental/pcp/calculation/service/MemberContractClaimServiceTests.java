@@ -16,6 +16,7 @@ import org.mockito.MockitoAnnotations;
 
 import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimPK;
 import com.deltadental.pcp.calculation.enums.Status;
 import com.deltadental.pcp.calculation.mapper.Mapper;
 import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
@@ -93,7 +94,10 @@ public class MemberContractClaimServiceTests {
 
     private ContractMemberClaimEntity buildContractMemberClaimEntity() {
         ContractMemberClaimEntity entity = new ContractMemberClaimEntity();
-        entity.setId("ID0011");
+        ContractMemberClaimPK id= new ContractMemberClaimPK();
+        id.setId("ID0011");
+        id.setSequenceId(2);
+        entity.setContractMemberClaimPK(id);
         entity.setContractId("C001");
         entity.setClaimId("CL001");
         entity.setProviderId("PR001");

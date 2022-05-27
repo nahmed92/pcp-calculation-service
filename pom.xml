@@ -199,7 +199,11 @@
 			<groupId>wsdl4j</groupId>
 			<artifactId>wsdl4j</artifactId>
 		</dependency>
-
+        <dependency>
+		    <groupId>com.google.guava</groupId>
+		    <artifactId>guava</artifactId>
+		    <version>31.0.1-jre</version>
+		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>

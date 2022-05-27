@@ -3,19 +3,22 @@ package com.deltadental.mtv.sync.interservice;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.apache.commons.lang.StringUtils;
 
 import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
 import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentRequest;
@@ -42,18 +45,26 @@ public class MTVSyncServiceClient {
 	@Autowired
 	private RestTemplateErrorHandler restTemplateErrorHandler;
 
-	public MemberClaimResponse memberClaim(String claimId) {
+	public List<MemberClaimResponse> memberClaim(List<String> claimId) {
 		log.info("START MTVSyncServiceClient.memberClaim");
-		MemberClaimResponse memberClaimResponse = null;
+		List<MemberClaimResponse> memberClaimResponse = null;
 		try {
 			String updatePCPMemberEndPoint = pcpMtvSyncServiceEndpoint.concat(MTVSyncServiceConstants.MEMBER_CLAIM);
 			UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(updatePCPMemberEndPoint);
 			final Map<String, String> params = new HashMap<>();
-			params.put("claim-id", StringUtils.trimToNull(claimId));
+			params.put("claim-ids", String.join(",",claimId));
 			URI exclusionsUri = builder.buildAndExpand(params).toUri();
 			log.info("Request uri : {} ", exclusionsUri);
 			restTemplate.setErrorHandler(restTemplateErrorHandler);
-			ResponseEntity<MemberClaimResponse> responseEntity = restTemplate.getForEntity(exclusionsUri, MemberClaimResponse.class);
+			HttpHeaders headers = new HttpHeaders();
+			HttpEntity<Object> requestEntity = new HttpEntity<Object>(headers);
+			ResponseEntity<List<MemberClaimResponse>> responseEntity = restTemplate.exchange(
+					exclusionsUri,
+					HttpMethod.GET,
+					requestEntity,
+					new ParameterizedTypeReference<List<MemberClaimResponse>>(){});
+
+			
 			if(responseEntity != null && responseEntity.getBody() != null) {
 				memberClaimResponse = responseEntity.getBody();
 				log.info("Response for claim id {} is {} ",claimId, memberClaimResponse);

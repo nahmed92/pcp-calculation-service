@@ -1,13 +1,18 @@
 package com.deltadental.pcp.calculation.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
 import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
 import com.deltadental.pcp.calculation.enums.Status;
@@ -25,40 +30,56 @@ public class MemberContractClaimService {
 
 	@Autowired
 	private PCPValidatorService pcpValidatorService;
-	
+
+	@Autowired
+	private MTVSyncServiceClient mtvSyncService;
+
 	@Autowired
 	private Mapper mapper;
 
 	@Value("${service.instance.id}")
 	private String serviceInstanceId;
 
-	private static final List<Status> SEARCH_STATUS = List.of(Status.RETRY, Status.STAGED, Status.VALIDATED, Status.PCP_ASSIGNED, Status.PCP_EXCLUDED, Status.PCP_NOT_INCLUDED);
+	private static final List<Status> SEARCH_STATUS = List.of(Status.RETRY, Status.STAGED, Status.VALIDATED,
+			Status.PCP_ASSIGNED, Status.PCP_EXCLUDED, Status.PCP_NOT_INCLUDED);
 
-	private void save(MemberContractClaimRequest request) {
+	private List<ContractMemberClaimEntity> save(List<MemberContractClaimRequest> requests) {
 		log.info("START MemberContractClaimService.save");
-		List<ContractMemberClaimEntity> memberClaimsEntities = repo
-				.findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
-						StringUtils.trimToNull(request.getClaimId()), // check this and remove
-						StringUtils.trimToNull(request.getContractId()), StringUtils.trimToNull(request.getMemberId()),
-						StringUtils.trimToNull(request.getProviderId()), StringUtils.trimToNull(request.getState()),
-						SEARCH_STATUS);
 
-		if (CollectionUtils.isEmpty(memberClaimsEntities)) {
-			log.info("Inserting  {} ", request);
-			ContractMemberClaimEntity contractMemberClaimsEntity = mapper.map(request, serviceInstanceId);
-			repo.save(contractMemberClaimsEntity);
-			pcpValidatorService.validateAndAssignPCP(contractMemberClaimsEntity);
-		} else {
-			log.warn("Record already exists in contract member claims table : {} ", request);
+		List<ContractMemberClaimEntity> entities = List.of();
+
+		if (CollectionUtils.isNotEmpty(requests)) {
+			for(MemberContractClaimRequest request: requests) {
+				// FIXME:
+				List<ContractMemberClaimEntity> memberClaimsEntities = repo
+						.findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
+								StringUtils.trimToNull(request.getClaimId()), // check this and remove
+								StringUtils.trimToNull(request.getContractId()),
+								StringUtils.trimToNull(request.getMemberId()),
+								StringUtils.trimToNull(request.getProviderId()),
+								StringUtils.trimToNull(request.getState()), SEARCH_STATUS);
+
+				if (CollectionUtils.isEmpty(memberClaimsEntities)) {
+					log.info("Inserting  {} ", requests);
+					entities = mapper.map(requests, serviceInstanceId);
+					// stage member contract
+					repo.saveAll(entities);
+				} else {
+					log.warn("Record already exists in contract member claims table : {} ", request);
+				}
+
+			}
 		}
 		log.info("END MemberContractClaimService.save");
+		return entities;
 	}
 
 	public void stageMemberContractClaimRecords(List<MemberContractClaimRequest> memberContractClaimRequests) {
 		log.info("START MemberContractClaimService.stageMemberContractClaimRecords");
-		if (CollectionUtils.isNotEmpty(memberContractClaimRequests)) {
-			memberContractClaimRequests.forEach(i -> save(i));
-		}
+		List<ContractMemberClaimEntity> entities = save(memberContractClaimRequests);
+		if(CollectionUtils.isNotEmpty(entities)) {
+		pcpValidatorService.validateAndAssignPCP(entities);
+	}
 		log.info("END MemberContractClaimService.stageMemberContractClaimRecords");
 	}
 

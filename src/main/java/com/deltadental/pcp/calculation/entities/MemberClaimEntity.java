@@ -90,7 +90,7 @@ public class MemberClaimEntity implements Serializable {
 	private String operatorId;
 
 	@Column(name = "contract_member_claim_id")
-	private String contractMemberClaimId;
+	private ContractMemberClaimPK contractMemberClaimId;
 	
 	 
 }

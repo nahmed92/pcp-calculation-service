@@ -65,7 +65,8 @@ public class PCPAssignmentTask implements Runnable {
 		log.info("Processing {} ", contractMemberClaimEntity);
 		StringBuilder errorMessageBuilder = new StringBuilder();
 		try {
-			MemberClaimResponse memberClaimResponse = mtvSyncService.memberClaim(contractMemberClaimEntity.getClaimId());
+			MemberClaimResponse memberClaimResponse = null;
+				//	mtvSyncService.memberClaim(contractMemberClaimEntity.getClaimId());
 			if (null != memberClaimResponse && (StringUtils.isBlank(memberClaimResponse.getErrorCode()) || StringUtils.isBlank(memberClaimResponse.getErrorMessage()))) {
 				boolean exclusionFlag = pcpConfigData.isProviderInExclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber());
 				boolean inclusionFlag = pcpConfigData.isProviderInInclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber());

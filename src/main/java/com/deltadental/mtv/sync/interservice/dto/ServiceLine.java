@@ -1,10 +1,14 @@
 package com.deltadental.mtv.sync.interservice.dto;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 import com.deltadental.pcp.calculation.util.TimestampDeserializer;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.deser.std.DateDeserializers.DateDeserializer;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +31,8 @@ public class ServiceLine {
     private Timestamp servicePaidTs;
     @JsonDeserialize(using = TimestampDeserializer.class)
     private Timestamp serviceResolutionTs;
-    private String fromDate;
-    private String thruDate;
+    @JsonFormat(shape = Shape.STRING, pattern = "MM-dd-yyyy", timezone = JsonFormat.DEFAULT_TIMEZONE)
+    private Date fromDate;
+    @JsonFormat(shape = Shape.STRING, pattern = "MM-dd-yyyy", timezone = JsonFormat.DEFAULT_TIMEZONE)
+    private Date thruDate;
 }

@@ -2,8 +2,10 @@ package com.deltadental.pcp.calculation.entities;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -30,10 +32,9 @@ public class ContractMemberClaimEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@Column(name = "id", nullable = false, unique = true)
-	private String id;
-
+	@EmbeddedId
+	private ContractMemberClaimPK contractMemberClaimPK;
+	
 	@Column(name = "claim_id")
 	private String claimId;
 
@@ -61,7 +62,7 @@ public class ContractMemberClaimEntity implements Serializable {
 
 	@Column(name = "instance_id")
 	private String instanceId;
-
+	
 	@Column(name = "error_message")
 	private String errorMessage;
 

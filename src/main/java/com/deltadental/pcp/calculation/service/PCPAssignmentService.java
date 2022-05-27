@@ -22,6 +22,7 @@ import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentRequest;
 import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentResponse;
 import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimPK;
 import com.deltadental.pcp.calculation.entities.MemberClaimEntity;
 import com.deltadental.pcp.calculation.entities.MemberClaimServicesEntity;
 import com.deltadental.pcp.calculation.entities.MemberProviderEntity;
@@ -81,8 +82,6 @@ public class PCPAssignmentService {
 	@Autowired
 	private MemberClaimRepo memberClaimRepo;
 	
-	private final DateFormat mmddyyyyFormatter = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
-	
 	public void process(ContractMemberClaimEntity contractMemberClaimEntity, MemberClaimResponse memberClaimResponse) {
 		log.info("START PCPAssignmentService.process()");
 		try {
@@ -99,7 +98,7 @@ public class PCPAssignmentService {
 						contractMemberClaimEntity.setStatus(Status.PCP_ASSIGNED);
 						MemberClaimEntity memberClaimEntity = saveMemberClaimEntity(contractMemberClaimEntity, memberClaimResponse);
 						saveMemberClaimServices(memberClaimEntity, memberClaimResponse.getServiceLines());
-						saveMemberProvider(contractMemberClaimEntity.getId(),providerAssignmentResponse, memberClaimResponse, pcpEffectiveDate, Status.PCP_ASSIGNED);
+						saveMemberProvider(contractMemberClaimEntity.getContractMemberClaimPK(),providerAssignmentResponse, memberClaimResponse, pcpEffectiveDate, Status.PCP_ASSIGNED);
 						log.info("PCP Assignment status for claim id {} status is {}.", contractMemberClaimEntity.getClaimId(), Status.PCP_ASSIGNED);
 					} else {
 						log.info("PCP Assignment status for claim id {} status is {} and error message is {}.", contractMemberClaimEntity.getClaimId(), Status.FAILED, String.join(" : ", providerAssignmentResponse.getErrorCode(), providerAssignmentResponse.getErrorMessage()));
@@ -203,7 +202,7 @@ public class PCPAssignmentService {
 				.receivedAt(getTimestamp(memberClaimResponse.getReceivedTs().getNanos()))
 				.resolvedAt(getTimestamp(memberClaimResponse.getResolvedTs().getNanos()))
 				.servicesNumber(memberClaimResponse.getServicesNumber())
-				.contractMemberClaimId(contractMemberClaimsEntity.getId())
+				.contractMemberClaimId(contractMemberClaimsEntity.getContractMemberClaimPK())
 				.operatorId(OPERATORID_PCPCALS)
 				.id(UUID.randomUUID().toString())
 				.build();
@@ -235,7 +234,7 @@ public class PCPAssignmentService {
 		log.info("END PCPAssignmentService.saveMemberClaimServices()");
 	}
 	
-	private MemberProviderEntity saveMemberProvider(String contractMemberClaimId, ProviderAssignmentResponse providerAssignmentResponse, MemberClaimResponse memberClaimResponse, String pcpEffectiveDate, Status status) {
+	private MemberProviderEntity saveMemberProvider(ContractMemberClaimPK contractMemberClaimId, ProviderAssignmentResponse providerAssignmentResponse, MemberClaimResponse memberClaimResponse, String pcpEffectiveDate, Status status) {
 		log.info("START PCPAssignmentService.saveMemberProvider()");
 		MemberProviderEntity memberProviderEntity = MemberProviderEntity.builder()
 				.id(UUID.randomUUID().toString())

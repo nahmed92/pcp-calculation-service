@@ -9,11 +9,12 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimPK;
 import com.deltadental.pcp.calculation.enums.Status;
 
 @Repository
 @Transactional(readOnly = false)
-public interface ContractMemberClaimRepo extends JpaRepository<ContractMemberClaimEntity, Integer> {
+public interface ContractMemberClaimRepo extends JpaRepository<ContractMemberClaimEntity, ContractMemberClaimPK> {
 
 	// FIXME: remove query
 	@Query("SELECT cmc FROM ContractMemberClaimEntity cmc WHERE  cmc.claimId = :claimId AND  cmc.contractId = :contractId AND  cmc.memberId = :memberId AND  cmc.providerId = :providerId AND cmc.state = :state AND cmc.status in :status")
