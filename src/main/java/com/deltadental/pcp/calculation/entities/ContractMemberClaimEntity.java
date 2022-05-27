@@ -53,9 +53,7 @@ public class ContractMemberClaimEntity implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private Status status;
 	
-	@Column(name = "retry_count")
-	private Integer retryCount;
-
+	
 	@Column(name = "operator_id")
 	private String operatorId;
 
@@ -72,11 +70,5 @@ public class ContractMemberClaimEntity implements Serializable {
 	@UpdateTimestamp
 	@Column(name = "last_updated_at")
 	private Timestamp lastUpdatedAt;
-
-	public void incrementRetryCount() {
-		if( this.retryCount == null) {
-			this.retryCount = 0;
-		}
-		this.retryCount++;
-	}
+	
 }
