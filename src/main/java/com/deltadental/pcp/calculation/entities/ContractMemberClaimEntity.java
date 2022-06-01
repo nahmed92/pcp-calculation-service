@@ -18,6 +18,7 @@ import com.deltadental.pcp.calculation.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
@@ -30,6 +31,7 @@ public class ContractMemberClaimEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	@EqualsAndHashCode.Exclude
 	@Id
 	@Column(name = "id", nullable = false, unique = true)
 	private String id;
@@ -53,20 +55,24 @@ public class ContractMemberClaimEntity implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private Status status;
 	
-	
+	@EqualsAndHashCode.Exclude
 	@Column(name = "operator_id")
 	private String operatorId;
 
+	@EqualsAndHashCode.Exclude
 	@Column(name = "instance_id")
 	private String instanceId;
 
+	@EqualsAndHashCode.Exclude
 	@Column(name = "error_message")
 	private String errorMessage;
 
+	@EqualsAndHashCode.Exclude
 	@CreationTimestamp
-	@Column(name = "created_at")
+	@Column(name = "created_at", updatable = false)
 	private Timestamp crationAt;
 
+	@EqualsAndHashCode.Exclude
 	@UpdateTimestamp
 	@Column(name = "last_updated_at")
 	private Timestamp lastUpdatedAt;
