@@ -1,16 +1,9 @@
 package com.deltadental.pcp.calculation.service;
 
-import com.deltadental.pcp.calculation.interservice.PCPConfigData;
-import com.deltadental.pcp.config.interservice.pojo.GroupRestrictions;
-import com.deltadental.pcp.config.interservice.pojo.InclusionExclusion;
-import com.deltadental.pcp.interservice.PCPConfigServiceClient;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,10 +13,18 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
 import java.util.Locale;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.deltadental.pcp.calculation.interservice.PCPConfigData;
+import com.deltadental.pcp.config.interservice.pojo.GroupRestrictions;
+import com.deltadental.pcp.config.interservice.pojo.InclusionExclusion;
+import com.deltadental.pcp.interservice.PCPConfigServiceClient;
+@ExtendWith(MockitoExtension.class)
 public class PCPConfigDataTest {
 	@InjectMocks
 	PCPConfigData pcpConfigData;
@@ -32,7 +33,7 @@ public class PCPConfigDataTest {
 
 	@BeforeEach
 	public void setup() {
-		MockitoAnnotations.initMocks(this);
+		//MockitoAnnotations.initMocks(this);
 		//pcpConfigData = new PCPConfigData();
 
 	}

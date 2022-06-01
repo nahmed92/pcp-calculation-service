@@ -11,8 +11,7 @@
 	<artifactId>pcp-calculation-service</artifactId>
 	<version>1.0.0</version>
 	<name>pcp-calculation-service</name>
-	<description>Wrapper Springboot Service for PCP Calculation Service
-	</description>
+	<description>PCP Calculation Service</description>
 	<properties>
 		<service.name>${project.name}</service.name>
 
@@ -45,9 +44,6 @@
 		<maven-check-style-plugin-version>2.17</maven-check-style-plugin-version>
 		<maven-jxr-plugin-version>2.5</maven-jxr-plugin-version>
 
-		<docker.plugin.version>0.2.3</docker.plugin.version>
-
-
 		<!-- SonarQube properties -->
 		<jacoco.version>0.8.5</jacoco.version>
 		<sonar.projectKey>PCP-CALCULATION-SERVICE</sonar.projectKey>
@@ -58,15 +54,16 @@
 		<sonar-jacoco-listeners.version>1.4</sonar-jacoco-listeners.version>
 		<sonar.coverage.jacoco.xmlReportPath>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPath>
 		
-				<easymock.version>2.4</easymock.version>
+		<easymock.version>2.4</easymock.version>
 		<objenesis.version>2.5</objenesis.version>
 		<mockito.version>4.4.0</mockito.version>
 		<checkstyle.version>8.4</checkstyle.version>
 
 		<!-- Logger versions -->
-		<log4j2.version>2.14.0</log4j2.version>
+		<log4j2.version>2.17.2</log4j2.version>
 		<slf4j.version>1.7.25</slf4j.version>
 		<jackson.version>2.13.0</jackson.version>
+		<sqlserver.version>4.0</sqlserver.version>
 	</properties>
 
 	<dependencyManagement>
@@ -139,26 +136,27 @@
 			<artifactId>commons-collections4</artifactId>
 			<version>4.4</version>
 		</dependency>
-
-
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-c3p0</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
-			<artifactId>mssql-jdbc</artifactId>
+			<artifactId>sqljdbc4</artifactId>
 			<version>${sqlserver.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
+			<version>5.3.7.Final</version>
+			</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-c3p0</artifactId>
+			<version>5.3.6.Final</version>
 		</dependency>
 		<dependency>
-			<groupId>org.hibernate.validator</groupId>
-			<artifactId>hibernate-validator</artifactId>
+			<groupId>org.objenesis</groupId>
+			<artifactId>objenesis</artifactId>
+			<version>${objenesis.version}</version>
+			<scope>test</scope>
 		</dependency>
-
 		<!-- Added for actuator -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -337,19 +335,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.objenesis</groupId>
-			<artifactId>objenesis</artifactId>
-			<version>${objenesis.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<!--<dependency>
-			<groupId>org.junit.vintage</groupId>
-			<artifactId>junit-vintage-engine</artifactId>
-			<version>5.8.2</version>
-			<scope>test</scope>
-		</dependency>-->
-
-		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>4.1.2</version>
@@ -389,39 +374,17 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<arguments>
-						<argument>--spring.profiles.active=mock</argument>
-					</arguments>
-				</configuration>
 			</plugin>
 			<!-- Compiler plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<release>11</release>
+					<release>${java.version}</release>
 					<forceJavacCompilerUse>true</forceJavacCompilerUse>
 				</configuration>
 			</plugin>
-			<!-- Docker image creation -->
-			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>docker-maven-plugin</artifactId>
-				<version>${docker.plugin.version}</version>
-				<configuration>
-					<imageName>${project.artifactId}</imageName>
-					<dockerDirectory>src/main/docker</dockerDirectory>
-					<resources>
-						<resource>
-							<targetPath>/</targetPath>
-							<directory>${project.build.directory}</directory>
-							<include>${project.build.finalName}.jar</include>
-						</resource>
-					</resources>
-				</configuration>
-			</plugin>
-			<!-- End Docker image creation -->
+			 
 
 			<!-- Jacoco integration test plugin -->
 			<plugin>
@@ -429,288 +392,57 @@
 				<artifactId>sonar-maven-plugin</artifactId>
 				<version>3.6.0.1398</version>
 			</plugin>
-
-			<!-- Checkstyle plugin -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>3.1.1</version>
-				<executions>
-					<execution>
-						<id>validate</id>
-						<phase>validate</phase>
-						<configuration>
-							<configLocation>delta-platform-checkstyle.xml</configLocation>
-							<encoding>UTF-8</encoding>
-							<consoleOutput>false</consoleOutput>
-							<failsOnError>false</failsOnError>
-							<skip>true</skip>
-						</configuration>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<!-- Surefire unit test plugin -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<argLine>
-						--illegal-access=permit
-					</argLine>
-					<properties>
-						<property>
-							<name>listener</name>
-							<value>org.sonar.java.jacoco.JUnitListener</value>
-						</property>
-					</properties>
-					<testFailureIgnore>true</testFailureIgnore>
-				</configuration>
-			</plugin>
-			<!-- Failsafe integration test plugin -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
-				<configuration>
-					<argLine>--illegal-access=permit -Xmx1024m -XX:MaxPermSize=256m}
-					</argLine>
-					<properties>
-						<property>
-							<name>listener</name>
-							<value>org.sonar.java.jacoco.JUnitListener</value>
-						</property>
-					</properties>
-					<!-- Put failsafe reports with surefire to have access to tests failures/success 
-						reports in sonar -->
-					<reportsDirectory>${project.build.directory}/surefire-reports
-					</reportsDirectory>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.5</version>
-				<executions>
-					<!-- Prepares a variable, jacoco.agent.ut.arg, that contains the info 
-						to be passed to the JVM hosting the code being tested. -->
-					<execution>
-						<id>prepare-ut-agent</id>
-						<phase>process-test-classes</phase>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-						<configuration>
-							<destFile>${sonar.jacoco.reportPath}</destFile>
-							<propertyName>jacoco.agent.ut.arg</propertyName>
-							<append>true</append>
-						</configuration>
-					</execution>
-					<!-- Prepares a variable, jacoco.agent.it.arg, that contains the info 
-						to be passed to the JVM hosting the code being tested. -->
-					<execution>
-						<id>prepare-it-agent</id>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-						<configuration>
-							<destFile>${sonar.jacoco.itReportPath}</destFile>
-							<propertyName>jacoco.agent.it.arg</propertyName>
-							<append>true</append>
-						</configuration>
-					</execution>
-				</executions>
+				<version>0.8.4</version>
 			</plugin>
 		</plugins>
 	</build>
+
 	<profiles>
 		<profile>
-			<id>codeQuality</id>
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<resources>
+					<resource>
+						<directory>src/main/resources</directory>
+					</resource>
+					<resource>
+						<targetPath>META-INF</targetPath>
+						<directory>src/main/resources/META-INF</directory>
+					</resource>
+				</resources>
+			</build>
+		</profile>
+		<profile>
+			<id>coverage</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 			<build>
 				<plugins>
-					<!-- Checkstyle plugin -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-checkstyle-plugin</artifactId>
-						<version>3.1.1</version>
-						<executions>
-							<execution>
-								<id>validate</id>
-								<phase>validate</phase>
-								<configuration>
-									<configLocation>delta-platform-checkstyle.xml</configLocation>
-									<encoding>UTF-8</encoding>
-									<consoleOutput>false</consoleOutput>
-									<failsOnError>false</failsOnError>
-									<skip>true</skip>
-								</configuration>
-								<goals>
-									<goal>check</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<!-- Surefire unit test plugin -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<version>2.22.2</version>
-						<configuration>
-							<argLine>
-								--illegal-access=permit
-							</argLine>
-							<properties>
-								<property>
-									<name>listener</name>
-									<value>org.sonar.java.jacoco.JUnitListener</value>
-								</property>
-							</properties>
-							<testFailureIgnore>true</testFailureIgnore>
-						</configuration>
-					</plugin>
-
-					<!-- Failsafe integration test plugin -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-failsafe-plugin</artifactId>
-						<version>2.22.2</version>
-						<configuration>
-							<argLine>--illegal-access=permit -Xmx1024m -XX:MaxPermSize=256m}
-							</argLine>
-							<properties>
-								<property>
-									<name>listener</name>
-									<value>org.sonar.java.jacoco.JUnitListener</value>
-								</property>
-							</properties>
-							<!-- Put failsafe reports with surefire to have access to tests failures/success 
-								reports in sonar -->
-							<reportsDirectory>${project.build.directory}/surefire-reports
-							</reportsDirectory>
-						</configuration>
-					</plugin>
 					<plugin>
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>
-						<version>0.8.5</version>
 						<executions>
-							<!-- Prepares a variable, jacoco.agent.ut.arg, that contains the info 
-								to be passed to the JVM hosting the code being tested. -->
 							<execution>
-								<id>prepare-ut-agent</id>
-								<phase>process-test-classes</phase>
+								<id>prepare-agent</id>
 								<goals>
 									<goal>prepare-agent</goal>
 								</goals>
-								<configuration>
-									<destFile>${sonar.jacoco.reportPath}</destFile>
-									<propertyName>jacoco.agent.ut.arg</propertyName>
-									<append>true</append>
-								</configuration>
-							</execution>
-							<!-- Prepares a variable, jacoco.agent.it.arg, that contains the info 
-								to be passed to the JVM hosting the code being tested. -->
-							<execution>
-								<id>prepare-it-agent</id>
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>prepare-agent</goal>
-								</goals>
-								<configuration>
-									<destFile>${sonar.jacoco.itReportPath}</destFile>
-									<propertyName>jacoco.agent.it.arg</propertyName>
-									<append>true</append>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-
-			<reporting>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-jxr-plugin</artifactId>
-						<version>3.0.0</version>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-checkstyle-plugin</artifactId>
-						<version>3.1.1</version>
-						<reportSets>
-							<reportSet>
-								<reports>
-									<report>checkstyleReport</report>
-								</reports>
-							</reportSet>
-						</reportSets>
-					</plugin>
-				</plugins>
-			</reporting>
-			<dependencies>
-				<dependency>
-					<groupId>org.sonarsource.java</groupId>
-					<artifactId>sonar-jacoco-listeners</artifactId>
-					<version>5.14.0.18788</version>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
-		</profile>
-
-		<!-- Integraton tests -->
-		<profile>
-			<id>run-its</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>build-helper-maven-plugin</artifactId>
-						<version>3.0.0</version>
-						<executions>
-							<execution>
-								<id>add-integration-test-sources</id>
-								<phase>generate-test-sources</phase>
-								<goals>
-									<goal>add-test-source</goal>
-								</goals>
-								<configuration>
-									<sources>
-										<source>src/e2e-test/java</source>
-									</sources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-failsafe-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>integration-test</id>
-								<phase>integration-test</phase>
-								<goals>
-									<goal>integration-test</goal>
-								</goals>
-								<configuration>
-									<includes>
-										<include>**/*IT.java</include>
-									</includes>
-								</configuration>
 							</execution>
 							<execution>
-								<id>verify</id>
-								<phase>verify</phase>
+								<id>report</id>
 								<goals>
-									<goal>verify</goal>
+									<goal>report</goal>
 								</goals>
 							</execution>
 						</executions>
 					</plugin>
-
 				</plugins>
 			</build>
 		</profile>

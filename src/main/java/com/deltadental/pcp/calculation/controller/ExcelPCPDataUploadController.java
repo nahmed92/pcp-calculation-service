@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,7 +27,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 
-@CrossOrigin(exposedHeaders = "Content-Disposition")
 @RestController
 @RequestMapping(value = "/pcp-calculation")
 @Api(value = "/pcp-calculation")
@@ -37,7 +35,7 @@ public class ExcelPCPDataUploadController {
 
 	@Autowired
 	private MemberContractClaimService memberContractClaimService;
-	
+
 	@Autowired
 	private ExcelService excelService;
 
@@ -49,19 +47,24 @@ public class ExcelPCPDataUploadController {
 			@ApiResponse(code = 500, message = "Internal server error.", response = ServiceError.class) })
 	@ResponseBody
 	@MethodExecutionTime
-	@PostMapping(value = PCPCalculationServiceConstants.UPLOAD_MEMBERS_CONTRACTS_CLAIMS_URI, produces = { MediaType.APPLICATION_JSON_VALUE })
-	public ResponseEntity<String> uploadPCPMemberClaims(@RequestParam(name = "pcpMemberClaimsDataFile", required = true) MultipartFile pcpMemberClaimsDataFile) {
+	@PostMapping(value = PCPCalculationServiceConstants.UPLOAD_MEMBERS_CONTRACTS_CLAIMS_URI, produces = {
+			MediaType.APPLICATION_JSON_VALUE })
+	public ResponseEntity<String> uploadPCPMemberClaims(
+			@RequestParam(name = "pcpMemberClaimsDataFile", required = true) MultipartFile pcpMemberClaimsDataFile) {
 		log.info("START PCPCalculationServiceController.uploadPCPMemberClaims");
 		ResponseEntity<String> responseEntity = null;
 		if (excelService.hasExcelFormat(pcpMemberClaimsDataFile)) {
-			List<MemberContractClaimRequest> memberContractClaimRequests = excelService.extractPCPMemberClaimsData(pcpMemberClaimsDataFile);
-			if (CollectionUtils.isNotEmpty(memberContractClaimRequests)) {				
+			List<MemberContractClaimRequest> memberContractClaimRequests = excelService
+					.extractPCPMemberClaimsData(pcpMemberClaimsDataFile);
+			if (CollectionUtils.isNotEmpty(memberContractClaimRequests)) {
 				memberContractClaimService.stageMemberContractClaimRecords(memberContractClaimRequests);
-				responseEntity = new ResponseEntity<>("Successfully uploaded member contract claims!", HttpStatus.CREATED);
+				responseEntity = new ResponseEntity<>("Successfully uploaded member contract claims!",
+						HttpStatus.CREATED);
 				log.info("Successfully uploaded member contract claims!");
 			} else {
 				log.info("No member contract claims to upload in uploaded file.");
-				responseEntity = new ResponseEntity<>("No member contract claims to upload in uploaded file.", HttpStatus.BAD_REQUEST);
+				responseEntity = new ResponseEntity<>("No member contract claims to upload in uploaded file.",
+						HttpStatus.BAD_REQUEST);
 			}
 		} else {
 			log.info("Invalid excel data!");

@@ -1,5 +1,21 @@
 package com.deltadental.pcp.calculation.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.client.RestClientException;
+
 import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
 import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
 import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
@@ -7,20 +23,6 @@ import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
 import com.deltadental.pcp.calculation.enums.Status;
 import com.deltadental.pcp.calculation.interservice.PCPConfigData;
 import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
-import org.apache.commons.lang.StringUtils;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.client.RestClientException;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 public class PCPValidatorServiceTest {
     
@@ -45,8 +47,6 @@ public class PCPValidatorServiceTest {
 
     @BeforeEach
     public void setup(){
-        //MockitoAnnotations.initMocks(this);
-        //ReflectionTestUtils.setField(PCPValidatorService.class, serviceInstanceId, "instance-id");
     }
 
     @Test
@@ -67,13 +67,240 @@ public class PCPValidatorServiceTest {
                 .thenReturn(true);
         Mockito.when(mockPCPConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus())))
                 .thenReturn(true);
-        List<ServiceLine> spyServiceLineList = Mockito.spy(memberClaimResponse.getServiceLines());
-        Mockito.when(mockPCPConfigData.isExplanationCodeValid(spyServiceLineList))
+        Mockito.when(mockPCPConfigData.isExplanationCodeValid(ArgumentMatchers.any()))
                 .thenReturn(true);
-        Mockito.when(mockPCPConfigData.isProcedureCodeValid(spyServiceLineList))
+        Mockito.when(mockPCPConfigData.isProcedureCodeValid(ArgumentMatchers.any()))
                 .thenReturn(true);
         Mockito.doNothing().when(mockPCPAssignmentService).process(contractEntity, memberClaimResponse);
-        //List<ContractMemberClaimEntity> expectedRecords = mockContractMemberClaimRepo.findByInstanceIdWhereStatusInList(serviceInstanceId, SEARCH_STATUS_VALIDATE);
+        mockPCPValidatorService.validatePending();
+        assertEquals(1, spyList.size());
+
+    }
+
+    @Test
+    public void testValidatePending_inclusionIsFalse(){
+
+        ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
+        List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
+        spyList.add(contractEntity);
+        MemberClaimResponse memberClaimResponse = buildMemberClaimResponse();
+        Mockito.when(
+                        mockContractMemberClaimRepo.findByInstanceIdWhereStatusInList(serviceInstanceId, SEARCH_STATUS_VALIDATE))
+                .thenReturn(spyList);
+        Mockito.when(mockMTVSyncServiceClient.memberClaim(contractEntity.getClaimId())).thenReturn(memberClaimResponse);
+
+        Mockito.when(mockPCPConfigData.isProviderInExclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()))
+                .thenReturn(true);
+        Mockito.when(mockPCPConfigData.isProviderInInclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()))
+                .thenReturn(false);
+        Mockito.when(mockPCPConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus())))
+                .thenReturn(true);
+        Mockito.when(mockPCPConfigData.isExplanationCodeValid(ArgumentMatchers.any()))
+                .thenReturn(true);
+        Mockito.when(mockPCPConfigData.isProcedureCodeValid(ArgumentMatchers.any()))
+                .thenReturn(true);
+        Mockito.doNothing().when(mockPCPAssignmentService).process(contractEntity, memberClaimResponse);
+        mockPCPValidatorService.validatePending();
+        assertEquals(1, spyList.size());
+
+    }
+
+    @Test
+    public void testValidatePending_ExclusionIsFalse(){
+
+        ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
+        List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
+        spyList.add(contractEntity);
+        MemberClaimResponse memberClaimResponse = buildMemberClaimResponse();
+        Mockito.when(
+                        mockContractMemberClaimRepo.findByInstanceIdWhereStatusInList(serviceInstanceId, SEARCH_STATUS_VALIDATE))
+                .thenReturn(spyList);
+        Mockito.when(mockMTVSyncServiceClient.memberClaim(contractEntity.getClaimId())).thenReturn(memberClaimResponse);
+
+        Mockito.when(mockPCPConfigData.isProviderInExclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()))
+                .thenReturn(false);
+        Mockito.when(mockPCPConfigData.isProviderInInclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()))
+                .thenReturn(true);
+        Mockito.when(mockPCPConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus())))
+                .thenReturn(true);
+        Mockito.when(mockPCPConfigData.isExplanationCodeValid(ArgumentMatchers.any()))
+                .thenReturn(true);
+        Mockito.when(mockPCPConfigData.isProcedureCodeValid(ArgumentMatchers.any()))
+                .thenReturn(true);
+        mockPCPValidatorService.validatePending();
+        assertEquals(1, spyList.size());
+
+    }
+
+    @Test
+    public void testValidatePending_claimStatusIsFalse(){
+
+        ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
+        List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
+        spyList.add(contractEntity);
+        MemberClaimResponse memberClaimResponse = buildMemberClaimResponse();
+        Mockito.when(
+                        mockContractMemberClaimRepo.findByInstanceIdWhereStatusInList(serviceInstanceId, SEARCH_STATUS_VALIDATE))
+                .thenReturn(spyList);
+        Mockito.when(mockMTVSyncServiceClient.memberClaim(contractEntity.getClaimId())).thenReturn(memberClaimResponse);
+
+        Mockito.when(mockPCPConfigData.isProviderInExclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()))
+                .thenReturn(true);
+        Mockito.when(mockPCPConfigData.isProviderInInclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()))
+                .thenReturn(true);
+        Mockito.when(mockPCPConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus())))
+                .thenReturn(false);
+        Mockito.when(mockPCPConfigData.isExplanationCodeValid(ArgumentMatchers.any()))
+                .thenReturn(true);
+        Mockito.when(mockPCPConfigData.isProcedureCodeValid(ArgumentMatchers.any()))
+                .thenReturn(true);
+        mockPCPValidatorService.validatePending();
+        assertEquals(1, spyList.size());
+
+    }
+
+    @Test
+    public void testValidatePending_ExplainationCodeIsFalse(){
+
+        ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
+        List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
+        spyList.add(contractEntity);
+        MemberClaimResponse memberClaimResponse = buildMemberClaimResponse();
+        Mockito.when(
+                        mockContractMemberClaimRepo.findByInstanceIdWhereStatusInList(serviceInstanceId, SEARCH_STATUS_VALIDATE))
+                .thenReturn(spyList);
+        Mockito.when(mockMTVSyncServiceClient.memberClaim(contractEntity.getClaimId())).thenReturn(memberClaimResponse);
+
+        Mockito.when(mockPCPConfigData.isProviderInExclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()))
+                .thenReturn(true);
+        Mockito.when(mockPCPConfigData.isProviderInInclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()))
+                .thenReturn(true);
+        Mockito.when(mockPCPConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus())))
+                .thenReturn(true);
+        Mockito.when(mockPCPConfigData.isExplanationCodeValid(ArgumentMatchers.any()))
+                .thenReturn(false);
+        Mockito.when(mockPCPConfigData.isProcedureCodeValid(ArgumentMatchers.any()))
+                .thenReturn(true);
+        mockPCPValidatorService.validatePending();
+        assertEquals(1, spyList.size());
+
+    }
+
+    @Test
+    public void testValidatePending_ProcedureCodeIsFalse(){
+
+        ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
+        List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
+        spyList.add(contractEntity);
+        MemberClaimResponse memberClaimResponse = buildMemberClaimResponse();
+        Mockito.when(
+                        mockContractMemberClaimRepo.findByInstanceIdWhereStatusInList(serviceInstanceId, SEARCH_STATUS_VALIDATE))
+                .thenReturn(spyList);
+        Mockito.when(mockMTVSyncServiceClient.memberClaim(contractEntity.getClaimId())).thenReturn(memberClaimResponse);
+
+        Mockito.when(mockPCPConfigData.isProviderInExclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()))
+                .thenReturn(true);
+        Mockito.when(mockPCPConfigData.isProviderInInclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()))
+                .thenReturn(false);
+        Mockito.when(mockPCPConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus())))
+                .thenReturn(true);
+        Mockito.when(mockPCPConfigData.isExplanationCodeValid(ArgumentMatchers.any()))
+                .thenReturn(true);
+        Mockito.when(mockPCPConfigData.isProcedureCodeValid(ArgumentMatchers.any()))
+                .thenReturn(false);
+        mockPCPValidatorService.validatePending();
+        assertEquals(1, spyList.size());
+
+    }
+
+    @Test
+    public void testValidatePending_memberClaimResponseIsNull(){
+
+        ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
+        List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
+        spyList.add(contractEntity);
+        Mockito.when(
+                        mockContractMemberClaimRepo.findByInstanceIdWhereStatusInList(serviceInstanceId, SEARCH_STATUS_VALIDATE))
+                .thenReturn(spyList);
+        Mockito.when(mockMTVSyncServiceClient.memberClaim(contractEntity.getClaimId())).thenReturn(null);
+
+        mockPCPValidatorService.validatePending();
+        assertEquals(1, spyList.size());
+
+    }
+
+    @Test
+    public void testValidatePending_memberClaimResponseIsErrorCodeIsNull(){
+
+        ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
+        List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
+        spyList.add(contractEntity);
+        MemberClaimResponse memberClaimResponse = buildMemberClaimResponse();
+        memberClaimResponse.setErrorCode(null);
+        Mockito.when(
+                        mockContractMemberClaimRepo.findByInstanceIdWhereStatusInList(serviceInstanceId, SEARCH_STATUS_VALIDATE))
+                .thenReturn(spyList);
+        Mockito.when(mockMTVSyncServiceClient.memberClaim(contractEntity.getClaimId())).thenReturn(memberClaimResponse);
+        mockPCPValidatorService.validatePending();
+        assertEquals(1, spyList.size());
+
+    }
+
+    @Test
+    public void testValidatePending_memberClaimResponseIsErrorMessageIsNull(){
+
+        ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
+        List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
+        spyList.add(contractEntity);
+        MemberClaimResponse memberClaimResponse = buildMemberClaimResponse();
+        memberClaimResponse.setErrorMessage(null);
+        Mockito.when(
+                        mockContractMemberClaimRepo.findByInstanceIdWhereStatusInList(serviceInstanceId, SEARCH_STATUS_VALIDATE))
+                .thenReturn(spyList);
+        Mockito.when(mockMTVSyncServiceClient.memberClaim(contractEntity.getClaimId())).thenReturn(memberClaimResponse);
+        mockPCPValidatorService.validatePending();
+        assertEquals(1, spyList.size());
+
+    }
+
+    @Test
+    public void testValidatePending_whenInclusionAndExclusionIsFalse(){
+
+        ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
+        List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
+        spyList.add(contractEntity);
+        MemberClaimResponse memberClaimResponse = buildMemberClaimResponse();
+        Mockito.when(
+                        mockContractMemberClaimRepo.findByInstanceIdWhereStatusInList(serviceInstanceId, SEARCH_STATUS_VALIDATE))
+                .thenReturn(spyList);
+        Mockito.when(mockMTVSyncServiceClient.memberClaim(contractEntity.getClaimId())).thenReturn(memberClaimResponse);
+
+        Mockito.when(mockPCPConfigData.isProviderInExclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()))
+                .thenReturn(false);
+        Mockito.when(mockPCPConfigData.isProviderInInclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()))
+                .thenReturn(false);
+        mockPCPValidatorService.validatePending();
+        assertEquals(1, spyList.size());
+
+    }
+
+    @Test
+    public void testValidatePending_whenServiceLineIsEmpty(){
+
+        ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
+        List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
+        spyList.add(contractEntity);
+        MemberClaimResponse memberClaimResponse = buildMemberClaimResponse();
+        Mockito.when(
+                        mockContractMemberClaimRepo.findByInstanceIdWhereStatusInList(serviceInstanceId, SEARCH_STATUS_VALIDATE))
+                .thenReturn(spyList);
+        Mockito.when(mockMTVSyncServiceClient.memberClaim(contractEntity.getClaimId())).thenReturn(memberClaimResponse);
+
+        Mockito.when(mockPCPConfigData.isProviderInExclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()))
+                .thenReturn(true);
+        Mockito.when(mockPCPConfigData.isProviderInInclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()))
+                .thenReturn(true);
+        memberClaimResponse.setServiceLines(null);
         mockPCPValidatorService.validatePending();
         assertEquals(1, spyList.size());
 
