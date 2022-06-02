@@ -9,7 +9,7 @@ CREATE TABLE dbo.member_claim_service (
 	service_number varchar(5),
 	service_paid_at datetime null,
 	service_resolution_at datetime null,
-	creation_at datetime null,
+	created_at datetime null,
 	last_update_at datetime null,
 	operator_id varchar(255),
 	member_claim_id varchar(200) null,
