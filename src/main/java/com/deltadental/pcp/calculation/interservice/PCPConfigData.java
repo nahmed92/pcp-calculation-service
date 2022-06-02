@@ -256,26 +256,34 @@ public class PCPConfigData implements InitializingBean {
 	}
 	
 	private boolean matchInclusion(InclusionExclusion inclusionExclusion, String providerId, String group, String division) {
+		log.info("START : PCPConfigData.matchInclusion");
 		LocalDate effectiveDate = LocalDate.parse(inclusionExclusion.getEffectiveDate(), dateTimeFormatter);
 		LocalDate now = LocalDate.now();
+		boolean returnValue = true;
 		if(now.isAfter(effectiveDate) || now.isEqual(effectiveDate)) {
 			GroupRestrictions groupRestrictions = inclusionExclusion.getGroupRestrictions();
-			return StringUtils.equals(groupRestrictions.getMasterContractId(), providerId) && StringUtils.equals(groupRestrictions.getGroupId(), group) && StringUtils.equals(groupRestrictions.getDivisionId(), division);
+			returnValue = StringUtils.equals(groupRestrictions.getMasterContractId(), providerId) && StringUtils.equals(groupRestrictions.getGroupId(), group) && StringUtils.equals(groupRestrictions.getDivisionId(), division);
 		} else {
-			log.info("Provider {} inclusion list configuration is not effective as of this date {}.", providerId, now);
-			return true;
+			returnValue = true;
 		}
+		log.info("Returning {} for Effective date {}, provider id {}, group {}, division {} as of now {} for inclusion.",returnValue,effectiveDate, providerId, group, division, now);
+		log.info("END : PCPConfigData.matchInclusion");
+		return returnValue;
 	}
 	
 	private boolean matchExclusion(InclusionExclusion inclusionExclusion, String providerId, String group, String division) {
+		log.info("START : PCPConfigData.matchExclusion");
 		LocalDate effectiveDate = LocalDate.parse(inclusionExclusion.getEffectiveDate(), dateTimeFormatter);
 		LocalDate now = LocalDate.now();
-		if(now.isBefore(effectiveDate) || now.isEqual(effectiveDate)) {
+		boolean returnValue = true;
+		if(effectiveDate.isBefore(now) || now.isEqual(effectiveDate)) {
 			GroupRestrictions groupRestrictions = inclusionExclusion.getGroupRestrictions();
-			return !(StringUtils.equals(groupRestrictions.getMasterContractId(), providerId) && StringUtils.equals(groupRestrictions.getGroupId(), group)  && StringUtils.equals(groupRestrictions.getDivisionId(), division));
+			returnValue = !(StringUtils.equals(groupRestrictions.getMasterContractId(), providerId) && StringUtils.equals(groupRestrictions.getGroupId(), group)  && StringUtils.equals(groupRestrictions.getDivisionId(), division));
 		} else {
-			log.info("Provider {} exlusion list configuration is not effective as of this date {}.", providerId, now);
-			return true;
+			returnValue = true;			
 		}
+		log.info("Returning {} for Effective date {}, provider id {}, group {}, division {} as of now {} for exclusion.",returnValue,effectiveDate, providerId, group, division, now);
+		log.info("END : PCPConfigData.matchExclusion");
+		return returnValue;
 	}
 }

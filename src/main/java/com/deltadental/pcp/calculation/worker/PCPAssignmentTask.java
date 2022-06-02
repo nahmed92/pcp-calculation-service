@@ -20,6 +20,7 @@ import com.deltadental.pcp.calculation.repos.MemberClaimServicesRepo;
 import com.deltadental.pcp.calculation.repos.MemberProviderRepo;
 import com.deltadental.pcp.calculation.service.PCPAssignmentService;
 import com.deltadental.pcp.search.interservice.PCPSearchServiceClient;
+import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -60,6 +61,7 @@ public class PCPAssignmentTask implements Runnable {
 
 	private ContractMemberClaimEntity contractMemberClaimEntity;
 
+	@MethodExecutionTime
 	public void validateAndAssignProvider() {
 		log.info("START PCPCalculationService.processPCPAssignment.");
 		log.info("Processing {} ", contractMemberClaimEntity);

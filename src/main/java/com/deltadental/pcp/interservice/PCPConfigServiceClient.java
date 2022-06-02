@@ -24,6 +24,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.deltadental.pcp.calculation.error.PCPCalculationServiceErrors;
 import com.deltadental.pcp.config.interservice.pojo.InclusionExclusion;
+import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -147,6 +148,7 @@ public class PCPConfigServiceClient {
 //		return null;
 //	}
 	
+	@MethodExecutionTime
 	public InclusionExclusion[] exclusions(String providerId) {
 		log.info("START PCPConfigServiceClient.exclusions");
 		final String exclusionsProviderUrl = pcpConfigServiceEndpoint.concat(EXCLUSIONS_PROVIDER);
@@ -172,6 +174,7 @@ public class PCPConfigServiceClient {
 		return new InclusionExclusion[0];
 	}
 	
+	@MethodExecutionTime
 	public InclusionExclusion[] inclusions(String providerId) {
 		log.info("START PCPConfigServiceClient.inclusions");
 		final String inclusionsProviderUrl = pcpConfigServiceEndpoint.concat(INCLUSIONS_PROVIDER);

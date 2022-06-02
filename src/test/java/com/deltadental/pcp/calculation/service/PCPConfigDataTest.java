@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -63,18 +64,20 @@ public class PCPConfigDataTest {
 		assertFalse(inclusionFlag);
 	}
 	
-	/*
+	
 	@DisplayName("Test provider exclusion")
 	@Test
-	@Ignore
+//	@Ignore
 	void testProviderExclusion() {
 		InclusionExclusion[] inclusionExclusions = new InclusionExclusion[1];
 		InclusionExclusion inclusionExclusion = getInclusionExclusion(); 
 		inclusionExclusions[0] = inclusionExclusion;
 		when(mockPCPConfigService.exclusions(anyString())).thenReturn(inclusionExclusions);
-		boolean inclusionFlag = pcpConfigData.isProviderInExclusionList("DC026845", "78672", "00001");
+		boolean inclusionFlag = pcpConfigData.isProviderInExclusionList("DC035065", "75394", "00003");
 		assertFalse(inclusionFlag);
 	}
+	
+	/*
 	
 	@DisplayName("Test provider exclusion not listed")
 	@Test
@@ -114,11 +117,11 @@ public class PCPConfigDataTest {
 	
 	private InclusionExclusion getInclusionExclusion() {
 		InclusionExclusion inclusionExclusion = new InclusionExclusion();
-		inclusionExclusion.setEffectiveDate("2022-05-01 00:00:00.0");
+		inclusionExclusion.setEffectiveDate("2022-05-31 00:00:00.0");
 		GroupRestrictions groupRestrictions = new GroupRestrictions();
-		groupRestrictions.setMasterContractId("DC026845");
-		groupRestrictions.setDivisionId("00001");
-		groupRestrictions.setGroupId("78672");
+		groupRestrictions.setMasterContractId("DC035065");
+		groupRestrictions.setDivisionId("00003");
+		groupRestrictions.setGroupId("75394");
 		inclusionExclusion.setGroupRestrictions(groupRestrictions);
 		return inclusionExclusion;
 	}
