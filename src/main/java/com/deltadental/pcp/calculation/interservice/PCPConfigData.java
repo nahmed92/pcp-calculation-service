@@ -62,6 +62,7 @@ public class PCPConfigData implements InitializingBean {
 	private List<PcpConfigResponse> claimStatusList = new ArrayList<>();
 	private List<PcpConfigResponse> procedureCodes = new ArrayList<>();
 	private List<PcpConfigResponse> explanationCodes = new ArrayList<>();
+	private String providerLookAHeadDays = "";
 
 	@Override
     public void afterPropertiesSet() throws Exception {
@@ -78,6 +79,8 @@ public class PCPConfigData implements InitializingBean {
 		log.info("Procedure codes : {} ",procedureCodes);
 		log.info("Wash rule cutoff day {} ",washRuleCutoffDay);
 		log.info("PCP Effectice Date {} ",calculatePCPEffectiveDate());
+		providerLookAHeadDays = providerLookAHeadDays();
+		log.info("Provider Look A Head Days {}", providerLookAHeadDays);
 		log.info("END PCPConfigData.afterPropertiesSet");
 	}
 	
@@ -130,6 +133,9 @@ public class PCPConfigData implements InitializingBean {
 		log.info("END PCPConfigData.procedureCodes");
 	}
 	
+	public String providerLookAHeadDays() {
+		return pcpConfigServiceClient.providerLookaheadDays();
+	}
 	
 	public boolean isClaimStatusValid(String claimStatus) {
 		log.info("START PCPConfigData.isClaimStatusValid");

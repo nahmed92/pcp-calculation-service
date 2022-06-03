@@ -37,6 +37,8 @@ public class PCPConfigServiceClient {
 
 	@Autowired(required=true)
 	private RestTemplate restTemplate;
+	
+	private static final String LOOK_A_HEAD_DAYS_90 = "90";
 
 	public String getPCPConfigData(String serviceEndPoint) {
 		log.info("START PCPConfigServiceClient.pcpConfigData {} ", serviceEndPoint);
@@ -67,19 +69,21 @@ public class PCPConfigServiceClient {
 		String uriBuilder = builder.build().encode().toUriString();
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
+		String returnValue = LOOK_A_HEAD_DAYS_90;
 		try {
 			ResponseEntity<String> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
 			if(responseEntity.getStatusCode() == HttpStatus.OK) {
-				return responseEntity.getBody();
+				returnValue = responseEntity.getBody();
 			}else {
-				log.error("Got {} response code from PCP Config API {} ",responseEntity.getStatusCode(),PROVIDER_LOOKAHEAD_DAYS);
+				log.error("Got {} response code from PCP Config API {} ",responseEntity.getStatusCode(), PROVIDER_LOOKAHEAD_DAYS);
 			} 
-		} catch (RestClientException | URISyntaxException e) {
-			log.error("Unable to call PCP Config for API {} ",PROVIDER_LOOKAHEAD_DAYS,e);
-			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(e);
+		} catch (Exception e) {
+			log.error("Unable to call PCP Config for API {} ", PROVIDER_LOOKAHEAD_DAYS, e);
+//			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(e);
 		}
+		log.info("Returning provider Look a head days {}", returnValue);
 		log.info("END PCPConfigServiceClient.providerLookaheadDays");
-		return null;
+		return returnValue;
 	}
 	
 //	public String explanationCode() {
