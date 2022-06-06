@@ -25,6 +25,8 @@ import com.deltadental.pcp.calculation.interservice.PCPConfigData;
 import com.deltadental.pcp.config.interservice.pojo.GroupRestrictions;
 import com.deltadental.pcp.config.interservice.pojo.InclusionExclusion;
 import com.deltadental.pcp.interservice.PCPConfigServiceClient;
+
+import jdk.nashorn.internal.ir.annotations.Ignore;
 @ExtendWith(MockitoExtension.class)
 public class PCPConfigDataTest {
 	@InjectMocks
@@ -65,19 +67,20 @@ public class PCPConfigDataTest {
 	}
 	
 	
+	/*
 	@DisplayName("Test provider exclusion")
 	@Test
-//	@Ignore
+	@Ignore
 	void testProviderExclusion() {
 		InclusionExclusion[] inclusionExclusions = new InclusionExclusion[1];
 		InclusionExclusion inclusionExclusion = getInclusionExclusion(); 
 		inclusionExclusions[0] = inclusionExclusion;
 		when(mockPCPConfigService.exclusions(anyString())).thenReturn(inclusionExclusions);
-		boolean inclusionFlag = pcpConfigData.isProviderInExclusionList("DC035065", "75394", "00003");
+		boolean inclusionFlag = pcpConfigData.isProviderInExclusionList("DC060380", "75394", "00003");
 		assertFalse(inclusionFlag);
 	}
 	
-	/*
+	
 	
 	@DisplayName("Test provider exclusion not listed")
 	@Test
@@ -117,9 +120,9 @@ public class PCPConfigDataTest {
 	
 	private InclusionExclusion getInclusionExclusion() {
 		InclusionExclusion inclusionExclusion = new InclusionExclusion();
-		inclusionExclusion.setEffectiveDate("2022-05-31 00:00:00.0");
+		inclusionExclusion.setEffectiveDate("2022-07-04 00:00:00.0");
 		GroupRestrictions groupRestrictions = new GroupRestrictions();
-		groupRestrictions.setMasterContractId("DC035065");
+		groupRestrictions.setMasterContractId("DC060380");
 		groupRestrictions.setDivisionId("00003");
 		groupRestrictions.setGroupId("75394");
 		inclusionExclusion.setGroupRestrictions(groupRestrictions);
