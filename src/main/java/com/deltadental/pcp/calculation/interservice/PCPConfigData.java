@@ -235,7 +235,7 @@ public class PCPConfigData implements InitializingBean {
 				}
 			} else {
 				log.info("Provider {}, Group {}, Division {} is not listed in exlusion list.", providerId, group, division);
-				exclusionFlag = Boolean.TRUE;
+				exclusionFlag = Boolean.FALSE;
 			}
 		}
 		log.info("END PCPConfigData.isProviderInExclusionList {}, {}, {}", providerId, group, division);
