@@ -230,7 +230,7 @@ public class PCPConfigData implements InitializingBean {
 						log.info("Provider {}, Group {}, Division {} is listed in exlusion list.", providerId, group, division);
 					}
 				} else {
-					exclusionFlag = Boolean.valueOf(exclusionList.stream().anyMatch(exclusion -> matchInclusion(exclusion, providerId, group, division)));
+					exclusionFlag = Boolean.valueOf(exclusionList.stream().anyMatch(exclusion -> matchExclusion(exclusion, providerId, group, division)));
 					log.info("Provider {}, Group {}, Division {} is listed in exlusion list.", providerId, group, division);
 				}
 			} else {
