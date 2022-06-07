@@ -24,6 +24,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.deltadental.pcp.calculation.error.PCPCalculationServiceErrors;
 import com.deltadental.pcp.config.interservice.pojo.InclusionExclusion;
+import com.deltadental.pcp.security.HttpHeaderBuilder;
 import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 
 import lombok.extern.slf4j.Slf4j;
@@ -39,14 +40,16 @@ public class PCPConfigServiceClient {
 	private RestTemplate restTemplate;
 	
 	private static final String LOOK_A_HEAD_DAYS_90 = "90";
+	
+	@Autowired
+	private HttpHeaderBuilder httpHeaderBuilder;
 
 	public String getPCPConfigData(String serviceEndPoint) {
 		log.info("START PCPConfigServiceClient.pcpConfigData {} ", serviceEndPoint);
 		String providerLookaheadDaysEndPoint = pcpConfigServiceEndpoint.concat(serviceEndPoint);
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(providerLookaheadDaysEndPoint);
 		String uriBuilder = builder.build().encode().toUriString();
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpHeaders headers = createHttpHeaders();
 		try {
 			ResponseEntity<String> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
 			if(responseEntity.getStatusCode() == HttpStatus.OK) {
@@ -61,14 +64,19 @@ public class PCPConfigServiceClient {
 		log.info("END PCPConfigServiceClient.pcpConfigData {} ", serviceEndPoint);
 		return null;
 	}
+
+	private HttpHeaders createHttpHeaders() {
+		HttpHeaders headers = httpHeaderBuilder.createHttpSecurityHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		return headers;
+	}
 	
 	public String providerLookaheadDays() {
 		log.info("START PCPConfigServiceClient.providerLookaheadDays");
 		String providerLookaheadDaysEndPoint = pcpConfigServiceEndpoint.concat(PROVIDER_LOOKAHEAD_DAYS);
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(providerLookaheadDaysEndPoint);
 		String uriBuilder = builder.build().encode().toUriString();
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpHeaders headers = createHttpHeaders();
 		String returnValue = LOOK_A_HEAD_DAYS_90;
 		try {
 			ResponseEntity<String> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
@@ -91,8 +99,7 @@ public class PCPConfigServiceClient {
 //		final String explanationCode = pcpConfigServiceEndpoint.concat(EXPLANATION_CODE);
 //		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(explanationCode);
 //		String uriBuilder = builder.build().encode().toUriString();
-//		HttpHeaders headers = new HttpHeaders();
-//		headers.setContentType(MediaType.APPLICATION_JSON);
+//		HttpHeaders headers = createHttpHeaders();
 //		try {
 //			ResponseEntity<String> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
 //			if(responseEntity.getStatusCode() == HttpStatus.OK) {
@@ -113,8 +120,7 @@ public class PCPConfigServiceClient {
 //		final String procedureCode = pcpConfigServiceEndpoint.concat(PROCEDURE_CODE);
 //		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(procedureCode);
 //		String uriBuilder = builder.build().encode().toUriString();
-//		HttpHeaders headers = new HttpHeaders();
-//		headers.setContentType(MediaType.APPLICATION_JSON);
+//		HttpHeaders headers = createHttpHeaders();
 //		try {
 //			ResponseEntity<String> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
 //			if(responseEntity.getStatusCode() == HttpStatus.OK) {
@@ -135,8 +141,7 @@ public class PCPConfigServiceClient {
 //		final String claimStatusUrl = pcpConfigServiceEndpoint.concat(CLAIM_STATUS);
 //		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(claimStatusUrl);
 //		String uriBuilder = builder.build().encode().toUriString();
-//		HttpHeaders headers = new HttpHeaders();
-//		headers.setContentType(MediaType.APPLICATION_JSON);
+//		HttpHeaders headers = createHttpHeaders();
 //		try {
 //			ResponseEntity<String> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
 //			if(responseEntity.getStatusCode() == HttpStatus.OK) {
@@ -161,9 +166,8 @@ public class PCPConfigServiceClient {
 	    params.put("providerId", providerId);
 	    URI exclusionsUri = builder.buildAndExpand(params).toUri();
 	    log.info("exclusions uri : "+exclusionsUri);
-	    HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);		
-		try {
+	    HttpHeaders headers = createHttpHeaders();
+	    try {
 			ResponseEntity<InclusionExclusion[]> responseEntity = this.restTemplate.exchange(exclusionsUri, HttpMethod.GET, new HttpEntity<>(headers), InclusionExclusion[].class);
 			if (null != responseEntity && responseEntity.getStatusCode() == HttpStatus.OK) {
 				return responseEntity.getBody();
@@ -187,8 +191,7 @@ public class PCPConfigServiceClient {
 	    params.put("providerId", providerId);
 	    URI inclusionsUri = builder.buildAndExpand(params).toUri();
 	    log.info("exclusions uri : "+inclusionsUri);
-	    HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);		
+	    HttpHeaders headers = createHttpHeaders();		
 		try {
 			ResponseEntity<InclusionExclusion[]> responseEntity = this.restTemplate.exchange(inclusionsUri, HttpMethod.GET, new HttpEntity<>(headers), InclusionExclusion[].class);
 			if (null != responseEntity && responseEntity.getStatusCode() == HttpStatus.OK) {
