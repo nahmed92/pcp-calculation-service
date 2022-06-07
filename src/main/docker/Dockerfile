@@ -33,6 +33,9 @@ ENTRYPOINT java $JAVA_OPTS \
 	-DsystemLogLevel=${SYSTEM_LOG_LEVEL} \
 	-Dserver.port=${SERVER_PORT} \
 	-Dservice.name=${SERVICE_NAME} \
+    -Dservice.oauth.token.url=${SERVICE_OAUTH_TOKEN_URL} \
+    -Dservice.oauth.client.key=${SERVICE_OAUTH_CLIENT_KEY} \
+    -Dservice.oauth.client.secret=${SERVICE_OAUTH_CLIENT_SECRET} \
 	-Dspring.datasource.url=${DATASOURCE_URL} \
     -Dspring.datasource.username=${DATASOURCE_USERNAME} \
     -Dspring.datasource.password=${DATASOURCE_PASSWORD} \
@@ -45,13 +48,11 @@ ENTRYPOINT java $JAVA_OPTS \
     -Dspring.jpa.hibernate.c3p0.timeout=${JPA_TIMEOUT} \
     -Dservice.instance.id=${SERVICE_INSTANCE_ID} \
     -Dpcp.wash.rule.cutoff.day=${WASH_RULE_CUTOFF_DAY} \
-	-Dpcp.search.service.endpoint=${PCP_SEARCH_SERVICE_ENDPOINT} \
-	-Dpcp.config.service.endpoint=${PCP_CONFIG_SERVICE_ENDPOINT} \
+	-Dpcp.config.service.url=${PCP_CONFIG_SERVICE_URL} \
 	-Dpcp.mtv.sync.service.endpoint=${PCP_MTV_SYNC_SERVICE_ENDPOINT} \
 	-Dmanagement.endpoints.enabled-by-default=${MANAGEMENT_ENDPOINTS_ENABLED_BY_DEFAULT} \
 	-Dmanagement.endpoints.web.path-mapping.health=${MANAGEMENT_ENDPOINTS_WEB_PATH_MAPPING_HEALTH} \
 	-Dmanagement.endpoint.health.enabled=${MANAGEMENT_ENDPOINT_HEALTH_ENABLED} \
 	-Dmanagement.endpoint.health.show-details=${MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS} \
 	-Dpcp.assignment.process.workers.count=${PCP_ASSIGNMENT_PROCESS_WORKERS_COUNT} \
-	-Denvironment=${ENVIRONMENT} \
 	-jar /pcp-calculation-service-1.0.0.jar

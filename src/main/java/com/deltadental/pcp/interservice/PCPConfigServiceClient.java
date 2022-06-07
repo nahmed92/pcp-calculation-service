@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -33,10 +34,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PCPConfigServiceClient {
 
-	@Value("${pcp.config.service.endpoint}")
+	@Value("${pcp.config.service.url}")
 	private String pcpConfigServiceEndpoint;
-
-	@Autowired(required=true)
+	
+	@Autowired
+	@Qualifier("securedRestTemplate")
 	private RestTemplate restTemplate;
 	
 	private static final String LOOK_A_HEAD_DAYS_90 = "90";
