@@ -23,14 +23,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ExcelService {
 
-	public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+	public static final String CONTENT_TYPE_EXCEL = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 	
-	public boolean hasExcelFormat(MultipartFile file) {
-		log.info("START ExcelService.hasExcelFormat()");
-		if (!TYPE.equals(file.getContentType())) {
-			return false;
-		}
-		return true;
+	public boolean isExcelFormat(MultipartFile file) {
+		return CONTENT_TYPE_EXCEL.equals(file.getContentType());
 	}
 
 	public List<MemberContractClaimRequest> extractPCPMemberClaimsData(MultipartFile pcpMemberClaimsDataFile) {

@@ -70,7 +70,7 @@ public class MTVSyncServiceClient {
 				log.info("Response for claim id {} is {} ",claimId, memberClaimResponse);
 			}			
 		} catch (RestClientException e) {
-			log.error("Error calling MTV member claim for request claim id {}", claimId);
+			log.error("Error calling MTV member claim for request claim id {}", claimId,e);
 			throw PCPCalculationServiceErrors.MTV_SYNC_CLAIM_SERVICE_ERROR.createException();
 		}
 		log.info("END MTVSyncServiceClient.memberClaim()");

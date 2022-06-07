@@ -33,7 +33,7 @@ public class ExcelServiceTest {
         String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         MultipartFile file = Mockito.mock(MultipartFile.class);
         Mockito.when(file.getContentType()).thenReturn(TYPE);
-        boolean expectedResult = mockExcelService.hasExcelFormat(file);
+        boolean expectedResult = mockExcelService.isExcelFormat(file);
         Assertions.assertEquals(true, expectedResult);
     }
 
@@ -42,7 +42,7 @@ public class ExcelServiceTest {
         String TYPE = "application/any";
         MultipartFile file = Mockito.mock(MultipartFile.class);
         Mockito.when(file.getContentType()).thenReturn(TYPE);
-        boolean expectedResult = mockExcelService.hasExcelFormat(file);
+        boolean expectedResult = mockExcelService.isExcelFormat(file);
         Assertions.assertEquals(false, expectedResult);
     }
 

@@ -77,7 +77,7 @@ public class MemberProviderEntity implements Serializable {
 	private String providerQualifierId;
 
 	@CreationTimestamp
-	@Column(name = "creation_at")
+	@Column(name = "creation_at", updatable = false)
 	private Timestamp crationAt;
 
 	@UpdateTimestamp

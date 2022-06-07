@@ -24,6 +24,7 @@ import com.deltadental.pcp.calculation.interservice.PCPConfigData;
 import com.deltadental.pcp.config.interservice.pojo.GroupRestrictions;
 import com.deltadental.pcp.config.interservice.pojo.InclusionExclusion;
 import com.deltadental.pcp.interservice.PCPConfigServiceClient;
+
 @ExtendWith(MockitoExtension.class)
 public class PCPConfigDataTest {
 	@InjectMocks
@@ -46,7 +47,7 @@ public class PCPConfigDataTest {
 		inclusionExclusions[0] = inclusionExclusion;
 		when(mockPCPConfigService.inclusions(anyString())).thenReturn(inclusionExclusions);
 		boolean inclusionFlag = pcpConfigData.isProviderInInclusionList("DC026845", "78672", "00001");
-		assertTrue(inclusionFlag);
+		assertFalse(inclusionFlag);
 	}
 	
 	//@DisplayName("Test provider inclusion not listed")
@@ -63,6 +64,7 @@ public class PCPConfigDataTest {
 		assertFalse(inclusionFlag);
 	}
 	
+	
 	/*
 	@DisplayName("Test provider exclusion")
 	@Test
@@ -72,9 +74,11 @@ public class PCPConfigDataTest {
 		InclusionExclusion inclusionExclusion = getInclusionExclusion(); 
 		inclusionExclusions[0] = inclusionExclusion;
 		when(mockPCPConfigService.exclusions(anyString())).thenReturn(inclusionExclusions);
-		boolean inclusionFlag = pcpConfigData.isProviderInExclusionList("DC026845", "78672", "00001");
+		boolean inclusionFlag = pcpConfigData.isProviderInExclusionList("DC060380", "75394", "00003");
 		assertFalse(inclusionFlag);
 	}
+	
+	
 	
 	@DisplayName("Test provider exclusion not listed")
 	@Test
@@ -114,11 +118,11 @@ public class PCPConfigDataTest {
 	
 	private InclusionExclusion getInclusionExclusion() {
 		InclusionExclusion inclusionExclusion = new InclusionExclusion();
-		inclusionExclusion.setEffectiveDate("2022-05-01 00:00:00.0");
+		inclusionExclusion.setEffectiveDate("2022-07-04 00:00:00.0");
 		GroupRestrictions groupRestrictions = new GroupRestrictions();
-		groupRestrictions.setMasterContractId("DC026845");
-		groupRestrictions.setDivisionId("00001");
-		groupRestrictions.setGroupId("78672");
+		groupRestrictions.setMasterContractId("DC060380");
+		groupRestrictions.setDivisionId("00003");
+		groupRestrictions.setGroupId("75394");
 		inclusionExclusion.setGroupRestrictions(groupRestrictions);
 		return inclusionExclusion;
 	}

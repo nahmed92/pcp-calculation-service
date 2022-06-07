@@ -53,18 +53,15 @@ public class ExcelPCPDataUploadController {
 			@RequestParam(name = "pcpMemberClaimsDataFile", required = true) MultipartFile pcpMemberClaimsDataFile) {
 		log.info("START PCPCalculationServiceController.uploadPCPMemberClaims");
 		ResponseEntity<String> responseEntity = null;
-		if (excelService.hasExcelFormat(pcpMemberClaimsDataFile)) {
-			List<MemberContractClaimRequest> memberContractClaimRequests = excelService
-					.extractPCPMemberClaimsData(pcpMemberClaimsDataFile);
+		if (excelService.isExcelFormat(pcpMemberClaimsDataFile)) {
+			List<MemberContractClaimRequest> memberContractClaimRequests = excelService.extractPCPMemberClaimsData(pcpMemberClaimsDataFile);
 			if (CollectionUtils.isNotEmpty(memberContractClaimRequests)) {
 				memberContractClaimService.stageMemberContractClaimRecords(memberContractClaimRequests);
-				responseEntity = new ResponseEntity<>("Successfully uploaded member contract claims!",
-						HttpStatus.CREATED);
+				responseEntity = new ResponseEntity<>("Successfully uploaded member contract claims!", HttpStatus.CREATED);
 				log.info("Successfully uploaded member contract claims!");
 			} else {
 				log.info("No member contract claims to upload in uploaded file.");
-				responseEntity = new ResponseEntity<>("No member contract claims to upload in uploaded file.",
-						HttpStatus.BAD_REQUEST);
+				responseEntity = new ResponseEntity<>("No member contract claims to upload in uploaded file.", HttpStatus.BAD_REQUEST);
 			}
 		} else {
 			log.info("Invalid excel data!");

@@ -56,8 +56,6 @@ public class PCPAssignmentService {
 
 	private static final String REASON_CODE_5NEW = "5NEW";
 
-	private static final String LOOK_A_HEAD_DAYS_90 = "90";
-
 	private static final String DCM_SOURCESYSTEM = "DCM";
 
 	private static final String DC_PRODUCT = "DC";
@@ -151,7 +149,7 @@ public class PCPAssignmentService {
 		log.info("START PCPAssignmentService.callPCPValidate()");
 		PCPValidateRequest pcpValidateRequest = PCPValidateRequest.builder()
 				.contractId(memberClaimResponse.getContractId())
-				.lookAheadDays(LOOK_A_HEAD_DAYS_90)
+				.lookAheadDays(pcpConfigData.providerLookAHeadDays())
 				.memberType(memberClaimResponse.getMemberID())
 				.mtvPersonId(memberClaimResponse.getPersonId())
 				.pcpEffDate(pcpEffectiveDate)
