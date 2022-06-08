@@ -21,6 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 @AllArgsConstructor
 @Component("pcpConfigData")
+@RefreshScope
 @Slf4j
 public class PCPConfigData implements InitializingBean {
 
@@ -79,18 +81,18 @@ public class PCPConfigData implements InitializingBean {
 		log.info("Procedure codes : {} ",procedureCodes);
 		log.info("Wash rule cutoff day {} ",washRuleCutoffDay);
 		log.info("PCP Effectice Date {} ",calculatePCPEffectiveDate());
-		providerLookAHeadDays = providerLookAHeadDays();
+		setProviderLookAHeadDays(fetchProviderLookAHeadDays());
 		log.info("Provider Look A Head Days {}", providerLookAHeadDays);
 		log.info("END PCPConfigData.afterPropertiesSet");
 	}
 	
-	@Scheduled(cron = "* * 2 * * *", zone = ZONE_ID)
+	@Scheduled(cron = "${pcp.config.data.refresh.corn.expression}", zone = ZONE_ID)
 	@Synchronized
-	//FIXME: remove scheduler and cache config data
 	public void refreshPCPConfigData() {
 		log.info("START PCPConfigData.refreshPCPConfigData");
 		try {
 			afterPropertiesSet();
+			log.info("Config data refreshed time {}", new Date());
 		} catch (Exception e) {
 			log.error("Unable to refresh pcp config",e);
 		}
@@ -133,7 +135,15 @@ public class PCPConfigData implements InitializingBean {
 		log.info("END PCPConfigData.procedureCodes");
 	}
 	
+	public void setProviderLookAHeadDays(String providerLookAHeadDays) {
+		this.providerLookAHeadDays = providerLookAHeadDays;
+	}
+	
 	public String providerLookAHeadDays() {
+		return providerLookAHeadDays;
+	}
+	
+	private String fetchProviderLookAHeadDays() {
 		return pcpConfigServiceClient.providerLookaheadDays();
 	}
 	
