@@ -64,7 +64,7 @@ public class PCPConfigData implements InitializingBean {
 	private List<PcpConfigResponse> claimStatusList = new ArrayList<>();
 	private List<PcpConfigResponse> procedureCodes = new ArrayList<>();
 	private List<PcpConfigResponse> explanationCodes = new ArrayList<>();
-	private String providerLookAHeadDays = "";
+	private String providerLookAHeadDays = "90";
 
 	@Override
     public void afterPropertiesSet() throws Exception {
@@ -82,7 +82,7 @@ public class PCPConfigData implements InitializingBean {
 		log.info("Wash rule cutoff day {} ",washRuleCutoffDay);
 		log.info("PCP Effectice Date {} ",calculatePCPEffectiveDate());
 		setProviderLookAHeadDays(fetchProviderLookAHeadDays());
-		log.info("Provider Look A Head Days {}", providerLookAHeadDays);
+		log.info("Provider Look A Head Days {}", providerLookAHeadDays());
 		log.info("END PCPConfigData.afterPropertiesSet");
 	}
 	
