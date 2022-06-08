@@ -86,7 +86,8 @@ public class PCPConfigData implements InitializingBean {
 		log.info("END PCPConfigData.afterPropertiesSet");
 	}
 	
-	@Scheduled(cron = "${pcp.config.data.refresh.corn.expression}", zone = ZONE_ID)
+//	@Scheduled(cron = "${pcp.config.data.refresh.corn.expression}", zone = ZONE_ID)
+	@Scheduled(cron = "*/59 * * * * *", zone = ZONE_ID)
 	@Synchronized
 	public void refreshPCPConfigData() {
 		log.info("START PCPConfigData.refreshPCPConfigData");
@@ -234,12 +235,12 @@ public class PCPConfigData implements InitializingBean {
 			if (CollectionUtils.isNotEmpty(exclusionList)) {
 				providerNotexclusionFlag = Boolean.valueOf(exclusionList.stream().anyMatch(exclusion -> matchExclusion(exclusion, providerId, group, division)));	
 				if(providerNotexclusionFlag.booleanValue()) {
-					log.info("Provider {}, Group {}, Division {} is not listed in exlusion list, inclusion flag {}", providerId, group, division, providerNotexclusionFlag);
+					log.info("Provider {}, Group {}, Division {} is not listed in exlusion list, exclusion flag {}", providerId, group, division, providerNotexclusionFlag);
 				} else {
-					log.info("Provider {}, Group {}, Division {} is listed in exlusion list, inclusion flag {}", providerId, group, division, providerNotexclusionFlag);
+					log.info("Provider {}, Group {}, Division {} is listed in exlusion list, exclusion flag {}", providerId, group, division, providerNotexclusionFlag);
 				}
 			} else {
-				log.info("Provider {}, Group {}, Division {} is not listed in exlusion list, inclusion flag {}", providerId, group, division, providerNotexclusionFlag);
+				log.info("Provider {}, Group {}, Division {} is not listed in exlusion list, exclusion flag {}", providerId, group, division, providerNotexclusionFlag);
 			}
 		}
 		log.info("END PCPConfigData.isProviderInExclusionList {}, {}, {}", providerId, group, division);
