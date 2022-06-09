@@ -1,5 +1,4 @@
 
-DROP TABLE CREATE TABLE [dbo].[contract_member_claim];
 
 CREATE TABLE [dbo].[contract_member_claim] (
 	id varchar(200) NOT NULL,
