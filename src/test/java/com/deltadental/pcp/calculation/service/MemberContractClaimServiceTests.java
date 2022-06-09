@@ -58,14 +58,16 @@ public class MemberContractClaimServiceTests {
         Mockito.when(mockRepo
                 .findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
                         StringUtils.trimToNull(request.getClaimId()), // check this and remove
-                        StringUtils.trimToNull(request.getContractId()), StringUtils.trimToNull(request.getMemberId()),
-                        StringUtils.trimToNull(request.getProviderId()), StringUtils.trimToNull(request.getState()),
+                        StringUtils.trimToNull(request.getContractId()), //
+                        StringUtils.trimToNull(request.getMemberId()), //
+                     //   StringUtils.trimToNull(request.getProviderId()),
+                        StringUtils.trimToNull(request.getState()),
                         SEARCH_STATUS
                 )).thenReturn(memberClaimsEntities);
         mockMemberContractClaimService.stageMemberContractClaimRecords(requestList);
         Mockito.verify(mockRepo).
                 findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
-                        ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any());
+                        ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any());
         assertEquals(memberClaimsEntities.size(), 1);
     }
 
@@ -83,8 +85,10 @@ public class MemberContractClaimServiceTests {
         Mockito.when(mockRepo
                         .findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
                                 StringUtils.trimToNull(request.getClaimId()), // check this and remove
-                                StringUtils.trimToNull(request.getContractId()), StringUtils.trimToNull(request.getMemberId()),
-                                StringUtils.trimToNull(request.getProviderId()), StringUtils.trimToNull(request.getState()),
+                                StringUtils.trimToNull(request.getContractId()), //
+                                StringUtils.trimToNull(request.getMemberId()), //
+                                //StringUtils.trimToNull(request.getProviderId()), //
+                                StringUtils.trimToNull(request.getState()),
                                 SEARCH_STATUS
                         ))
                 .thenReturn(memberClaimsEntities);

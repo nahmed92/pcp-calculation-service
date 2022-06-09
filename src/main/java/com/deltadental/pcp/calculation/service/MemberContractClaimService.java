@@ -1,10 +1,6 @@
 package com.deltadental.pcp.calculation.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -12,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
 import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
 import com.deltadental.pcp.calculation.enums.Status;
@@ -30,9 +25,6 @@ public class MemberContractClaimService {
 
 	@Autowired
 	private PCPValidatorService pcpValidatorService;
-
-	@Autowired
-	private MTVSyncServiceClient mtvSyncService;
 
 	@Autowired
 	private Mapper mapper;
@@ -56,7 +48,6 @@ public class MemberContractClaimService {
 								StringUtils.trimToNull(request.getClaimId()), // check this and remove
 								StringUtils.trimToNull(request.getContractId()),
 								StringUtils.trimToNull(request.getMemberId()),
-								StringUtils.trimToNull(request.getProviderId()),
 								StringUtils.trimToNull(request.getState()), SEARCH_STATUS);
 
 				if (CollectionUtils.isEmpty(memberClaimsEntities)) {
