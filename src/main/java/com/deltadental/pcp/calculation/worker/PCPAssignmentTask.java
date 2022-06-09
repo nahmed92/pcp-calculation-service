@@ -20,6 +20,7 @@ import com.deltadental.pcp.calculation.repos.MemberClaimServicesRepo;
 import com.deltadental.pcp.calculation.repos.MemberProviderRepo;
 import com.deltadental.pcp.calculation.service.PCPAssignmentService;
 import com.deltadental.pcp.search.interservice.PCPSearchServiceClient;
+import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -60,6 +61,7 @@ public class PCPAssignmentTask implements Runnable {
 
 	private ContractMemberClaimEntity contractMemberClaimEntity;
 
+	@MethodExecutionTime
 	public void validateAndAssignProvider() {
 		log.info("START PCPCalculationService.processPCPAssignment.");
 		log.info("Processing {} ", contractMemberClaimEntity);
@@ -102,20 +104,20 @@ public class PCPAssignmentTask implements Runnable {
 					}
 				} else {
 					if (!exclusionFlag) {
-						errorMessageBuilder.append(String.format("Provider {}, Group {}, Division {} is listed in exlusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()));
+						errorMessageBuilder.append(String.format("Provider %s, Group %s, Division %s is listed in exlusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()));
 						contractMemberClaimEntity.setStatus(Status.PCP_EXCLUDED);
 						contractMemberClaimEntity.setErrorMessage(errorMessageBuilder.toString());
 					}
 					if (!inclusionFlag) {
 						appendColon(errorMessageBuilder);
-						errorMessageBuilder.append(String.format("Provider {}, Group {}, Division {} is not listed in inclusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()));
+						errorMessageBuilder.append(String.format("Provider %s, Group %s, Division %s is not listed in inclusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()));
 						contractMemberClaimEntity.setStatus(Status.PCP_NOT_INCLUDED);
 						contractMemberClaimEntity.setErrorMessage(errorMessageBuilder.toString());
 					}
 				}
 			} else {
 				if (memberClaimResponse == null) {
-					errorMessageBuilder.append(String.format("Claim information not found for claim # ", contractMemberClaimEntity.getClaimId()));
+					errorMessageBuilder.append(String.format("Claim information not found for claim # %s", contractMemberClaimEntity.getClaimId()));
 					log.info("Marking as {} for Claim id {} with member claim response is null ",Status.CLAIM_NOT_FOUND,contractMemberClaimEntity.getClaimId());
 					contractMemberClaimEntity.setStatus(Status.CLAIM_NOT_FOUND);
 					contractMemberClaimEntity.setErrorMessage(errorMessageBuilder.toString());

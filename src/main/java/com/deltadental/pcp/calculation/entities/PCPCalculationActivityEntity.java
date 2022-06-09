@@ -53,7 +53,7 @@ public class PCPCalculationActivityEntity implements java.io.Serializable {
 	@Column(name = "end_time")
 	private Timestamp endTime;
 
-	@Column(name = "created_at")
+	@Column(name = "created_at", updatable = false)
 	@CreationTimestamp
 	private Timestamp createdAt;
 

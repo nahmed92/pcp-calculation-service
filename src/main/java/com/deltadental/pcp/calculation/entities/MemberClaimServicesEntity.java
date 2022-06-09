@@ -56,7 +56,7 @@ public class MemberClaimServicesEntity implements Serializable {
 	private Date serviceResolutionAt;
 
 	@CreationTimestamp
-	@Column(name = "creation_at")
+	@Column(name = "creation_at", updatable = false)
 	private Timestamp crationAt;
 
 	@UpdateTimestamp

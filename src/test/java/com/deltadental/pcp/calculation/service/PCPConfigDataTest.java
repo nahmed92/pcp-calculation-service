@@ -24,6 +24,7 @@ import com.deltadental.pcp.calculation.interservice.PCPConfigData;
 import com.deltadental.pcp.config.interservice.pojo.GroupRestrictions;
 import com.deltadental.pcp.config.interservice.pojo.InclusionExclusion;
 import com.deltadental.pcp.interservice.PCPConfigServiceClient;
+
 @ExtendWith(MockitoExtension.class)
 public class PCPConfigDataTest {
 	@InjectMocks
@@ -40,18 +41,18 @@ public class PCPConfigDataTest {
 	
 	//@DisplayName("Test provider inclusion")
 	@Test
-	void testProviderInclusion() {
+	void testProviderInclusionNotListed() {
 		InclusionExclusion[] inclusionExclusions = new InclusionExclusion[1];
 		InclusionExclusion inclusionExclusion = getInclusionExclusion(); 
 		inclusionExclusions[0] = inclusionExclusion;
 		when(mockPCPConfigService.inclusions(anyString())).thenReturn(inclusionExclusions);
-		boolean inclusionFlag = pcpConfigData.isProviderInInclusionList("DC026845", "78672", "00001");
-		assertTrue(inclusionFlag);
+		boolean inclusionFlag = pcpConfigData.isProviderInInclusionList("DC060380", "75394", "00003");
+		assertFalse(inclusionFlag);
 	}
 	
 	//@DisplayName("Test provider inclusion not listed")
 	@Test
-	void testProviderInclusionNotListed() {
+	void testProviderInclusion() {
 		//pcpConfigData.setPcpConfigServiceClient(mockPCPConfigService);
 		//pcpConfigData.setWashRuleCutoffDay(16);
 		InclusionExclusion[] inclusionExclusions = new InclusionExclusion[1];
@@ -59,9 +60,10 @@ public class PCPConfigDataTest {
 		inclusionExclusion.setEffectiveDate("2022-04-01 00:00:00.0");
 		inclusionExclusions[0] = inclusionExclusion;
 		when(mockPCPConfigService.inclusions(anyString())).thenReturn(inclusionExclusions);
-		boolean inclusionFlag = pcpConfigData.isProviderInInclusionList("DC026845", "78662", "00001");
-		assertFalse(inclusionFlag);
+		boolean inclusionFlag = pcpConfigData.isProviderInInclusionList("DC060380", "75394", "00003");
+		assertTrue(inclusionFlag);
 	}
+	
 	
 	/*
 	@DisplayName("Test provider exclusion")
@@ -72,9 +74,11 @@ public class PCPConfigDataTest {
 		InclusionExclusion inclusionExclusion = getInclusionExclusion(); 
 		inclusionExclusions[0] = inclusionExclusion;
 		when(mockPCPConfigService.exclusions(anyString())).thenReturn(inclusionExclusions);
-		boolean inclusionFlag = pcpConfigData.isProviderInExclusionList("DC026845", "78672", "00001");
+		boolean inclusionFlag = pcpConfigData.isProviderInExclusionList("DC060380", "75394", "00003");
 		assertFalse(inclusionFlag);
 	}
+	
+	
 	
 	@DisplayName("Test provider exclusion not listed")
 	@Test
@@ -114,11 +118,11 @@ public class PCPConfigDataTest {
 	
 	private InclusionExclusion getInclusionExclusion() {
 		InclusionExclusion inclusionExclusion = new InclusionExclusion();
-		inclusionExclusion.setEffectiveDate("2022-05-01 00:00:00.0");
+		inclusionExclusion.setEffectiveDate("2022-07-04 00:00:00.0");
 		GroupRestrictions groupRestrictions = new GroupRestrictions();
-		groupRestrictions.setMasterContractId("DC026845");
-		groupRestrictions.setDivisionId("00001");
-		groupRestrictions.setGroupId("78672");
+		groupRestrictions.setMasterContractId("DC060380");
+		groupRestrictions.setDivisionId("00003");
+		groupRestrictions.setGroupId("75394");
 		inclusionExclusion.setGroupRestrictions(groupRestrictions);
 		return inclusionExclusion;
 	}

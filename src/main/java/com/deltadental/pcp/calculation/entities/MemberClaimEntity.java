@@ -78,7 +78,7 @@ public class MemberClaimEntity implements Serializable {
 	@Column(name = "services_number")
     private String servicesNumber;
 	
-	@Column(name = "creation_at")
+	@Column(name = "creation_at", updatable = false)
 	@CreationTimestamp
 	private Timestamp crationAt;
 

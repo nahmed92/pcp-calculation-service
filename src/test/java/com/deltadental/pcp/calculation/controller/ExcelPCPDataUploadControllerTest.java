@@ -44,7 +44,7 @@ public class ExcelPCPDataUploadControllerTest {
         byte[] bytes = Files.readAllBytes(f.toPath());
         MockMultipartFile file = new MockMultipartFile("Test",bytes);
         List<MemberContractClaimRequest> memberContractClaimRequests = buildMemberContractClaimRequests();
-        Mockito.when(excelService.hasExcelFormat(file)).thenReturn(true);
+        Mockito.when(excelService.isExcelFormat(file)).thenReturn(true);
         Mockito.when(excelService
                 .extractPCPMemberClaimsData(file)).thenReturn(memberContractClaimRequests);
         Mockito.doNothing().when(memberContractClaimService).stageMemberContractClaimRecords(memberContractClaimRequests);
@@ -58,7 +58,7 @@ public class ExcelPCPDataUploadControllerTest {
         byte[] bytes = Files.readAllBytes(f.toPath());
         MockMultipartFile file = new MockMultipartFile("Test",bytes);
         List<MemberContractClaimRequest> memberContractClaimRequests = buildMemberContractClaimRequests();
-        Mockito.when(excelService.hasExcelFormat(file)).thenReturn(false);
+        Mockito.when(excelService.isExcelFormat(file)).thenReturn(false);
         ResponseEntity<String> expectedResults = mockController.uploadPCPMemberClaims(file);
         Assertions.assertEquals(expectedResults.getStatusCode(), HttpStatus.BAD_REQUEST);
     }
@@ -68,7 +68,7 @@ public class ExcelPCPDataUploadControllerTest {
         File f = new File("src/test/resources/data/ExcelServiceTestData_empty.xlsx");
         byte[] bytes = Files.readAllBytes(f.toPath());
         MockMultipartFile file = new MockMultipartFile("Test",bytes);
-        Mockito.when(excelService.hasExcelFormat(file)).thenReturn(true);
+        Mockito.when(excelService.isExcelFormat(file)).thenReturn(true);
         Mockito.when(excelService
                 .extractPCPMemberClaimsData(file)).thenReturn(null);
         ResponseEntity<String> expectedResults = mockController.uploadPCPMemberClaims(file);
