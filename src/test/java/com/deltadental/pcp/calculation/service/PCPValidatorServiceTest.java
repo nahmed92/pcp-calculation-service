@@ -1,10 +1,12 @@
 package com.deltadental.pcp.calculation.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
+import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
+import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
+import com.deltadental.pcp.calculation.enums.Status;
+import com.deltadental.pcp.calculation.interservice.PCPConfigData;
+import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
 import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,29 +18,27 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClientException;
 
-import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
-import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
-import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
-import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
-import com.deltadental.pcp.calculation.enums.Status;
-import com.deltadental.pcp.calculation.interservice.PCPConfigData;
-import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @ExtendWith(MockitoExtension.class)
 public class PCPValidatorServiceTest {
-    
+
     @InjectMocks
     PCPValidatorService mockPCPValidatorService;
 
     @Mock
     MTVSyncServiceClient mockMTVSyncServiceClient;
 
-    @Mock 
+    @Mock
     PCPConfigData mockPCPConfigData;
 
     @Mock
     ContractMemberClaimRepo mockContractMemberClaimRepo;
 
-    @Mock 
+    @Mock
     PCPAssignmentService mockPCPAssignmentService;
 
     String serviceInstanceId;
@@ -46,18 +46,18 @@ public class PCPValidatorServiceTest {
     private static final List<Status> SEARCH_STATUS_VALIDATE = List.of(Status.RETRY, Status.STAGED);
 
     @BeforeEach
-    public void setup(){
+    public void setup() {
     }
 
     @Test
-    public void testValidatePending_success(){
+    public void testValidatePending_success() {
 
         ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
         List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
         spyList.add(contractEntity);
         MemberClaimResponse memberClaimResponse = buildMemberClaimResponse();
         Mockito.when(
-                mockContractMemberClaimRepo.findByInstanceIdWhereStatusInList(serviceInstanceId, SEARCH_STATUS_VALIDATE))
+                        mockContractMemberClaimRepo.findByInstanceIdWhereStatusInList(serviceInstanceId, SEARCH_STATUS_VALIDATE))
                 .thenReturn(spyList);
         Mockito.when(mockMTVSyncServiceClient.memberClaim(contractEntity.getClaimId())).thenReturn(memberClaimResponse);
 
@@ -78,7 +78,7 @@ public class PCPValidatorServiceTest {
     }
 
     @Test
-    public void testValidatePending_inclusionIsFalse(){
+    public void testValidatePending_inclusionIsFalse() {
 
         ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
         List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
@@ -106,7 +106,7 @@ public class PCPValidatorServiceTest {
     }
 
     @Test
-    public void testValidatePending_ExclusionIsFalse(){
+    public void testValidatePending_ExclusionIsFalse() {
 
         ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
         List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
@@ -133,7 +133,7 @@ public class PCPValidatorServiceTest {
     }
 
     @Test
-    public void testValidatePending_claimStatusIsFalse(){
+    public void testValidatePending_claimStatusIsFalse() {
 
         ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
         List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
@@ -160,7 +160,7 @@ public class PCPValidatorServiceTest {
     }
 
     @Test
-    public void testValidatePending_ExplainationCodeIsFalse(){
+    public void testValidatePending_ExplainationCodeIsFalse() {
 
         ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
         List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
@@ -187,7 +187,7 @@ public class PCPValidatorServiceTest {
     }
 
     @Test
-    public void testValidatePending_ProcedureCodeIsFalse(){
+    public void testValidatePending_ProcedureCodeIsFalse() {
 
         ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
         List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
@@ -214,7 +214,7 @@ public class PCPValidatorServiceTest {
     }
 
     @Test
-    public void testValidatePending_memberClaimResponseIsNull(){
+    public void testValidatePending_memberClaimResponseIsNull() {
 
         ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
         List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
@@ -230,7 +230,7 @@ public class PCPValidatorServiceTest {
     }
 
     @Test
-    public void testValidatePending_memberClaimResponseIsErrorCodeIsNull(){
+    public void testValidatePending_memberClaimResponseIsErrorCodeIsNull() {
 
         ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
         List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
@@ -247,7 +247,7 @@ public class PCPValidatorServiceTest {
     }
 
     @Test
-    public void testValidatePending_memberClaimResponseIsErrorMessageIsNull(){
+    public void testValidatePending_memberClaimResponseIsErrorMessageIsNull() {
 
         ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
         List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
@@ -264,7 +264,7 @@ public class PCPValidatorServiceTest {
     }
 
     @Test
-    public void testValidatePending_whenInclusionAndExclusionIsFalse(){
+    public void testValidatePending_whenInclusionAndExclusionIsFalse() {
 
         ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
         List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
@@ -285,7 +285,7 @@ public class PCPValidatorServiceTest {
     }
 
     @Test
-    public void testValidatePending_whenServiceLineIsEmpty(){
+    public void testValidatePending_whenServiceLineIsEmpty() {
 
         ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
         List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
@@ -307,7 +307,7 @@ public class PCPValidatorServiceTest {
     }
 
     @Test
-    public void testValidatePending_failure(){
+    public void testValidatePending_failure() {
 
         String expectedErrorMessage = "Exception occured during retriving member claim information from Metavance Sync Service. Test Exception";
         ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();

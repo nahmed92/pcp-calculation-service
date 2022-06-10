@@ -1,13 +1,12 @@
 package com.deltadental.pcp.calculation.scheduler;
 
+import com.deltadental.pcp.calculation.service.PCPValidatorService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
-import com.deltadental.pcp.calculation.service.PCPValidatorService;
 
 
 public class PCPValidateSchedulerTests {
@@ -19,12 +18,12 @@ public class PCPValidateSchedulerTests {
     PCPValidatorService mockPCPValidatorService;
 
     @BeforeEach
-    public void init(){
+    public void init() {
         MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    public void testProcess(){
+    public void testProcess() {
         Mockito.doNothing().when(mockPCPValidatorService).validatePending();
         mockPCPValidateScheduler.process();
     }

@@ -1,10 +1,8 @@
 package com.deltadental.pcp.calculation.controller;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
+import com.deltadental.pcp.calculation.service.ExcelService;
+import com.deltadental.pcp.calculation.service.MemberContractClaimService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,9 +15,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 
-import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
-import com.deltadental.pcp.calculation.service.ExcelService;
-import com.deltadental.pcp.calculation.service.MemberContractClaimService;
+import java.io.File;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 public class ExcelPCPDataUploadControllerTest {
@@ -34,15 +33,15 @@ public class ExcelPCPDataUploadControllerTest {
     ExcelService excelService;
 
     @BeforeEach
-    public void setup(){
+    public void setup() {
 
     }
 
     @Test
-    public void testUploadPCPMemberClaims_success() throws Exception{
+    public void testUploadPCPMemberClaims_success() throws Exception {
         File f = new File("src/test/resources/data/ExcelServiceTestData_empty.xlsx");
         byte[] bytes = Files.readAllBytes(f.toPath());
-        MockMultipartFile file = new MockMultipartFile("Test",bytes);
+        MockMultipartFile file = new MockMultipartFile("Test", bytes);
         List<MemberContractClaimRequest> memberContractClaimRequests = buildMemberContractClaimRequests();
         Mockito.when(excelService.isExcelFormat(file)).thenReturn(true);
         Mockito.when(excelService
@@ -53,10 +52,10 @@ public class ExcelPCPDataUploadControllerTest {
     }
 
     @Test
-    public void testUploadPCPMemberClaims_hasExcelFormatFalse() throws Exception{
+    public void testUploadPCPMemberClaims_hasExcelFormatFalse() throws Exception {
         File f = new File("src/test/resources/data/ExcelServiceTestData_empty.xlsx");
         byte[] bytes = Files.readAllBytes(f.toPath());
-        MockMultipartFile file = new MockMultipartFile("Test",bytes);
+        MockMultipartFile file = new MockMultipartFile("Test", bytes);
         List<MemberContractClaimRequest> memberContractClaimRequests = buildMemberContractClaimRequests();
         Mockito.when(excelService.isExcelFormat(file)).thenReturn(false);
         ResponseEntity<String> expectedResults = mockController.uploadPCPMemberClaims(file);
@@ -64,10 +63,10 @@ public class ExcelPCPDataUploadControllerTest {
     }
 
     @Test
-    public void testUploadPCPMemberClaims_RequestIsNull() throws Exception{
+    public void testUploadPCPMemberClaims_RequestIsNull() throws Exception {
         File f = new File("src/test/resources/data/ExcelServiceTestData_empty.xlsx");
         byte[] bytes = Files.readAllBytes(f.toPath());
-        MockMultipartFile file = new MockMultipartFile("Test",bytes);
+        MockMultipartFile file = new MockMultipartFile("Test", bytes);
         Mockito.when(excelService.isExcelFormat(file)).thenReturn(true);
         Mockito.when(excelService
                 .extractPCPMemberClaimsData(file)).thenReturn(null);
