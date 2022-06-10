@@ -1,65 +1,63 @@
 package com.deltadental.pcp.calculation.service;
 
-import java.util.List;
-
+import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
+import com.deltadental.pcp.calculation.enums.Status;
+import com.deltadental.pcp.calculation.mapper.Mapper;
+import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
-import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
-import com.deltadental.pcp.calculation.enums.Status;
-import com.deltadental.pcp.calculation.mapper.Mapper;
-import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
 
 @Service
 @Slf4j
 public class MemberContractClaimService {
 
-	@Autowired
-	private ContractMemberClaimRepo repo;
+    @Autowired
+    private ContractMemberClaimRepo repo;
 
-	@Autowired
-	private PCPValidatorService pcpValidatorService;
-	
-	@Autowired
-	private Mapper mapper;
+    @Autowired
+    private PCPValidatorService pcpValidatorService;
 
-	@Value("${service.instance.id}")
-	private String serviceInstanceId;
+    @Autowired
+    private Mapper mapper;
 
-	private static final List<Status> SEARCH_STATUS = List.of(Status.RETRY, Status.STAGED, Status.VALIDATED, Status.PCP_ASSIGNED, Status.PCP_EXCLUDED, Status.PCP_NOT_INCLUDED);
+    @Value("${service.instance.id}")
+    private String serviceInstanceId;
 
-	private void save(MemberContractClaimRequest request) {
-		log.info("START MemberContractClaimService.save");
-		List<ContractMemberClaimEntity> memberClaimsEntities = repo
-				.findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
-						StringUtils.trimToNull(request.getClaimId()), // check this and remove
-						StringUtils.trimToNull(request.getContractId()), StringUtils.trimToNull(request.getMemberId()),
-						StringUtils.trimToNull(request.getProviderId()), StringUtils.trimToNull(request.getState()),
-						SEARCH_STATUS);
+    private static final List<Status> SEARCH_STATUS = List.of(Status.RETRY, Status.STAGED, Status.VALIDATED, Status.PCP_ASSIGNED, Status.PCP_EXCLUDED, Status.PCP_NOT_INCLUDED);
 
-		if (CollectionUtils.isEmpty(memberClaimsEntities)) {
-			log.info("Inserting  {} ", request);
-			ContractMemberClaimEntity contractMemberClaimsEntity = mapper.map(request, serviceInstanceId);
-			repo.save(contractMemberClaimsEntity);
-			pcpValidatorService.validateAndAssignPCP(contractMemberClaimsEntity);
-		} else {
-			log.warn("Record already exists in contract member claims table : {} ", request);
-		}
-		log.info("END MemberContractClaimService.save");
-	}
+    private void save(MemberContractClaimRequest request) {
+        log.info("START MemberContractClaimService.save");
+        List<ContractMemberClaimEntity> memberClaimsEntities = repo
+                .findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
+                        StringUtils.trimToNull(request.getClaimId()), // check this and remove
+                        StringUtils.trimToNull(request.getContractId()), StringUtils.trimToNull(request.getMemberId()),
+                        StringUtils.trimToNull(request.getProviderId()), StringUtils.trimToNull(request.getState()),
+                        SEARCH_STATUS);
 
-	public void stageMemberContractClaimRecords(List<MemberContractClaimRequest> memberContractClaimRequests) {
-		log.info("START MemberContractClaimService.stageMemberContractClaimRecords");
-		if (CollectionUtils.isNotEmpty(memberContractClaimRequests)) {
-			memberContractClaimRequests.forEach(i -> save(i));
-		}
-		log.info("END MemberContractClaimService.stageMemberContractClaimRecords");
-	}
+        if (CollectionUtils.isEmpty(memberClaimsEntities)) {
+            log.info("Inserting  {} ", request);
+            ContractMemberClaimEntity contractMemberClaimsEntity = mapper.map(request, serviceInstanceId);
+            repo.save(contractMemberClaimsEntity);
+            pcpValidatorService.validateAndAssignPCP(contractMemberClaimsEntity);
+        } else {
+            log.warn("Record already exists in contract member claims table : {} ", request);
+        }
+        log.info("END MemberContractClaimService.save");
+    }
+
+    public void stageMemberContractClaimRecords(List<MemberContractClaimRequest> memberContractClaimRequests) {
+        log.info("START MemberContractClaimService.stageMemberContractClaimRecords");
+        if (CollectionUtils.isNotEmpty(memberContractClaimRequests)) {
+            memberContractClaimRequests.forEach(i -> save(i));
+        }
+        log.info("END MemberContractClaimService.stageMemberContractClaimRecords");
+    }
 
 }

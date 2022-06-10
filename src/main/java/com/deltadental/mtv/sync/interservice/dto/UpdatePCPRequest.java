@@ -1,14 +1,13 @@
 package com.deltadental.mtv.sync.interservice.dto;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -18,7 +17,7 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UpdatePCPRequest {
 
-	private String actionIndicator;
+    private String actionIndicator;
     private List<BenefitPackage> benefitPackage;
     private String benefitPackageId;
     private String contractID;
