@@ -53,9 +53,11 @@ public class MTVSyncServiceClient {
 			URI exclusionsUri = builder.buildAndExpand(params).toUri();
 			log.info("Request uri : {} ", exclusionsUri);
 			restTemplate.setErrorHandler(restTemplateErrorHandler);
-			ResponseEntity<MemberClaimResponse> responseEntity = restTemplate.getForEntity(exclusionsUri, MemberClaimResponse.class);
+			ResponseEntity<MemberClaimResponse[]> responseEntity = restTemplate.getForEntity(exclusionsUri, MemberClaimResponse[].class);
 			if(responseEntity != null && responseEntity.getBody() != null) {
-				memberClaimResponse = responseEntity.getBody();
+				// FIXME : Fix this later when service is ready, this is a temp fix
+				MemberClaimResponse[] memberClaimResponses = responseEntity.getBody();				
+				memberClaimResponse = memberClaimResponses[0];
 				log.info("Response for claim id {} is {} ",claimId, memberClaimResponse);
 			}			
 		} catch (RestClientException e) {
