@@ -98,8 +98,10 @@ public class PCPValidatorService {
 				entity.setStatus(Status.RETRY);
 			});
 		}
+		if(!memberWiseResponseMultiMap.isEmpty()) {
 		repo.saveAll(contractMemberClaimsEntities);
 		pcpAssignmentService(contractMemberClaimsEntities, memberWiseResponseMultiMap);
+		}
 		log.info("END PCPValidatorService.validateContractMemberClaim");
 	}
 

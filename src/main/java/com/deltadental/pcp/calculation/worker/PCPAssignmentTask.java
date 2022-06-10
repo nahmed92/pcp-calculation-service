@@ -66,9 +66,11 @@ public class PCPAssignmentTask implements Runnable {
 		log.info("START PCPCalculationService.processPCPAssignment.");
 		log.info("Processing {} ", contractMemberClaimEntity);
 		StringBuilder errorMessageBuilder = new StringBuilder();
+		List<String> memberClaimResponseList = List.of(contractMemberClaimEntity.getClaimId());
 		try {
-			MemberClaimResponse memberClaimResponse = null;
-				//	mtvSyncService.memberClaim(contractMemberClaimEntity.getClaimId());
+			List<MemberClaimResponse> memberClaimsResponse = mtvSyncService.memberClaim(memberClaimResponseList);
+			if(CollectionUtils.isNotEmpty(memberClaimsResponse)) {
+			MemberClaimResponse memberClaimResponse = memberClaimsResponse.get(0);
 			if (null != memberClaimResponse && (StringUtils.isBlank(memberClaimResponse.getErrorCode()) || StringUtils.isBlank(memberClaimResponse.getErrorMessage()))) {
 				boolean exclusionFlag = pcpConfigData.isProviderInExclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber());
 				boolean inclusionFlag = pcpConfigData.isProviderInInclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber());
@@ -128,6 +130,7 @@ public class PCPAssignmentTask implements Runnable {
 					log.info("Marking as {} for Claim id {} with member claim response {} ",Status.FAILED,contractMemberClaimEntity.getClaimId(),  errorMessageBuilder);
 					contractMemberClaimEntity.setErrorMessage(errorMessageBuilder.toString());
 				}
+			}
 			}
 		} catch (Exception e) {
 			log.error("Exception occured during retriving member claim information from Metavance Sync Service.", e);

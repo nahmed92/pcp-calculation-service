@@ -1,5 +1,6 @@
 package com.deltadental.pcp.calculation.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -41,28 +42,37 @@ public class MemberContractClaimService {
 		List<ContractMemberClaimEntity> entities = List.of();
 
 		if (CollectionUtils.isNotEmpty(requests)) {
-			for(MemberContractClaimRequest request: requests) {
 				// FIXME:
-				List<ContractMemberClaimEntity> memberClaimsEntities = repo
-						.findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
-								StringUtils.trimToNull(request.getClaimId()), // check this and remove
-								StringUtils.trimToNull(request.getContractId()),
-								StringUtils.trimToNull(request.getMemberId()),
-								StringUtils.trimToNull(request.getState()), SEARCH_STATUS);
-
-				if (CollectionUtils.isEmpty(memberClaimsEntities)) {
-					log.info("Inserting  {} ", requests);
-					entities = mapper.map(requests, serviceInstanceId);
+				List<MemberContractClaimRequest>  memberClaimRequests= getLatestMemberClaimsEntities(requests);
+				if (CollectionUtils.isNotEmpty(memberClaimRequests)) {
+					log.info("Inserting  {} ", memberClaimRequests);
+					entities = mapper.map(memberClaimRequests, serviceInstanceId);
 					// stage member contract
 					repo.saveAll(entities);
-				} else {
-					log.warn("Record already exists in contract member claims table : {} ", request);
-				}
-
-			}
+				} 
 		}
 		log.info("END MemberContractClaimService.save");
 		return entities;
+	}
+	
+	private List<MemberContractClaimRequest> getLatestMemberClaimsEntities(List<MemberContractClaimRequest> requests) {
+		List<MemberContractClaimRequest> memberClaimsRequests = new ArrayList<>();
+		for(MemberContractClaimRequest request: requests) {
+			// FIXME:
+			List<ContractMemberClaimEntity> memberClaimsEntities = repo
+					.findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
+							StringUtils.trimToNull(request.getClaimId()), // check this and remove
+							StringUtils.trimToNull(request.getContractId()),
+							StringUtils.trimToNull(request.getMemberId()),
+							StringUtils.trimToNull(request.getState()), SEARCH_STATUS);
+			if(CollectionUtils.isEmpty(memberClaimsEntities)) {
+				memberClaimsRequests.add(request);
+			} else {
+				log.warn("Record already exists in contract member claims table : {} ", request);
+			}
+		
+		}
+			return memberClaimsRequests;
 	}
 
 	public void stageMemberContractClaimRecords(List<MemberContractClaimRequest> memberContractClaimRequests) {
