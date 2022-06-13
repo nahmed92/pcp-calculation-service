@@ -17,10 +17,10 @@ import com.deltadental.pcp.calculation.enums.Status;
 public interface ContractMemberClaimRepo extends JpaRepository<ContractMemberClaimEntity, ContractMemberClaimPK> {
 
 	// FIXME: remove query
-	@Query("SELECT cmc FROM ContractMemberClaimEntity cmc WHERE  cmc.claimId = :claimId AND  cmc.contractId = :contractId AND  cmc.memberId = :memberId AND cmc.state = :state AND cmc.status in :status")
+	@Query("SELECT cmc FROM ContractMemberClaimEntity cmc WHERE  cmc.claimId = :claimId AND  cmc.contractId = :contractId AND  cmc.memberId = :memberId AND cmc.providerId = :providerId AND cmc.state = :state AND cmc.status in :status")
 	List<ContractMemberClaimEntity> findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
 			@Param("claimId") String claimId, @Param("contractId") String contractId,
-			@Param("memberId") String memberId, @Param("state") String state,
+			@Param("memberId") String memberId,  @Param("providerId") String providerId, @Param("state") String state,
 			@Param("status") List<Status> status);
 
 	@Query("SELECT cmc FROM ContractMemberClaimEntity cmc WHERE cmc.instanceId = :instanceId AND cmc.status in :status")
