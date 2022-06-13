@@ -1,8 +1,5 @@
 
-<<<<<<< HEAD
 EXEC sp_rename 'contract_member_claim', 'contract_member_claim_13062022';
-=======
->>>>>>> 82dc974d9bc318d520c119bcb236fa4a3e1b162a
 
 CREATE TABLE [dbo].[contract_member_claim] (
 	id varchar(200) NOT NULL,
