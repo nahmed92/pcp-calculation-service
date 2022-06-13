@@ -5,6 +5,7 @@ import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
 import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentResponse;
 import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimPK;
 import com.deltadental.pcp.calculation.entities.MemberClaimEntity;
 import com.deltadental.pcp.calculation.entities.MemberClaimServicesEntity;
 import com.deltadental.pcp.calculation.entities.MemberProviderEntity;
@@ -167,7 +168,10 @@ public class PCPAssignmentServiceTest {
 
     private ContractMemberClaimEntity buildContractMemberClaimEntity() {
         ContractMemberClaimEntity entity = new ContractMemberClaimEntity();
-        entity.setId("ID0011");
+        ContractMemberClaimPK id= new ContractMemberClaimPK();
+        id.setId("ID0011");
+        id.setSequenceId(2);
+        entity.setContractMemberClaimPK(id);
         entity.setContractId("C001");
         entity.setClaimId("CL001");
         entity.setProviderId("PR001");

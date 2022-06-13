@@ -1,15 +1,17 @@
 package com.deltadental.mtv.sync.interservice.dto;
 
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.List;
+
 import com.deltadental.pcp.calculation.util.TimestampDeserializer;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.sql.Timestamp;
-import java.util.List;
 
 
 @Data
@@ -36,6 +38,8 @@ public class MemberClaimResponse {
     private String memberFirstName;
     private String memberID;
     private String memberLastName;
+    private Date fromDate;
+    private Date thruDate;
 
 //    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss.SSSXXX")
 

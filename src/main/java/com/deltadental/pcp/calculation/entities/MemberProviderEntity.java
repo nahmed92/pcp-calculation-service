@@ -47,8 +47,8 @@ public class MemberProviderEntity implements Serializable {
     @Column(name = "operator_id")
     private String operatorId;
 
-    @Column(name = "contract_member_claim_id")
-    private String contractMemberClaimId;
+	@Column(name = "contract_member_claim_id")
+	private ContractMemberClaimPK contractMemberClaimId;
 
     @Column(name = "person_id")
     private String personId;

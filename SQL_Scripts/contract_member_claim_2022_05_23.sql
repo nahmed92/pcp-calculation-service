@@ -1,4 +1,5 @@
 
+EXEC sp_rename 'contract_member_claim', 'contract_member_claim_13062022';
 
 CREATE TABLE [dbo].[contract_member_claim] (
 	id varchar(200) NOT NULL,
@@ -10,13 +11,21 @@ CREATE TABLE [dbo].[contract_member_claim] (
 	state varchar(2) NOT NULL,
 	status varchar(15) NULL,
 	operator_id varchar(25) NULL,
-	creation_at datetime DEFAULT getdate() NULL,
+	created_at datetime DEFAULT getdate() NULL,
 	last_updated_at datetime DEFAULT getdate() NULL,
 	instance_id varchar(25) NULL,
-	error_message varchar(4096) NULL,
-	CONSTRAINT uq_claim_contract_member_claim_provider_state UNIQUE  (claim_id,contract_id,member_id,provider_id,state)
+	error_message varchar(4096) NULL
 );
 
 ALTER TABLE contract_member_claim ADD CONSTRAINT pk_contract_member_claim_id_sequence_id PRIMARY KEY (id,sequence_id)
 
+ALTER TABLE [dbo].[member_claim_service] ADD [from_date] date;
+
+ALTER TABLE [dbo].[member_claim_service] ADD [thru_date] date;
+
+ALTER TABLE [dbo].[member_claim_service] ADD [received_timestamp] datetime;	
+
 CREATE  INDEX [idx_instance_id_1] ON [dbo].[contract_member_claim](instance_id);
+
+CREATE  INDEX [idx_instance_id_2] ON [dbo].[contract_member_claim](claim_id, contract_id, provider_id,member_id, state);
+

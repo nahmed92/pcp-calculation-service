@@ -19,14 +19,12 @@ public class ContractMemberClaimEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @EqualsAndHashCode.Exclude
-    @Id
-    @Column(name = "id", nullable = false, unique = true)
-    private String id;
-
-    @Column(name = "claim_id")
-    private String claimId;
-
+	@EmbeddedId
+	private ContractMemberClaimPK contractMemberClaimPK;
+	
+	@Column(name = "claim_id")
+	private String claimId;
+	
     @Column(name = "contract_id")
     private String contractId;
 
