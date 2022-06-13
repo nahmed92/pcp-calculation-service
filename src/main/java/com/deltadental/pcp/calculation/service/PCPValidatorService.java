@@ -32,8 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PCPValidatorService {
 
-	@Autowired
-	private MTVSyncServiceClient mtvSyncService;
+    @Autowired
+    private MTVSyncServiceClient mtvSyncService;
 
 	@Autowired
 	private PCPConfigData pcpConfigData;

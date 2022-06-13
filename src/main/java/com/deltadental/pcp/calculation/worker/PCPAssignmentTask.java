@@ -1,13 +1,5 @@
 package com.deltadental.pcp.calculation.worker;
 
-import java.util.List;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
 import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
 import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
@@ -21,11 +13,17 @@ import com.deltadental.pcp.calculation.repos.MemberProviderRepo;
 import com.deltadental.pcp.calculation.service.PCPAssignmentService;
 import com.deltadental.pcp.search.interservice.PCPSearchServiceClient;
 import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,31 +33,31 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PCPAssignmentTask implements Runnable {
 
-	@Autowired
-	private PCPSearchServiceClient pcpSearchService;
-	
-	@Autowired
-	private MTVSyncServiceClient mtvSyncService;
-	
-	@Autowired
-	private PCPConfigData pcpConfigData;
+    @Autowired
+    private PCPSearchServiceClient pcpSearchService;
+
+    @Autowired
+    private MTVSyncServiceClient mtvSyncService;
+
+    @Autowired
+    private PCPConfigData pcpConfigData;
 
     @Autowired
     private MemberProviderRepo memberProviderRepo;
-	
-	@Autowired
-	private MemberClaimServicesRepo memberClaimServicesRepo;
-	
-	@Autowired
-	private MemberClaimRepo memberClaimRepo;
-	
-	@Autowired
-	private ContractMemberClaimRepo contractMemberClaimRepo; 
-	
-	@Autowired
-	private PCPAssignmentService pcpAssignmentService;
 
-	private ContractMemberClaimEntity contractMemberClaimEntity;
+    @Autowired
+    private MemberClaimServicesRepo memberClaimServicesRepo;
+
+    @Autowired
+    private MemberClaimRepo memberClaimRepo;
+
+    @Autowired
+    private ContractMemberClaimRepo contractMemberClaimRepo;
+
+    @Autowired
+    private PCPAssignmentService pcpAssignmentService;
+
+    private ContractMemberClaimEntity contractMemberClaimEntity;
 
 	@MethodExecutionTime
 	public void validateAndAssignProvider() {
@@ -141,15 +139,15 @@ public class PCPAssignmentTask implements Runnable {
 		contractMemberClaimRepo.save(contractMemberClaimEntity);
 		log.info("END PCPCalculationService.processPCPAssignment");
 	}
-
-	private void appendColon(StringBuilder strBuilder) {
-		if(strBuilder != null && strBuilder.length() > 0){
-			strBuilder.append(": ");
-		}
-	}
 	
-	@Override
-	public void run() {
-		validateAndAssignProvider();		
-	}
+    private void appendColon(StringBuilder strBuilder) {
+        if (strBuilder != null && strBuilder.length() > 0) {
+            strBuilder.append(": ");
+        }
+    }
+
+    @Override
+    public void run() {
+        validateAndAssignProvider();
+    }
 }

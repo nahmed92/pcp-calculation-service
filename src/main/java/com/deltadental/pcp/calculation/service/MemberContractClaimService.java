@@ -84,5 +84,4 @@ public class MemberContractClaimService {
 	}
 		log.info("END MemberContractClaimService.stageMemberContractClaimRecords");
 	}
-
 }
