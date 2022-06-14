@@ -22,10 +22,12 @@ public class Mapper {
 		String id = UUID.randomUUID().toString();
 		int sequence = 1;
 		for (MemberContractClaimRequest request : requests) {
-			ContractMemberClaimEntity entity = map(request, serviceInstanceId);
-			ContractMemberClaimPK pk = ContractMemberClaimPK.builder().id(id).sequenceId( sequence++).build();
-			entity.setContractMemberClaimPK(pk);
-			response.add(entity);
+			if(StringUtils.startsWithIgnoreCase(request.getProviderId(), "DC")) {
+				ContractMemberClaimEntity entity = map(request, serviceInstanceId);
+				ContractMemberClaimPK pk = ContractMemberClaimPK.builder().id(id).sequenceId( sequence++).build();
+				entity.setContractMemberClaimPK(pk);
+				response.add(entity);
+			}
 		}
 		return response;
 

@@ -32,7 +32,7 @@ public class MemberContractClaimService {
 	private String serviceInstanceId;
 
 	private static final List<Status> SEARCH_STATUS = List.of(Status.RETRY, Status.STAGED, Status.VALIDATED,
-			Status.PCP_ASSIGNED, Status.PCP_EXCLUDED, Status.PCP_NOT_INCLUDED);
+			Status.PCP_ASSIGNED, Status.PCP_EXCLUDED, Status.PCP_NOT_INCLUDED, Status.PCP_ALREADY_ASSIGNED);
 
 	private List<ContractMemberClaimEntity> save(List<MemberContractClaimRequest> requests) {
 		log.info("START MemberContractClaimService.save");
