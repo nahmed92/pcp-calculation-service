@@ -89,8 +89,13 @@ public class PCPAssignmentService {
                         saveMemberProvider(contractMemberClaimEntity.getContractMemberClaimPK(), providerAssignmentResponse, memberClaimResponse, pcpEffectiveDate, Status.PCP_ASSIGNED);
                         log.info("PCP Assignment status for claim id {} status is {}.", contractMemberClaimEntity.getClaimId(), Status.PCP_ASSIGNED);
                     } else {
-                        log.info("PCP Assignment status for claim id {} status is {} and error message is {}.", contractMemberClaimEntity.getClaimId(), Status.FAILED, String.join(" : ", providerAssignmentResponse.getErrorCode(), providerAssignmentResponse.getErrorMessage()));
-                        contractMemberClaimEntity.setStatus(Status.FAILED);
+                        if(StringUtils.equals(providerAssignmentResponse.getErrorCode(), "DCM-701") || StringUtils.contains(providerAssignmentResponse.getErrorMessage(), "Member has Prior PCP")) {
+                            log.info("PCP Assignment status for claim id {} status is {} and error message is {}.", contractMemberClaimEntity.getClaimId(), Status.PCP_ALREADY_ASSIGNED, String.join(" : ", providerAssignmentResponse.getErrorCode(), providerAssignmentResponse.getErrorMessage()));
+                            contractMemberClaimEntity.setStatus(Status.PCP_ALREADY_ASSIGNED);
+                        } else {
+                            log.info("PCP Assignment status for claim id {} status is {} and error message is {}.", contractMemberClaimEntity.getClaimId(), Status.FAILED, String.join(" : ", providerAssignmentResponse.getErrorCode(), providerAssignmentResponse.getErrorMessage()));
+                            contractMemberClaimEntity.setStatus(Status.FAILED);
+                        }
                         contractMemberClaimEntity.setErrorMessage(String.join(" : ", providerAssignmentResponse.getErrorCode(), providerAssignmentResponse.getErrorMessage()));
                     }
                 } catch (Exception e) {

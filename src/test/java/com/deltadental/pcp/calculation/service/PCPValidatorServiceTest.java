@@ -49,7 +49,7 @@ public class PCPValidatorServiceTest {
 
     String serviceInstanceId;
 
-    private static final List<Status> SEARCH_STATUS_VALIDATE = List.of(Status.RETRY, Status.STAGED);
+    private static final List<Status> SEARCH_STATUS_VALIDATE = List.of(Status.RETRY, Status.STAGED, Status.VALIDATED, Status.PCP_EXCLUDED, Status.PCP_NOT_INCLUDED);
 
     @BeforeEach
     public void setup() {

@@ -47,7 +47,7 @@ public class PCPValidatorService {
 
 	SimpleDateFormat df = new SimpleDateFormat("MM-dd-yyyy");
 
-	private static final List<Status> SEARCH_STATUS_VALIDATE = List.of(Status.RETRY, Status.STAGED);
+	private static final List<Status> SEARCH_STATUS_VALIDATE = List.of(Status.RETRY, Status.STAGED, Status.VALIDATED, Status.PCP_EXCLUDED, Status.PCP_NOT_INCLUDED);
 
 	@MethodExecutionTime
 	public void validateAndAssignPCP(List<ContractMemberClaimEntity> contractMemberClaimsEntities) {
