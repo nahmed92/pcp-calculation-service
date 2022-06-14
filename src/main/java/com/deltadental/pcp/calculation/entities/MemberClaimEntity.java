@@ -88,6 +88,9 @@ public class MemberClaimEntity implements Serializable {
 	private String operatorId;
 
 	@Column(name = "contract_member_claim_id")
-	private ContractMemberClaimPK contractMemberClaimId;
+	private String contractMemberClaimId;
+	
+	@Column(name = "contract_member_claim_sequence_id")
+	private Integer contract_member_claim_sequence_id;
 
 }

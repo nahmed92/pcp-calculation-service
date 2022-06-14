@@ -1,33 +1,30 @@
 package com.deltadental.mtv.sync.interservice;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-
 import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
 import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentRequest;
 import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentResponse;
 import com.deltadental.pcp.calculation.error.PCPCalculationServiceErrors;
 import com.deltadental.pcp.calculation.error.RestTemplateErrorHandler;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @NoArgsConstructor
 @Data
@@ -46,7 +43,8 @@ public class MTVSyncServiceClient {
 
 	public List<MemberClaimResponse> memberClaim(List<String> claimId) {
 		log.info("START MTVSyncServiceClient.memberClaim");
-		List<MemberClaimResponse> memberClaimResponse = null;
+		List<MemberClaimResponse> memberClaimResponse = List.of();
+		if(CollectionUtils.isNotEmpty(claimId)) {
 		try {
 			String updatePCPMemberEndPoint = pcpMtvSyncServiceEndpoint.concat(MTVSyncServiceConstants.MEMBER_CLAIM);
 			UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(updatePCPMemberEndPoint);
@@ -72,6 +70,7 @@ public class MTVSyncServiceClient {
 			log.error("Error calling MTV member claim for request claim id {}", claimId,e);
 			throw PCPCalculationServiceErrors.MTV_SYNC_CLAIM_SERVICE_ERROR.createException();
 		}
+	}
 		log.info("END MTVSyncServiceClient.memberClaim()");
 		return memberClaimResponse;
 	}

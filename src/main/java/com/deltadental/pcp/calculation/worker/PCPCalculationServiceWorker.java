@@ -80,7 +80,7 @@ public class PCPCalculationServiceWorker {
                     log.info("Processing pcp assignment request for contract member claim {}", contractMemberClaimEntity.toString());
                     submitTask(contractMemberClaimEntity);
                 } catch (Exception e) {
-                    log.error("Exception processing pcp assingment request for contract member claim {} ", contractMemberClaimEntity.toString(), e);
+                    log.error("Exception processing pcp assignment request for contract member claim {} ", contractMemberClaimEntity.toString(), e);
                 }
             });
             long endTime = System.currentTimeMillis();

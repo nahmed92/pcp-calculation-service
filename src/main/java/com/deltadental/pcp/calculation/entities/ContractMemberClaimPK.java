@@ -1,15 +1,10 @@
 package com.deltadental.pcp.calculation.entities;
 
-import java.io.Serializable;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import java.io.Serializable;
 
 @Data
 @Builder

@@ -1,18 +1,5 @@
 package com.deltadental.pcp.calculation.service;
 
-import java.text.SimpleDateFormat;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
 import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
 import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
@@ -23,9 +10,20 @@ import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
 import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.text.SimpleDateFormat;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @NoArgsConstructor
@@ -90,10 +88,10 @@ public class PCPValidatorService {
 			}
 
 		} catch (Exception e) {
-			log.error("Exception occured during retriving member claim information from Metavance Sync Service.", e);
+			log.error("Exception occurred during retrieving member claim information from Metavance Sync Service.", e);
 			contractMemberClaimsEntities.stream().forEach(entity -> {
 				entity.setErrorMessage(
-						"Exception occured during retriving member claim information from Metavance Sync Service. "
+						"Exception occurred during retrieving member claim information from Metavance Sync Service. "
 								+ e.getMessage());
 				entity.setStatus(Status.RETRY);
 			});

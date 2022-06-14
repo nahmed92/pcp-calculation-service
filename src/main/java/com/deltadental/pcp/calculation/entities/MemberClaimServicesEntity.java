@@ -53,10 +53,10 @@ public class MemberClaimServicesEntity implements Serializable {
 	@Column(name = "service_resolution_at")
 	private Date serviceResolutionAt;
 	
-	@Column(name = "fromDate")
+	@Column(name = "from_date")
 	private Date fromDate;
 	
-	@Column(name = "thruDate")
+	@Column(name = "thru_date")
 	private Date thruDate;
 
     @CreationTimestamp

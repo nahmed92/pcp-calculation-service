@@ -1,21 +1,19 @@
 package com.deltadental.pcp.calculation.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
+import com.deltadental.pcp.calculation.enums.Status;
+import com.deltadental.pcp.calculation.mapper.Mapper;
+import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
-import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
-import com.deltadental.pcp.calculation.enums.Status;
-import com.deltadental.pcp.calculation.mapper.Mapper;
-import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Slf4j

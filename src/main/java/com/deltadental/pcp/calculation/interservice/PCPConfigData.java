@@ -70,7 +70,7 @@ public class PCPConfigData implements InitializingBean {
         procedureCodes();
         log.info("Procedure codes : {} ", procedureCodes);
         log.info("Wash rule cutoff day {} ", washRuleCutoffDay);
-        log.info("PCP Effectice Date {} ", calculatePCPEffectiveDate());
+        log.info("PCP Effective Date {} ", calculatePCPEffectiveDate());
         setProviderLookAHeadDays(fetchProviderLookAHeadDays());
         log.info("Provider Look A Head Days {}", providerLookAHeadDays());
         log.info("END PCPConfigData.afterPropertiesSet");
@@ -225,12 +225,12 @@ public class PCPConfigData implements InitializingBean {
             if (CollectionUtils.isNotEmpty(exclusionList)) {
                 providerNotexclusionFlag = Boolean.valueOf(exclusionList.stream().anyMatch(exclusion -> matchExclusion(exclusion, providerId, group, division)));
                 if (providerNotexclusionFlag.booleanValue()) {
-                    log.info("Provider {}, Group {}, Division {} is not listed in exlusion list, exclusion flag {}", providerId, group, division, providerNotexclusionFlag);
+                    log.info("Provider {}, Group {}, Division {} is not listed in exclusion list, exclusion flag {}", providerId, group, division, providerNotexclusionFlag);
                 } else {
-                    log.info("Provider {}, Group {}, Division {} is listed in exlusion list, exclusion flag {}", providerId, group, division, providerNotexclusionFlag);
+                    log.info("Provider {}, Group {}, Division {} is listed in exclusion list, exclusion flag {}", providerId, group, division, providerNotexclusionFlag);
                 }
             } else {
-                log.info("Provider {}, Group {}, Division {} is not listed in exlusion list, exclusion flag {}", providerId, group, division, providerNotexclusionFlag);
+                log.info("Provider {}, Group {}, Division {} is not listed in exclusion list, exclusion flag {}", providerId, group, division, providerNotexclusionFlag);
             }
         }
         log.info("END PCPConfigData.isProviderInExclusionList {}, {}, {}", providerId, group, division);

@@ -1,17 +1,17 @@
 package com.deltadental.mtv.sync.interservice.dto;
-import java.sql.Timestamp;
-import java.util.Date;
 
 import com.deltadental.pcp.calculation.util.TimestampDeserializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.sql.Timestamp;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor

@@ -1,16 +1,15 @@
 package com.deltadental.pcp.calculation.repos;
 
-import java.util.List;
-
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimPK;
+import com.deltadental.pcp.calculation.enums.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
-import com.deltadental.pcp.calculation.entities.ContractMemberClaimPK;
-import com.deltadental.pcp.calculation.enums.Status;
+import java.util.List;
 
 @Repository
 @Transactional(readOnly = false)
