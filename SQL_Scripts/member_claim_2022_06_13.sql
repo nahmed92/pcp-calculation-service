@@ -22,9 +22,8 @@ CREATE TABLE dbo.member_claim (
 	operator_id varchar(25),
 	contract_member_claim_id varchar(200) NOT NULL,
 	contract_member_claim_sequence_id smallint NOT NULL,
-	CONSTRAINT pk_member_claim_id PRIMARY KEY (id)
+	CONSTRAINT pk_member_claim_id PRIMARY KEY (id),
 	
   FOREIGN KEY (contract_member_claim_id, contract_member_claim_sequence_id) REFERENCES contract_member_claim
   (id, sequence_id));
-);
 
