@@ -1,7 +1,0 @@
-SELECT CONSTRAINT_NAME, CONSTRAINT_TYPE
-FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-WHERE TABLE_NAME='contract_member_claim';
-
-
-ALTER TABLE contract_member_claim
-DROP CONSTRAINT uq_claim_contract_member_claim_provider_state;
