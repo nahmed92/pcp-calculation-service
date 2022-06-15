@@ -31,6 +31,7 @@ public class PCPConfigServiceClient {
 
     private static final String LOOK_A_HEAD_DAYS_90 = "90";
 
+    @MethodExecutionTime
     public String getPCPConfigData(String serviceEndPoint) {
         log.info("START PCPConfigServiceClient.pcpConfigData {} ", serviceEndPoint);
         String providerLookaheadDaysEndPoint = pcpConfigServiceEndpoint.concat(serviceEndPoint);
@@ -53,6 +54,7 @@ public class PCPConfigServiceClient {
         return null;
     }
 
+    @MethodExecutionTime
     public String providerLookaheadDays() {
         log.info("START PCPConfigServiceClient.providerLookaheadDays");
         String providerLookaheadDaysEndPoint = pcpConfigServiceEndpoint.concat(PROVIDER_LOOKAHEAD_DAYS);
@@ -76,72 +78,6 @@ public class PCPConfigServiceClient {
         log.info("END PCPConfigServiceClient.providerLookaheadDays");
         return returnValue;
     }
-
-//	public String explanationCode() {
-//		log.info("START PCPConfigServiceClient.explanationcode");
-//		final String explanationCode = pcpConfigServiceEndpoint.concat(EXPLANATION_CODE);
-//		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(explanationCode);
-//		String uriBuilder = builder.build().encode().toUriString();
-//		HttpHeaders headers = new HttpHeaders();
-//		headers.setContentType(MediaType.APPLICATION_JSON);
-//		try {
-//			ResponseEntity<String> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
-//			if(responseEntity.getStatusCode() == HttpStatus.OK) {
-//				return responseEntity.getBody();
-//			}else {
-//				log.error("Got {} response code from PCP Config API {} ",responseEntity.getStatusCode(),EXPLANATION_CODE);
-//			}
-//		} catch (RestClientException | URISyntaxException e) {
-//			log.error("Unable to call PCP Config for API {} ",EXPLANATION_CODE,e);
-//			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(e);
-//		}
-//		log.info("END PCPConfigServiceClient.explanationcode");
-//		return null;
-//	}
-//	
-//	public String procedureCode() {
-//		log.info("START PCPConfigServiceClient.explanationcode");
-//		final String procedureCode = pcpConfigServiceEndpoint.concat(PROCEDURE_CODE);
-//		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(procedureCode);
-//		String uriBuilder = builder.build().encode().toUriString();
-//		HttpHeaders headers = new HttpHeaders();
-//		headers.setContentType(MediaType.APPLICATION_JSON);
-//		try {
-//			ResponseEntity<String> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
-//			if(responseEntity.getStatusCode() == HttpStatus.OK) {
-//				return responseEntity.getBody();
-//			}else {
-//				log.error("Got {} response code from PCP Config API {} ",responseEntity.getStatusCode(),PROCEDURE_CODE);
-//			}
-//		} catch (RestClientException | URISyntaxException e) {
-//			log.error("Unable to call PCP Config for API {} ",PROCEDURE_CODE,e);
-//			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException();
-//		}
-//		log.info("END PCPConfigServiceClient.explanationcode");
-//		return null;
-//	}
-//	
-//	public String claimStatus() {
-//		log.info("START PCPConfigServiceClient.claimStatus");
-//		final String claimStatusUrl = pcpConfigServiceEndpoint.concat(CLAIM_STATUS);
-//		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(claimStatusUrl);
-//		String uriBuilder = builder.build().encode().toUriString();
-//		HttpHeaders headers = new HttpHeaders();
-//		headers.setContentType(MediaType.APPLICATION_JSON);
-//		try {
-//			ResponseEntity<String> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
-//			if(responseEntity.getStatusCode() == HttpStatus.OK) {
-//				return responseEntity.getBody();
-//			} else {
-//				log.error("Got {} response code from PCP Config API {} ",responseEntity.getStatusCode(),CLAIM_STATUS);
-//			}
-//		} catch (RestClientException | URISyntaxException e) {
-//			log.error("Unable to call PCP Config for API {} ",CLAIM_STATUS,e);
-//			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException();
-//		}
-//		log.info("END PCPConfigServiceClient.claimStatus");
-//		return null;
-//	}
 
     @MethodExecutionTime
     public InclusionExclusion[] exclusions(String providerId) {
