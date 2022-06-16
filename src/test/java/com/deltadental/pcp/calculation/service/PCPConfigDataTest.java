@@ -45,7 +45,7 @@ public class PCPConfigDataTest {
         InclusionExclusion inclusionExclusion = getInclusionExclusion();
         inclusionExclusions[0] = inclusionExclusion;
         when(mockPCPConfigService.inclusions(anyString())).thenReturn(inclusionExclusions);
-        boolean inclusionFlag = pcpConfigData.isProviderInInclusionList("DC060380", "75394", "00003");
+        boolean inclusionFlag = pcpConfigData.isProviderInInclusionList("DC060381", "75394", "00003");
         assertFalse(inclusionFlag);
     }
 
