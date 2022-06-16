@@ -10,13 +10,14 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.transaction.Transactional;
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 
-@Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@Getter
+@Setter
 @Builder
 @Transactional
 @EnableJpaAuditing
@@ -29,11 +30,11 @@ public class PCPCalculationActivityEntity implements java.io.Serializable {
     @Column(name = "id", nullable = false, unique = true)
     private String id;
 
-    @NonNull
+    @NotNull
     @Column(name = "instance_wise_data_load")
     private String instanceId;
 
-    @NonNull
+    @NotNull
     @Column(name = "num_of_records")
     private Integer numOfRecords;
 

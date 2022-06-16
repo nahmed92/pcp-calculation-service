@@ -207,7 +207,7 @@ public class PCPConfigData implements InitializingBean {
     @MethodExecutionTime
     public boolean isProviderInInclusionList(String providerId, String group, String division) {
         log.info("START PCPConfigData.isProviderInInclusionList()");
-        boolean inclusionFlag = Boolean.TRUE;
+        boolean inclusionFlag = true;
         if (StringUtils.isNotBlank(providerId) && StringUtils.isNotBlank(group) && StringUtils.isNotBlank(division)) {
             InclusionExclusion[] inclusions = pcpConfigServiceClient.inclusions(providerId);
             List<InclusionExclusion> inclusionList = Arrays.asList(inclusions);
@@ -229,13 +229,13 @@ public class PCPConfigData implements InitializingBean {
     @MethodExecutionTime
     public boolean isProviderInExclusionList(String providerId, String group, String division) {
         log.info("START PCPConfigData.isProviderInExclusionList {}, {}, {}", providerId, group, division);
-        boolean providerNotexclusionFlag = Boolean.TRUE;
+        boolean providerNotExclusionFlag = true;
         if (StringUtils.isNotBlank(providerId) && StringUtils.isNotBlank(group) && StringUtils.isNotBlank(division)) {
             InclusionExclusion[] exclusions = pcpConfigServiceClient.exclusions(providerId);
             List<InclusionExclusion> exclusionList = Arrays.asList(exclusions);
             if (CollectionUtils.isNotEmpty(exclusionList)) {
-                providerNotexclusionFlag = exclusionList.stream().anyMatch(exclusion -> matchExclusion(exclusion, providerId, group, division));
-                if (providerNotexclusionFlag) {
+                providerNotExclusionFlag = exclusionList.stream().anyMatch(exclusion -> matchExclusion(exclusion, providerId, group, division));
+                if (providerNotExclusionFlag) {
                     log.info("Provider {}, Group {}, Division {} is not listed in exclusion list, exclusion flag {}", providerId, group, division, true);
                 } else {
                     log.info("Provider {}, Group {}, Division {} is listed in exclusion list, exclusion flag {}", providerId, group, division, false);
@@ -245,7 +245,7 @@ public class PCPConfigData implements InitializingBean {
             }
         }
         log.info("END PCPConfigData.isProviderInExclusionList {}, {}, {}", providerId, group, division);
-        return providerNotexclusionFlag;
+        return providerNotExclusionFlag;
     }
 
     @MethodExecutionTime

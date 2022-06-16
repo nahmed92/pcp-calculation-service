@@ -1,9 +1,6 @@
 package com.deltadental.pcp.calculation.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -14,12 +11,12 @@ import javax.persistence.Table;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
-@Data
 @NoArgsConstructor
+@Getter
+@Setter
 @AllArgsConstructor
 @Builder
 @Entity
-
 @Table(name = "member_provider", schema = "dbo")
 public class MemberProviderEntity implements Serializable {
 
@@ -73,7 +70,7 @@ public class MemberProviderEntity implements Serializable {
 
     @CreationTimestamp
     @Column(name = "creation_at", updatable = false)
-    private Timestamp crationAt;
+    private Timestamp creationAt;
 
     @UpdateTimestamp
     @Column(name = "last_updated_at")

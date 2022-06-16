@@ -223,7 +223,7 @@ public class PCPAssignmentService {
                 MemberClaimServicesEntity memberClaimServicesEntity = MemberClaimServicesEntity.builder()
                         .claimType(serviceLine.getClaimType())
                         .encounterFlag(serviceLine.getEncounterFlag())
-                        .explnCode(serviceLine.getExplnCode())
+                        .explainCode(serviceLine.getExplnCode())
                         .procedureCode(serviceLine.getProcedureCode())
                         .sequenceNumber(serviceLine.getSequenceNumber())
                         .serviceNumber(serviceLine.getServiceNumber())

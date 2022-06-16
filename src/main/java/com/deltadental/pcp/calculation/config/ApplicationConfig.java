@@ -50,7 +50,7 @@ public class ApplicationConfig implements AsyncConfigurer {
     }
 
     private static void setMessageConverter(RestTemplate restTemplate) {
-        List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
+        List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         converter.setSupportedMediaTypes(Collections.singletonList(MediaType.ALL));
         messageConverters.add(new FormHttpMessageConverter());

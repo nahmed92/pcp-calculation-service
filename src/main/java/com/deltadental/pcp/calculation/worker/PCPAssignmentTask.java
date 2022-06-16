@@ -105,16 +105,15 @@ public class PCPAssignmentTask implements Runnable {
 					}
 				} else {
 					if (!exclusionFlag) {
-						errorMessageBuilder.append(String.format("Provider %s, Group %s, Division %s is listed in exlusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()));
+						errorMessageBuilder.append(String.format("Provider %s, Group %s, Division %s is listed in exclusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()));
 						contractMemberClaimEntity.setStatus(Status.PCP_EXCLUDED);
-						contractMemberClaimEntity.setErrorMessage(errorMessageBuilder.toString());
 					}
 					if (!inclusionFlag) {
 						appendColon(errorMessageBuilder);
 						errorMessageBuilder.append(String.format("Provider %s, Group %s, Division %s is not listed in inclusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()));
 						contractMemberClaimEntity.setStatus(Status.PCP_NOT_INCLUDED);
-						contractMemberClaimEntity.setErrorMessage(errorMessageBuilder.toString());
 					}
+					contractMemberClaimEntity.setErrorMessage(errorMessageBuilder.toString());
 				}
 			} else {
 				if (memberClaimResponse == null) {
