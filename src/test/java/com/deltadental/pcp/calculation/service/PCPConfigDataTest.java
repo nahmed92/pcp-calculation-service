@@ -35,7 +35,6 @@ public class PCPConfigDataTest {
     public void setup() {
         //MockitoAnnotations.initMocks(this);
         //pcpConfigData = new PCPConfigData();
-
     }
 
     //@DisplayName("Test provider inclusion")
@@ -62,7 +61,7 @@ public class PCPConfigDataTest {
         boolean inclusionFlag = pcpConfigData.isProviderInInclusionList("DC060380", "75394", "00003");
         assertTrue(inclusionFlag);
     }
-	
+
 	
 	/*
 	@DisplayName("Test provider exclusion")

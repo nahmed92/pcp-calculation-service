@@ -75,20 +75,22 @@ public class MemberClaimEntity implements Serializable {
 
     @Column(name = "services_number")
     private String servicesNumber;
+	
+	@Column(name = "creation_at", updatable = false)
+	@CreationTimestamp
+	private Timestamp crationAt;
 
-    @Column(name = "creation_at", updatable = false)
-    @CreationTimestamp
-    private Timestamp crationAt;
+	@Column(name = "last_updated_at")
+	@UpdateTimestamp
+	private Timestamp lastUpdatedAt;
+	
+	@Column(name = "operator_id")
+	private String operatorId;
 
-    @Column(name = "last_updated_at")
-    @UpdateTimestamp
-    private Timestamp lastUpdatedAt;
-
-    @Column(name = "operator_id")
-    private String operatorId;
-
-    @Column(name = "contract_member_claim_id")
-    private String contractMemberClaimId;
-
+	@Column(name = "contract_member_claim_id")
+	private String contractMemberClaimId;
+	
+	@Column(name = "contract_member_claim_sequence_id")
+	private Integer contract_member_claim_sequence_id;
 
 }

@@ -47,9 +47,6 @@ public class MemberProviderEntity implements Serializable {
     @Column(name = "operator_id")
     private String operatorId;
 
-    @Column(name = "contract_member_claim_id")
-    private String contractMemberClaimId;
-
     @Column(name = "person_id")
     private String personId;
 
@@ -81,5 +78,11 @@ public class MemberProviderEntity implements Serializable {
     @UpdateTimestamp
     @Column(name = "last_updated_at")
     private Timestamp lastUpdatedAt;
+    
+	@Column(name = "contract_member_claim_id")
+	private String contractMemberClaimId;
+	
+	@Column(name = "contract_member_claim_sequence_id")
+	private Integer contractMemberClaimSequenceId;
 
 }

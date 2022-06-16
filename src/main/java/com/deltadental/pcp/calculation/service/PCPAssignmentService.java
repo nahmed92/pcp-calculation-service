@@ -5,10 +5,7 @@ import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
 import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentRequest;
 import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentResponse;
 import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
-import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
-import com.deltadental.pcp.calculation.entities.MemberClaimEntity;
-import com.deltadental.pcp.calculation.entities.MemberClaimServicesEntity;
-import com.deltadental.pcp.calculation.entities.MemberProviderEntity;
+import com.deltadental.pcp.calculation.entities.*;
 import com.deltadental.pcp.calculation.enums.Status;
 import com.deltadental.pcp.calculation.interservice.PCPConfigData;
 import com.deltadental.pcp.calculation.repos.MemberClaimRepo;
@@ -51,7 +48,7 @@ public class PCPAssignmentService {
 
     private static final String REASON_CODE_5NEW = "5NEW";
 
-    private static final String DCM_SOURCESYSTEM = "DCM";
+    private static final String DCM_SOURCE_SYSTEM = "DCM";
 
     private static final String DC_PRODUCT = "DC";
 
@@ -96,23 +93,28 @@ public class PCPAssignmentService {
                         saveMemberProvider(contractMemberClaimEntity.getId(), providerAssignmentResponse, memberClaimResponse, pcpEffectiveDate);
                         log.info("PCP Assignment status for claim id {} status is {}.", contractMemberClaimEntity.getClaimId(), Status.PCP_ASSIGNED);
                     } else {
-                        log.info("PCP Assignment status for claim id {} status is {} and error message is {}.", contractMemberClaimEntity.getClaimId(), Status.FAILED, String.join(" : ", providerAssignmentResponse.getErrorCode(), providerAssignmentResponse.getErrorMessage()));
-                        contractMemberClaimEntity.setStatus(Status.FAILED);
+                        if(StringUtils.equals(providerAssignmentResponse.getErrorCode(), "DCM-701") || StringUtils.contains(providerAssignmentResponse.getErrorMessage(), "Member has Prior PCP")) {
+                            log.info("PCP Assignment status for claim id {} status is {} and error message is {}.", contractMemberClaimEntity.getClaimId(), Status.PCP_ALREADY_ASSIGNED, String.join(" : ", providerAssignmentResponse.getErrorCode(), providerAssignmentResponse.getErrorMessage()));
+                            contractMemberClaimEntity.setStatus(Status.PCP_ALREADY_ASSIGNED);
+                        } else {
+                            log.info("PCP Assignment status for claim id {} status is {} and error message is {}.", contractMemberClaimEntity.getClaimId(), Status.FAILED, String.join(" : ", providerAssignmentResponse.getErrorCode(), providerAssignmentResponse.getErrorMessage()));
+                            contractMemberClaimEntity.setStatus(Status.FAILED);
+                        }
                         contractMemberClaimEntity.setErrorMessage(String.join(" : ", providerAssignmentResponse.getErrorCode(), providerAssignmentResponse.getErrorMessage()));
                     }
                 } catch (Exception e) {
-                    log.error("Exception occured during provider assignment from metavance sync Service.", e);
+                    log.error("Exception occurred during provider assignment from metavance sync Service.", e);
                     contractMemberClaimEntity.setStatus(Status.RETRY);
-                    contractMemberClaimEntity.setErrorMessage("Exception occured during provider assignment from metavance sync Service.");
+                    contractMemberClaimEntity.setErrorMessage("Exception occurred during provider assignment from metavance sync Service.");
                 }
             } else {
                 contractMemberClaimEntity.setStatus(Status.FAILED);
                 contractMemberClaimEntity.setErrorMessage(pcpValidationMessage);
             }
         } catch (Exception e) {
-            log.error("Exception occured during pcp valiation from pcp search Service.", e);
+            log.error("Exception occurred during pcp validation from pcp search Service.", e);
             contractMemberClaimEntity.setStatus(Status.RETRY);
-            contractMemberClaimEntity.setErrorMessage("Exception occured during pcp valiation from pcp search Service.");
+            contractMemberClaimEntity.setErrorMessage("Exception occurred during pcp validation from pcp search Service.");
         }
         log.info("END PCPAssignmentService.process()");
     }
@@ -156,7 +158,7 @@ public class PCPAssignmentService {
                 .pcpEndDate(PCP_END_DATE_12_31_9999)
                 .providerId(memberClaimResponse.getProviderId())
                 .recordIdentifier(String.valueOf(random()))
-                .sourceSystem(DCM_SOURCESYSTEM)
+                .sourceSystem(DCM_SOURCE_SYSTEM)
                 .build();
         PCPValidateResponse pcpValidateResponse = pcpSearchService.pcpValidate(pcpValidateRequest);
         log.info("END PCPAssignmentService.callPCPValidate()");
@@ -174,7 +176,7 @@ public class PCPAssignmentService {
                 .providerContFlag("N")
                 .providerId(memberClaimResponse.getProviderId())
                 .reasonCode(REASON_CODE_5NEW)
-                .sourceSystem(DCM_SOURCESYSTEM)
+                .sourceSystem(DCM_SOURCE_SYSTEM)
                 .userId(OPERATORID_PCPCALS)
                 .build();
         log.info("START PCPAssignmentService.buildProviderAssignment()");
@@ -202,7 +204,8 @@ public class PCPAssignmentService {
                 .receivedAt(getTimestamp(memberClaimResponse.getReceivedTs().getNanos()))
                 .resolvedAt(getTimestamp(memberClaimResponse.getResolvedTs().getNanos()))
                 .servicesNumber(memberClaimResponse.getServicesNumber())
-                .contractMemberClaimId(contractMemberClaimsEntity.getId())
+                .contractMemberClaimId(contractMemberClaimsEntity.getContractMemberClaimPK().getId())
+                .contract_member_claim_sequence_id(contractMemberClaimsEntity.getContractMemberClaimPK().getSequenceId())
                 .operatorId(OPERATORID_PCPCALS)
                 .id(UUID.randomUUID().toString())
                 .build();
@@ -227,6 +230,8 @@ public class PCPAssignmentService {
                         .servicePaidAt(getTimestamp(serviceLine.getServicePaidTs().getNanos()))
                         .serviceResolutionAt(getTimestamp(serviceLine.getServiceResolutionTs().getNanos()))
                         .memberClaimId(memberClaimEntity.getId())
+                        .fromDate(serviceLine.getFromDate())
+                        .thruDate(serviceLine.getThruDate())
                         .operatorId(OPERATORID_PCPCALS)
                         .id(UUID.randomUUID().toString())
                         .build();
@@ -247,12 +252,13 @@ public class PCPAssignmentService {
                 .memberId(memberClaimResponse.getMemberID())
                 .pcpEffectiveDate(pcpEffectiveDate)
                 .reasonCode(REASON_CODE_5NEW)
-                .sourceSystem(DCM_SOURCESYSTEM)
+                .sourceSystem(DCM_SOURCE_SYSTEM)
                 .status(PCP_STATUS_INITIAL)
                 .operatorId(OPERATORID_PCPCALS)
                 .contractId(memberClaimResponse.getContractId())
-                .contractMemberClaimId(contractMemberClaimId)
                 .status(Status.PCP_ASSIGNED.name())
+                .contractMemberClaimId(contractMemberClaimId.getId())
+                .contractMemberClaimSequenceId(contractMemberClaimId.getSequenceId())
                 .providerId(memberClaimResponse.getProviderId())
                 .businessLevelAssnId(providerAssignmentResponse.getBusinessLevelAsnId())
                 .practiceLocationId(providerAssignmentResponse.getProviderLocationId())
