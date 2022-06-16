@@ -22,7 +22,7 @@ public class TimestampDeserializer extends StdDeserializer<Timestamp> {
         super(Timestamp.class);
     }
 
-    public TimestampDeserializer(Class<?> vc) {
+    public TimestampDeserializer(Class<Timestamp> vc) {
         super(vc);
     }
 
