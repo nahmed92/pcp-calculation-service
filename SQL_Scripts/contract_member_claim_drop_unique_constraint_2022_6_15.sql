@@ -1,3 +1,2 @@
-
 ALTER TABLE contract_member_claim
 DROP CONSTRAINT uq_claim_contract_member_claim_provider_state;
