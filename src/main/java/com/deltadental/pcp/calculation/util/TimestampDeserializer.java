@@ -1,6 +1,7 @@
 package com.deltadental.pcp.calculation.util;
 
 import com.deltadental.pcp.calculation.error.PCPCalculationServiceErrors;
+import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -27,14 +28,13 @@ public class TimestampDeserializer extends StdDeserializer<Timestamp> {
     }
 
     @Override
+    @MethodExecutionTime
     public Timestamp deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException, JacksonException {
         String dateStr = jsonParser.getText();
-        log.info("Parsing timestamp {} ", dateStr);
         try {
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSXXX");
             Date date = format.parse(dateStr);
             Timestamp ts = new Timestamp(date.getTime());
-            log.info("Parsed timestamp {} ", dateStr);
             return ts;
         } catch (Exception e) {
             log.error("Unable to parse timestamp {} ", dateStr);

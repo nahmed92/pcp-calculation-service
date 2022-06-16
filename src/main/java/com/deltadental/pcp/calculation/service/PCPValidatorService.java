@@ -15,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -41,6 +42,7 @@ public class PCPValidatorService {
     private static final List<Status> SEARCH_STATUS_VALIDATE = List.of(Status.RETRY, Status.STAGED);
 
     @MethodExecutionTime
+    @Transactional
     public void validateAndAssignPCP(ContractMemberClaimEntity contractMemberClaimsEntity) {
         log.info("START PCPValidatorService.validateContractMemberClaim");
         try {
@@ -72,6 +74,7 @@ public class PCPValidatorService {
         log.info("END PCPValidatorService.validateContractMemberClaim");
     }
 
+    @MethodExecutionTime
     public void validatePending() {
         log.info("START PCPValidatorService.validatePending()");
 

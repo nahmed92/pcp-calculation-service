@@ -3,6 +3,7 @@ package com.deltadental.pcp.calculation.mapper;
 import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
 import com.deltadental.pcp.calculation.enums.Status;
+import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +12,7 @@ import java.util.UUID;
 @Component
 public class Mapper {
 
+    @MethodExecutionTime
     public ContractMemberClaimEntity map(MemberContractClaimRequest request, String serviceInstanceId) {
         ContractMemberClaimEntity contractMemberClaimsEntity = ContractMemberClaimEntity.builder()
                 .id(UUID.randomUUID().toString())

@@ -1,6 +1,7 @@
 package com.deltadental.pcp.calculation.service;
 
 import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
+import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 import com.deltadental.platform.common.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -27,6 +28,7 @@ public class ExcelService {
         return CONTENT_TYPE_EXCEL.equals(file.getContentType());
     }
 
+    @MethodExecutionTime
     public List<MemberContractClaimRequest> extractPCPMemberClaimsData(MultipartFile pcpMemberClaimsDataFile) {
         log.info("START ExcelService.extractPCPMemberClaimsData()");
         List<MemberContractClaimRequest> memberContractClaims = new ArrayList<MemberContractClaimRequest>();

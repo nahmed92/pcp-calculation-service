@@ -19,12 +19,14 @@ import com.deltadental.pcp.search.interservice.PCPValidateRequest;
 import com.deltadental.pcp.search.interservice.PCPValidateResponse;
 import com.deltadental.pcp.search.interservice.pojo.EnrolleeDetail;
 import com.deltadental.pcp.search.interservice.pojo.PCPResponse;
+import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 import com.deltadental.platform.common.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -73,6 +75,8 @@ public class PCPAssignmentService {
     @Autowired
     private MemberClaimRepo memberClaimRepo;
 
+    @Transactional
+    @MethodExecutionTime
     public void process(ContractMemberClaimEntity contractMemberClaimEntity, MemberClaimResponse memberClaimResponse) {
         log.info("START PCPAssignmentService.process()");
         try {
@@ -113,6 +117,7 @@ public class PCPAssignmentService {
         log.info("END PCPAssignmentService.process()");
     }
 
+    @MethodExecutionTime
     private String getPCPValidationMessage(PCPValidateResponse pcpValidateResponse) {
         log.info("START PCPAssignmentService.getPCPValidationMessage()");
         String pcpValidationMessage = null;
@@ -138,6 +143,7 @@ public class PCPAssignmentService {
         return pcpValidationMessage;
     }
 
+    @MethodExecutionTime
     private PCPValidateResponse callPCPValidate(MemberClaimResponse memberClaimResponse, String pcpEffectiveDate) throws ServiceException {
         log.info("START PCPAssignmentService.callPCPValidate()");
         PCPValidateRequest pcpValidateRequest = PCPValidateRequest.builder()
@@ -157,6 +163,7 @@ public class PCPAssignmentService {
         return pcpValidateResponse;
     }
 
+    @MethodExecutionTime
     private ProviderAssignmentRequest buildProviderAssignment(MemberClaimResponse memberClaimResponse, String pcpEffectiveDate) {
         log.info("START PCPAssignmentService.buildProviderAssignment()");
         ProviderAssignmentRequest providerAssignmentRequest = ProviderAssignmentRequest.builder()
@@ -174,6 +181,8 @@ public class PCPAssignmentService {
         return providerAssignmentRequest;
     }
 
+    @MethodExecutionTime
+    @Transactional
     private MemberClaimEntity saveMemberClaimEntity(ContractMemberClaimEntity contractMemberClaimsEntity, MemberClaimResponse memberClaimResponse) {
         log.info("START PCPAssignmentService.saveMemberClaimEntity()");
         MemberClaimEntity memberClaimEntity = MemberClaimEntity.builder()
@@ -202,6 +211,8 @@ public class PCPAssignmentService {
         return memberClaimEntity;
     }
 
+    @MethodExecutionTime
+    @Transactional
     private void saveMemberClaimServices(MemberClaimEntity memberClaimEntity, List<ServiceLine> serviceLines) {
         log.info("START PCPAssignmentService.saveMemberClaimServices()");
         if (!serviceLines.isEmpty()) {
@@ -225,6 +236,8 @@ public class PCPAssignmentService {
         log.info("END PCPAssignmentService.saveMemberClaimServices()");
     }
 
+    @MethodExecutionTime
+    @Transactional
     private MemberProviderEntity saveMemberProvider(String contractMemberClaimId, ProviderAssignmentResponse providerAssignmentResponse, MemberClaimResponse memberClaimResponse, String pcpEffectiveDate, Status status) {
         log.info("START PCPAssignmentService.saveMemberProvider()");
         MemberProviderEntity memberProviderEntity = MemberProviderEntity.builder()

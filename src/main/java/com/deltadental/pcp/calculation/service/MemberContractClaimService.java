@@ -5,12 +5,14 @@ import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
 import com.deltadental.pcp.calculation.enums.Status;
 import com.deltadental.pcp.calculation.mapper.Mapper;
 import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
+import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -32,6 +34,8 @@ public class MemberContractClaimService {
 
     private static final List<Status> SEARCH_STATUS = List.of(Status.RETRY, Status.STAGED, Status.VALIDATED, Status.PCP_ASSIGNED, Status.PCP_EXCLUDED, Status.PCP_NOT_INCLUDED);
 
+    @Transactional
+    @MethodExecutionTime
     private void save(MemberContractClaimRequest request) {
         log.info("START MemberContractClaimService.save");
         List<ContractMemberClaimEntity> memberClaimsEntities = repo
@@ -52,6 +56,7 @@ public class MemberContractClaimService {
         log.info("END MemberContractClaimService.save");
     }
 
+    @MethodExecutionTime
     public void stageMemberContractClaimRecords(List<MemberContractClaimRequest> memberContractClaimRequests) {
         log.info("START MemberContractClaimService.stageMemberContractClaimRecords");
         if (CollectionUtils.isNotEmpty(memberContractClaimRequests)) {

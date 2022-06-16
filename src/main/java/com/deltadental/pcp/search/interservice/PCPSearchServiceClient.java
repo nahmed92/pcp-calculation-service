@@ -2,6 +2,7 @@ package com.deltadental.pcp.search.interservice;
 
 import com.deltadental.pcp.calculation.error.PCPCalculationServiceErrors;
 import com.deltadental.pcp.calculation.error.RestTemplateErrorHandler;
+import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ public class PCPSearchServiceClient {
     @Autowired(required = true)
     private RestTemplate restTemplate;
 
+    @MethodExecutionTime
     public PCPValidateResponse pcpValidate(PCPValidateRequest pcpValidateRequest) {
         log.info("START PCPSearchServiceClient.validateProvider");
         PCPValidateResponse pcpValidateResponse = null;
