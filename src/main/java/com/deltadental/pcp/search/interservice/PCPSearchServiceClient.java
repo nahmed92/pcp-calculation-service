@@ -2,6 +2,7 @@ package com.deltadental.pcp.search.interservice;
 
 import com.deltadental.pcp.calculation.error.PCPCalculationServiceErrors;
 import com.deltadental.pcp.calculation.error.RestTemplateErrorHandler;
+import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,9 +31,10 @@ public class PCPSearchServiceClient {
     @Autowired
     private RestTemplateErrorHandler restTemplateErrorHandler;
 
-    @Autowired(required = true)
+    @Autowired
     private RestTemplate restTemplate;
 
+    @MethodExecutionTime
     public PCPValidateResponse pcpValidate(PCPValidateRequest pcpValidateRequest) {
         log.info("START PCPSearchServiceClient.validateProvider");
         PCPValidateResponse pcpValidateResponse = null;
@@ -47,7 +49,7 @@ public class PCPSearchServiceClient {
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 return responseEntity.getBody();
             }
-            if (responseEntity != null && responseEntity.getBody() != null) {
+            if (responseEntity.getBody() != null) {
                 pcpValidateResponse = responseEntity.getBody();
                 log.info("Response for pcp validate response for request {} is {} ", pcpValidateRequest, pcpValidateResponse);
             }

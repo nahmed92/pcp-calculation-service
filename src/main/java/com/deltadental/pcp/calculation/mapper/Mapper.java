@@ -4,6 +4,7 @@ import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimPK;
 import com.deltadental.pcp.calculation.enums.Status;
+import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,7 @@ public class Mapper {
 	
 	SimpleDateFormat df = new SimpleDateFormat("MM-dd-yyyy");
 
+  @MethodExecutionTime
 	public List<ContractMemberClaimEntity> map(List<MemberContractClaimRequest> requests, String serviceInstanceId) {
 		List<ContractMemberClaimEntity> response = new ArrayList<>();
 		String id = UUID.randomUUID().toString();
@@ -44,5 +46,4 @@ public class Mapper {
 				.instanceId(StringUtils.trimToNull(serviceInstanceId)).status(Status.STAGED).build();
 		return entity;
 	}
-
 }

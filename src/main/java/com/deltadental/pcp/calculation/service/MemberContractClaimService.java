@@ -5,12 +5,14 @@ import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
 import com.deltadental.pcp.calculation.enums.Status;
 import com.deltadental.pcp.calculation.mapper.Mapper;
 import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
+import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +21,7 @@ import java.util.List;
 @Slf4j
 public class MemberContractClaimService {
 
-	@Autowired
+  @Autowired
 	private ContractMemberClaimRepo repo;
 
 	@Autowired
@@ -34,6 +36,8 @@ public class MemberContractClaimService {
 	private static final List<Status> SEARCH_STATUS = List.of(Status.RETRY, Status.STAGED, Status.VALIDATED,
 			Status.PCP_ASSIGNED, Status.PCP_EXCLUDED, Status.PCP_NOT_INCLUDED, Status.PCP_ALREADY_ASSIGNED);
 
+  @Transactional
+  @MethodExecutionTime
 	private List<ContractMemberClaimEntity> save(List<MemberContractClaimRequest> requests) {
 		log.info("START MemberContractClaimService.save");
 
@@ -74,6 +78,7 @@ public class MemberContractClaimService {
 			return memberClaimsRequests;
 	}
 
+  @MethodExecutionTime
 	public void stageMemberContractClaimRecords(List<MemberContractClaimRequest> memberContractClaimRequests) {
 		log.info("START MemberContractClaimService.stageMemberContractClaimRecords");
 		List<ContractMemberClaimEntity> entities = save(memberContractClaimRequests);

@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
@@ -50,6 +51,7 @@ public class PCPValidatorService {
 	private static final List<Status> SEARCH_STATUS_VALIDATE = List.of(Status.RETRY, Status.STAGED, Status.VALIDATED, Status.PCP_EXCLUDED, Status.PCP_NOT_INCLUDED);
 
 	@MethodExecutionTime
+  @Transactional
 	public void validateAndAssignPCP(List<ContractMemberClaimEntity> contractMemberClaimsEntities) {
 		log.info("START PCPValidatorService.validateContractMemberClaim");
 		Multimap<String, MemberClaimResponse> memberWiseResponseMultiMap = ArrayListMultimap.create();
