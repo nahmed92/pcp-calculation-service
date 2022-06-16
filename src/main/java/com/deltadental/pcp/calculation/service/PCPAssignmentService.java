@@ -36,7 +36,7 @@ import java.util.UUID;
 @Slf4j
 public class PCPAssignmentService {
 
-    private static final String OPERATORID_PCPCALS = "PCPCALS";
+    private static final String OPERATOR_PASCALS = "PCPCALS";
 
     private static final String PCP_ASSIGNMENT_OK = "OK";
 
@@ -90,7 +90,7 @@ public class PCPAssignmentService {
                         contractMemberClaimEntity.setStatus(Status.PCP_ASSIGNED);
                         MemberClaimEntity memberClaimEntity = saveMemberClaimEntity(contractMemberClaimEntity, memberClaimResponse);
                         saveMemberClaimServices(memberClaimEntity, memberClaimResponse.getServiceLines());
-                        saveMemberProvider(contractMemberClaimEntity.getId(), providerAssignmentResponse, memberClaimResponse, pcpEffectiveDate);
+                        saveMemberProvider(contractMemberClaimEntity.getContractMemberClaimPK(), providerAssignmentResponse, memberClaimResponse, pcpEffectiveDate);
                         log.info("PCP Assignment status for claim id {} status is {}.", contractMemberClaimEntity.getClaimId(), Status.PCP_ASSIGNED);
                     } else {
                         if(StringUtils.equals(providerAssignmentResponse.getErrorCode(), "DCM-701") || StringUtils.contains(providerAssignmentResponse.getErrorMessage(), "Member has Prior PCP")) {
@@ -177,7 +177,7 @@ public class PCPAssignmentService {
                 .providerId(memberClaimResponse.getProviderId())
                 .reasonCode(REASON_CODE_5NEW)
                 .sourceSystem(DCM_SOURCE_SYSTEM)
-                .userId(OPERATORID_PCPCALS)
+                .userId(OPERATOR_PASCALS)
                 .build();
         log.info("START PCPAssignmentService.buildProviderAssignment()");
         return providerAssignmentRequest;
@@ -206,7 +206,7 @@ public class PCPAssignmentService {
                 .servicesNumber(memberClaimResponse.getServicesNumber())
                 .contractMemberClaimId(contractMemberClaimsEntity.getContractMemberClaimPK().getId())
                 .contract_member_claim_sequence_id(contractMemberClaimsEntity.getContractMemberClaimPK().getSequenceId())
-                .operatorId(OPERATORID_PCPCALS)
+                .operatorId(OPERATOR_PASCALS)
                 .id(UUID.randomUUID().toString())
                 .build();
         memberClaimRepo.save(memberClaimEntity);
@@ -232,7 +232,7 @@ public class PCPAssignmentService {
                         .memberClaimId(memberClaimEntity.getId())
                         .fromDate(serviceLine.getFromDate())
                         .thruDate(serviceLine.getThruDate())
-                        .operatorId(OPERATORID_PCPCALS)
+                        .operatorId(OPERATOR_PASCALS)
                         .id(UUID.randomUUID().toString())
                         .build();
                 memberClaimServicesRepo.save(memberClaimServicesEntity);
@@ -243,7 +243,7 @@ public class PCPAssignmentService {
 
     @MethodExecutionTime
     @Transactional
-    private void saveMemberProvider(String contractMemberClaimId, ProviderAssignmentResponse providerAssignmentResponse, MemberClaimResponse memberClaimResponse, String pcpEffectiveDate) {
+    private void saveMemberProvider(ContractMemberClaimPK contractMemberClaimId, ProviderAssignmentResponse providerAssignmentResponse, MemberClaimResponse memberClaimResponse, String pcpEffectiveDate) {
         log.info("START PCPAssignmentService.saveMemberProvider()");
         MemberProviderEntity memberProviderEntity = MemberProviderEntity.builder()
                 .id(UUID.randomUUID().toString())
@@ -254,7 +254,7 @@ public class PCPAssignmentService {
                 .reasonCode(REASON_CODE_5NEW)
                 .sourceSystem(DCM_SOURCE_SYSTEM)
                 .status(PCP_STATUS_INITIAL)
-                .operatorId(OPERATORID_PCPCALS)
+                .operatorId(OPERATOR_PASCALS)
                 .contractId(memberClaimResponse.getContractId())
                 .status(Status.PCP_ASSIGNED.name())
                 .contractMemberClaimId(contractMemberClaimId.getId())

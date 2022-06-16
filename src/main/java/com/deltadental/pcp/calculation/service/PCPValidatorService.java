@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -45,21 +44,17 @@ public class PCPValidatorService {
 
 	@Value("${service.instance.id}")
 	private String serviceInstanceId;
-
-	SimpleDateFormat df = new SimpleDateFormat("MM-dd-yyyy");
-
 	private static final List<Status> SEARCH_STATUS_VALIDATE = List.of(Status.RETRY, Status.STAGED, Status.VALIDATED, Status.PCP_EXCLUDED, Status.PCP_NOT_INCLUDED);
 
 	@MethodExecutionTime
-  @Transactional
+  	@Transactional
 	public void validateAndAssignPCP(List<ContractMemberClaimEntity> contractMemberClaimsEntities) {
 		log.info("START PCPValidatorService.validateContractMemberClaim");
 		Multimap<String, MemberClaimResponse> memberWiseResponseMultiMap = ArrayListMultimap.create();
-
 		try {
 			List<MemberClaimResponse> memberClaimsResponse = mtvSyncService.memberClaim(getClaimIds(contractMemberClaimsEntities));
 			if (CollectionUtils.isNotEmpty(memberClaimsResponse)) {
-				memberClaimsResponse.stream().forEach(memberClaimResponse -> {
+				memberClaimsResponse.forEach(memberClaimResponse -> {
 					if (null != memberClaimResponse && (StringUtils.isBlank(memberClaimResponse.getErrorCode())
 							|| StringUtils.isBlank(memberClaimResponse.getErrorMessage()))) {
 						boolean exclusionFlag = pcpConfigData.isProviderInExclusionList(
@@ -68,7 +63,6 @@ public class PCPValidatorService {
 						boolean inclusionFlag = pcpConfigData.isProviderInInclusionList(
 								memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(),
 								memberClaimResponse.getDivisionNumber());
-						// TODO : Get more info on when to validate inclusion and exclusion list
 						if (exclusionFlag || inclusionFlag) {
 							List<ServiceLine> serviceLines = memberClaimResponse.getServiceLines();
 							if (CollectionUtils.isNotEmpty(serviceLines)) {
@@ -91,7 +85,7 @@ public class PCPValidatorService {
 
 		} catch (Exception e) {
 			log.error("Exception occurred during retrieving member claim information from Metavance Sync Service.", e);
-			contractMemberClaimsEntities.stream().forEach(entity -> {
+			contractMemberClaimsEntities.forEach(entity -> {
 				entity.setErrorMessage(
 						"Exception occurred during retrieving member claim information from Metavance Sync Service. "
 								+ e.getMessage());
@@ -105,6 +99,7 @@ public class PCPValidatorService {
 		log.info("END PCPValidatorService.validateContractMemberClaim");
 	}
 
+	@MethodExecutionTime
 	private void pcpAssignmentService(List<ContractMemberClaimEntity> contractMemberClaimEntities,
 			Multimap<String, MemberClaimResponse> memberWiseResponseMap) {
  		    contractMemberClaimEntities.forEach(contractMemberClaim -> {
@@ -114,34 +109,33 @@ public class PCPValidatorService {
 		});
 	}
 
+	@MethodExecutionTime
 	public MemberClaimResponse calculateLatestClaim(List<MemberClaimResponse> members) {
 		if(members.size()==1) {
 			return members.get(0);
 		}
 		for (MemberClaimResponse memberClaim : members) {
-			Date maxFromDate = memberClaim.getServiceLines().stream().map(u -> u.getFromDate()).max(Date::compareTo)
-					.get();
-			Date maxThruDate = memberClaim.getServiceLines().stream().map(u -> u.getThruDate()).max(Date::compareTo)
-					.get();
+			Date maxFromDate = memberClaim.getServiceLines().stream().map(ServiceLine::getFromDate).max(Date::compareTo).get();
+			Date maxThruDate = memberClaim.getServiceLines().stream().map(ServiceLine::getThruDate).max(Date::compareTo).get();
 			memberClaim.setFromDate(maxFromDate);
 			memberClaim.setThruDate(maxThruDate);
 		}
 		
 		MemberClaimResponse memberClaimResponse = null;
-		Optional<MemberClaimResponse> collectData = members.stream().collect(Collectors.maxBy(Comparator
+		Optional<MemberClaimResponse> collectData = members.stream().max(Comparator
 				.comparing(MemberClaimResponse::getFromDate).thenComparing(MemberClaimResponse::getThruDate)
-				.thenComparing(MemberClaimResponse::getReceivedTs)));
+				.thenComparing(MemberClaimResponse::getReceivedTs));
 		if (collectData.isPresent()) {
 			memberClaimResponse = collectData.get();
 		}
-
 		return memberClaimResponse;
 	}
 
 	private List<String> getClaimIds(List<ContractMemberClaimEntity> contractMemberClaimEntities) {
-		return contractMemberClaimEntities.stream().map(i -> i.getClaimId()).collect(Collectors.toList());
+		return contractMemberClaimEntities.stream().map(ContractMemberClaimEntity::getClaimId).collect(Collectors.toList());
 	}
 
+	@MethodExecutionTime
 	public void validatePending() {
 		log.info("START PCPValidatorService.validatePending()");
 
