@@ -309,7 +309,7 @@ public class PCPValidatorServiceTest {
     @Test
     public void testValidatePending_failure() {
 
-        String expectedErrorMessage = "Exception occured during retriving member claim information from Metavance Sync Service. Test Exception";
+        String expectedErrorMessage = "Exception occurred during retrieving member claim information from Metavance Sync Service. Test Exception";
         ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
         List<ContractMemberClaimEntity> spyList = Mockito.spy(ArrayList.class);
         spyList.add(contractEntity);

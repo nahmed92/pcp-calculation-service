@@ -31,7 +31,7 @@ public class PCPSearchServiceClient {
     @Autowired
     private RestTemplateErrorHandler restTemplateErrorHandler;
 
-    @Autowired(required = true)
+    @Autowired
     private RestTemplate restTemplate;
 
     @MethodExecutionTime
@@ -49,7 +49,7 @@ public class PCPSearchServiceClient {
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 return responseEntity.getBody();
             }
-            if (responseEntity != null && responseEntity.getBody() != null) {
+            if (responseEntity.getBody() != null) {
                 pcpValidateResponse = responseEntity.getBody();
                 log.info("Response for pcp validate response for request {} is {} ", pcpValidateRequest, pcpValidateResponse);
             }

@@ -60,7 +60,7 @@ public class MemberContractClaimService {
     public void stageMemberContractClaimRecords(List<MemberContractClaimRequest> memberContractClaimRequests) {
         log.info("START MemberContractClaimService.stageMemberContractClaimRecords");
         if (CollectionUtils.isNotEmpty(memberContractClaimRequests)) {
-            memberContractClaimRequests.forEach(i -> save(i));
+            memberContractClaimRequests.forEach(this::save);
         }
         log.info("END MemberContractClaimService.stageMemberContractClaimRecords");
     }

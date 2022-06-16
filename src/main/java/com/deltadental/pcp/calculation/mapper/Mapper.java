@@ -14,7 +14,7 @@ public class Mapper {
 
     @MethodExecutionTime
     public ContractMemberClaimEntity map(MemberContractClaimRequest request, String serviceInstanceId) {
-        ContractMemberClaimEntity contractMemberClaimsEntity = ContractMemberClaimEntity.builder()
+        return ContractMemberClaimEntity.builder()
                 .id(UUID.randomUUID().toString())
                 .claimId(StringUtils.trimToNull(request.getClaimId()))
                 .contractId(StringUtils.trimToNull(request.getContractId()))
@@ -23,7 +23,6 @@ public class Mapper {
                 .state(StringUtils.trimToNull(request.getState()))
                 .operatorId(StringUtils.trimToNull(request.getOperatorId()))
                 .instanceId(StringUtils.trimToNull(serviceInstanceId)).status(Status.STAGED).build();
-        return contractMemberClaimsEntity;
     }
 
 }

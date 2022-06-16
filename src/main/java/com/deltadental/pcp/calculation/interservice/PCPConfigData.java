@@ -48,8 +48,8 @@ public class PCPConfigData implements InitializingBean {
     @Autowired
     private PCPConfigServiceClient pcpConfigServiceClient;
 
-    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S", Locale.US);
-    private final DateFormat mmddyyyyFormatter = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S", Locale.US);
+    private static final DateFormat MM_DD_YYYY_FORMATTER = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
     private static final String ZONE_ID = "America/Los_Angeles";
 
     private List<PcpConfigResponse> claimStatusList = new ArrayList<>();
@@ -59,7 +59,7 @@ public class PCPConfigData implements InitializingBean {
 
     @MethodExecutionTime
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         log.info("START PCPConfigData.afterPropertiesSet");
         claimStatusList.clear();
         procedureCodes.clear();
@@ -72,7 +72,7 @@ public class PCPConfigData implements InitializingBean {
         procedureCodes();
         log.info("Procedure codes : {} ", procedureCodes);
         log.info("Wash rule cutoff day {} ", washRuleCutoffDay);
-        log.info("PCP Effectice Date {} ", calculatePCPEffectiveDate());
+        log.info("PCP Effective Date {} ", calculatePCPEffectiveDate());
         setProviderLookAHeadDays(fetchProviderLookAHeadDays());
         log.info("Provider Look A Head Days {}", providerLookAHeadDays());
         log.info("END PCPConfigData.afterPropertiesSet");
@@ -97,12 +97,11 @@ public class PCPConfigData implements InitializingBean {
     private List<PcpConfigResponse> getPcpConfigResponseList(String jsonString) {
         try {
             JsonNode jsonNode = objectMapper.readTree(jsonString);
-            List<PcpConfigResponse> explnCodesList = objectMapper.convertValue(jsonNode,
+            return objectMapper.convertValue(jsonNode,
                     new TypeReference<List<PcpConfigResponse>>() {
                     });
-            return explnCodesList;
         } catch (Exception e) {
-            return new ArrayList<PcpConfigResponse>();
+            return new ArrayList<>();
         }
     }
 
@@ -155,7 +154,7 @@ public class PCPConfigData implements InitializingBean {
                 isClaimStatusValid = claimStatusList.stream().anyMatch(pcpConfigResponse -> StringUtils.equals(pcpConfigResponse.getCodeValue(), claimStatus));
             }
         } catch (Exception e) {
-            isClaimStatusValid = false;
+            log.error("Unknown exception occurred in checking claim status returning  {}", false);
         }
         log.info("Claim Status Valid {} ", isClaimStatusValid);
         return isClaimStatusValid;
@@ -208,45 +207,45 @@ public class PCPConfigData implements InitializingBean {
     @MethodExecutionTime
     public boolean isProviderInInclusionList(String providerId, String group, String division) {
         log.info("START PCPConfigData.isProviderInInclusionList()");
-        Boolean inclusionFlag = Boolean.TRUE;
+        boolean inclusionFlag = Boolean.TRUE;
         if (StringUtils.isNotBlank(providerId) && StringUtils.isNotBlank(group) && StringUtils.isNotBlank(division)) {
             InclusionExclusion[] inclusions = pcpConfigServiceClient.inclusions(providerId);
             List<InclusionExclusion> inclusionList = Arrays.asList(inclusions);
             if (CollectionUtils.isNotEmpty(inclusionList)) {
-                inclusionFlag = Boolean.valueOf(inclusionList.stream().anyMatch(inclusion -> matchInclusion(inclusion, providerId, group, division)));
-                if (inclusionFlag.booleanValue()) {
-                    log.info("Provider {}, Group {}, Division {} is listed in inclusion list, inclusion flag {}.", providerId, group, division, inclusionFlag);
+                inclusionFlag = inclusionList.stream().anyMatch(inclusion -> matchInclusion(inclusion, providerId, group, division));
+                if (inclusionFlag) {
+                    log.info("Provider {}, Group {}, Division {} is listed in inclusion list, inclusion flag {}.", providerId, group, division, true);
                 } else {
-                    log.info("Provider {}, Group {}, Division {} is not listed in inclusion list, inclusion flag {}.", providerId, group, division, inclusionFlag);
+                    log.info("Provider {}, Group {}, Division {} is not listed in inclusion list, inclusion flag {}.", providerId, group, division, false);
                 }
             } else {
-                log.info("Provider {}, Group {}, Division {} is not listed in inclusion list, inclusion flag {}.", providerId, group, division, inclusionFlag);
+                log.info("Provider {}, Group {}, Division {} is not listed in inclusion list, inclusion flag {}.", providerId, group, division, true);
             }
         }
         log.info("END PCPConfigData.isProviderInInclusionList()");
-        return inclusionFlag.booleanValue();
+        return inclusionFlag;
     }
 
     @MethodExecutionTime
     public boolean isProviderInExclusionList(String providerId, String group, String division) {
         log.info("START PCPConfigData.isProviderInExclusionList {}, {}, {}", providerId, group, division);
-        Boolean providerNotexclusionFlag = Boolean.TRUE;
+        boolean providerNotexclusionFlag = Boolean.TRUE;
         if (StringUtils.isNotBlank(providerId) && StringUtils.isNotBlank(group) && StringUtils.isNotBlank(division)) {
             InclusionExclusion[] exclusions = pcpConfigServiceClient.exclusions(providerId);
             List<InclusionExclusion> exclusionList = Arrays.asList(exclusions);
             if (CollectionUtils.isNotEmpty(exclusionList)) {
-                providerNotexclusionFlag = Boolean.valueOf(exclusionList.stream().anyMatch(exclusion -> matchExclusion(exclusion, providerId, group, division)));
-                if (providerNotexclusionFlag.booleanValue()) {
-                    log.info("Provider {}, Group {}, Division {} is not listed in exlusion list, exclusion flag {}", providerId, group, division, providerNotexclusionFlag);
+                providerNotexclusionFlag = exclusionList.stream().anyMatch(exclusion -> matchExclusion(exclusion, providerId, group, division));
+                if (providerNotexclusionFlag) {
+                    log.info("Provider {}, Group {}, Division {} is not listed in exclusion list, exclusion flag {}", providerId, group, division, true);
                 } else {
-                    log.info("Provider {}, Group {}, Division {} is listed in exlusion list, exclusion flag {}", providerId, group, division, providerNotexclusionFlag);
+                    log.info("Provider {}, Group {}, Division {} is listed in exclusion list, exclusion flag {}", providerId, group, division, false);
                 }
             } else {
-                log.info("Provider {}, Group {}, Division {} is not listed in exlusion list, exclusion flag {}", providerId, group, division, providerNotexclusionFlag);
+                log.info("Provider {}, Group {}, Division {} is not listed in exclusion list, exclusion flag {}", providerId, group, division, true);
             }
         }
         log.info("END PCPConfigData.isProviderInExclusionList {}, {}, {}", providerId, group, division);
-        return providerNotexclusionFlag.booleanValue();
+        return providerNotexclusionFlag;
     }
 
     @MethodExecutionTime
@@ -255,15 +254,15 @@ public class PCPConfigData implements InitializingBean {
         ZoneId defaultZoneId = ZoneId.of(ZONE_ID);
         LocalDate now = LocalDate.now(defaultZoneId);
         int currentDateDay = now.getDayOfMonth();
-        String pcpEffectiveDate = null;
+        String pcpEffectiveDate;
         if (currentDateDay < washRuleCutoffDay) {
             LocalDate firstDayOfMonth = LocalDate.now(defaultZoneId).with(TemporalAdjusters.firstDayOfMonth());
             Date firstDateOfMonth = Date.from(firstDayOfMonth.atStartOfDay(defaultZoneId).toInstant());
-            pcpEffectiveDate = mmddyyyyFormatter.format(firstDateOfMonth);
+            pcpEffectiveDate = MM_DD_YYYY_FORMATTER.format(firstDateOfMonth);
         } else {
             LocalDate firstDayOfNextMonth = LocalDate.now(defaultZoneId).with(TemporalAdjusters.firstDayOfNextMonth());
             Date firstDateOfNextMonth = Date.from(firstDayOfNextMonth.atStartOfDay(defaultZoneId).toInstant());
-            pcpEffectiveDate = mmddyyyyFormatter.format(firstDateOfNextMonth);
+            pcpEffectiveDate = MM_DD_YYYY_FORMATTER.format(firstDateOfNextMonth);
         }
         log.info("END : PCPConfigData.calculatePCPEffectiveDate {} !", pcpEffectiveDate);
         return pcpEffectiveDate;

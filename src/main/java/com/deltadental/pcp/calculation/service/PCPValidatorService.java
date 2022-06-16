@@ -66,8 +66,8 @@ public class PCPValidatorService {
                 }
             }
         } catch (Exception e) {
-            log.error("Exception occured during retriving member claim information from Metavance Sync Service.", e);
-            contractMemberClaimsEntity.setErrorMessage("Exception occured during retriving member claim information from Metavance Sync Service. " + e.getMessage());
+            log.error("Exception occurred during retrieving member claim information from Metavance Sync Service.", e);
+            contractMemberClaimsEntity.setErrorMessage("Exception occurred during retrieving member claim information from Metavance Sync Service. " + e.getMessage());
             contractMemberClaimsEntity.setStatus(Status.RETRY);
         }
         repo.save(contractMemberClaimsEntity);
@@ -80,7 +80,7 @@ public class PCPValidatorService {
 
         List<ContractMemberClaimEntity> recordsToValidate = repo.findByInstanceIdWhereStatusInList(serviceInstanceId, SEARCH_STATUS_VALIDATE);
 
-        recordsToValidate.forEach(i -> validateAndAssignPCP(i));
+        recordsToValidate.forEach(this::validateAndAssignPCP);
 
         log.info("END PCPValidatorService.validatePending()");
     }

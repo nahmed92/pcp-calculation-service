@@ -93,7 +93,7 @@ public class PCPAssignmentService {
                         contractMemberClaimEntity.setStatus(Status.PCP_ASSIGNED);
                         MemberClaimEntity memberClaimEntity = saveMemberClaimEntity(contractMemberClaimEntity, memberClaimResponse);
                         saveMemberClaimServices(memberClaimEntity, memberClaimResponse.getServiceLines());
-                        saveMemberProvider(contractMemberClaimEntity.getId(), providerAssignmentResponse, memberClaimResponse, pcpEffectiveDate, Status.PCP_ASSIGNED);
+                        saveMemberProvider(contractMemberClaimEntity.getId(), providerAssignmentResponse, memberClaimResponse, pcpEffectiveDate);
                         log.info("PCP Assignment status for claim id {} status is {}.", contractMemberClaimEntity.getClaimId(), Status.PCP_ASSIGNED);
                     } else {
                         log.info("PCP Assignment status for claim id {} status is {} and error message is {}.", contractMemberClaimEntity.getClaimId(), Status.FAILED, String.join(" : ", providerAssignmentResponse.getErrorCode(), providerAssignmentResponse.getErrorMessage()));
@@ -238,7 +238,7 @@ public class PCPAssignmentService {
 
     @MethodExecutionTime
     @Transactional
-    private MemberProviderEntity saveMemberProvider(String contractMemberClaimId, ProviderAssignmentResponse providerAssignmentResponse, MemberClaimResponse memberClaimResponse, String pcpEffectiveDate, Status status) {
+    private void saveMemberProvider(String contractMemberClaimId, ProviderAssignmentResponse providerAssignmentResponse, MemberClaimResponse memberClaimResponse, String pcpEffectiveDate) {
         log.info("START PCPAssignmentService.saveMemberProvider()");
         MemberProviderEntity memberProviderEntity = MemberProviderEntity.builder()
                 .id(UUID.randomUUID().toString())
@@ -252,7 +252,7 @@ public class PCPAssignmentService {
                 .operatorId(OPERATORID_PCPCALS)
                 .contractId(memberClaimResponse.getContractId())
                 .contractMemberClaimId(contractMemberClaimId)
-                .status(status.name())
+                .status(Status.PCP_ASSIGNED.name())
                 .providerId(memberClaimResponse.getProviderId())
                 .businessLevelAssnId(providerAssignmentResponse.getBusinessLevelAsnId())
                 .practiceLocationId(providerAssignmentResponse.getProviderLocationId())
@@ -261,12 +261,10 @@ public class PCPAssignmentService {
                 .build();
         memberProviderRepo.save(memberProviderEntity);
         log.info("END PCPAssignmentService.saveMemberProvider()");
-        return memberProviderEntity;
     }
 
     private Timestamp getTimestamp(int nanos) {
-        Timestamp ts = new Timestamp(nanos);
-        return ts;
+        return new Timestamp(nanos);
     }
 
     private int random() {

@@ -31,7 +31,7 @@ public class ExcelService {
     @MethodExecutionTime
     public List<MemberContractClaimRequest> extractPCPMemberClaimsData(MultipartFile pcpMemberClaimsDataFile) {
         log.info("START ExcelService.extractPCPMemberClaimsData()");
-        List<MemberContractClaimRequest> memberContractClaims = new ArrayList<MemberContractClaimRequest>();
+        List<MemberContractClaimRequest> memberContractClaims = new ArrayList<>();
         try (InputStream is = pcpMemberClaimsDataFile.getInputStream(); Workbook workbook = new XSSFWorkbook(is)) {
             Sheet firstSheet = workbook.getSheetAt(0);
             Iterator<Row> rows = firstSheet.iterator();
