@@ -18,6 +18,10 @@ public class TimestampDeserializer extends StdDeserializer<Timestamp> {
 
     private static final long serialVersionUID = 1L;
 
+    public TimestampDeserializer() {
+        super(Timestamp.class);
+    }
+
     public TimestampDeserializer(Class<?> vc) {
         super(vc);
     }
