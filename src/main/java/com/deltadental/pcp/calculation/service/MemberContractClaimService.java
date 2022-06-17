@@ -44,7 +44,7 @@ public class MemberContractClaimService {
         if (CollectionUtils.isNotEmpty(requests)) {
             // FIXME:
             List<MemberContractClaimRequest> memberClaimRequests = getLatestMemberClaimsEntities(requests);
-            if (CollectionUtils.isEmpty(memberClaimRequests)) {
+            if (CollectionUtils.isNotEmpty(memberClaimRequests)) {
                 log.info("Inserting  {} ", memberClaimRequests);
                 entities = mapper.map(memberClaimRequests, serviceInstanceId);
                 // stage member contract

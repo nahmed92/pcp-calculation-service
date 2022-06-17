@@ -135,10 +135,6 @@ public class PCPValidatorService {
 		return memberClaimResponse;
 	}
 
-	private List<String> getClaimIds(List<ContractMemberClaimEntity> contractMemberClaimEntities) {
-		return contractMemberClaimEntities.stream().map(ContractMemberClaimEntity::getClaimId).collect(Collectors.toList());
-	}
-
 	@MethodExecutionTime
 	public void validatePending() {
 		log.info("START PCPValidatorService.validatePending()");

@@ -1,14 +1,9 @@
 package com.deltadental.pcp.calculation.service;
 
-import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
-import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
-import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
-import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
-import com.deltadental.pcp.calculation.entities.ContractMemberClaimPK;
-import com.deltadental.pcp.calculation.enums.Status;
-import com.deltadental.pcp.calculation.interservice.PCPConfigData;
-import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
-import com.deltadental.pcp.calculation.util.MemberClaimUtils;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,15 +16,15 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClientException;
 
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
+import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
+import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimPK;
+import com.deltadental.pcp.calculation.enums.Status;
+import com.deltadental.pcp.calculation.interservice.PCPConfigData;
+import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
+import com.deltadental.pcp.calculation.util.MemberClaimUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class PCPValidatorServiceTest {
@@ -38,13 +33,13 @@ public class PCPValidatorServiceTest {
     PCPValidatorService mockPCPValidatorService;
     
     @Mock
-    MemberClaimUtils mockMemberClaimUtills;
-
-    @Mock
     MTVSyncServiceClient mockMTVSyncServiceClient;
 
     @Mock
     PCPConfigData mockPCPConfigData;
+    
+    @Mock
+    MemberClaimUtils memberClaimUtills;
 
     @Mock
     ContractMemberClaimRepo mockContractMemberClaimRepo;
@@ -60,7 +55,7 @@ public class PCPValidatorServiceTest {
     public void setup() {
     }
 
-  //  @Test
+    @Test
     public void testValidatePending_success() {
 
         ContractMemberClaimEntity contractEntity = buildContractMemberClaimEntity();
@@ -208,7 +203,7 @@ public class PCPValidatorServiceTest {
         Mockito.when(
                         mockContractMemberClaimRepo.findByInstanceIdWhereStatusInList(serviceInstanceId, SEARCH_STATUS_VALIDATE))
                 .thenReturn(spyList);
-        Mockito.when(mockMTVSyncServiceClient.memberClaim( List.of(contractEntity.getClaimId()))).thenReturn( List.of(memberClaimResponse));
+        Mockito.when(mockMTVSyncServiceClient.memberClaim(List.of(contractEntity.getClaimId()))).thenReturn( List.of(memberClaimResponse));
 
         Mockito.when(mockPCPConfigData.isProviderInExclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()))
                 .thenReturn(true);
@@ -335,109 +330,7 @@ public class PCPValidatorServiceTest {
         assertEquals(expectedErrorMessage, contractEntity.getErrorMessage());
 
     }
-    
-   // @Test
-    public void testCalculateLatestClaim() throws Exception {
-    	DateFormat df = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
-    	List<ServiceLine> member01ServiceLine = List.of(getServiceLine(df.parse("03-04-2022"), df.parse("03-04-2022")),
-    			                                        getServiceLine(df.parse("03-05-2022"), df.parse("03-05-2022")),
-    	                                                getServiceLine(df.parse("04-05-2022"), df.parse("04-05-2022")));
-    	
-    	List<ServiceLine> member02ServiceLine = List.of(getServiceLine(df.parse("03-04-2021"), df.parse("03-04-2021")),
-                                                        getServiceLine(df.parse("03-05-2021"), df.parse("03-05-2021")),
-                                                        getServiceLine(df.parse("03-06-2022"), df.parse("03-06-2022")));
-    	
-    	MemberClaimResponse memberClaimResponse01 = MemberClaimResponse.builder()
-    			.claimId("11113344")
-    			.contractId("12345678")
-    			.memberID("01")
-    			.receivedTs(Timestamp.valueOf("2022-06-01 00:00:00.527"))
-    			.serviceLines(member01ServiceLine)
-    			.build();
-    	
-    	MemberClaimResponse memberClaimResponse02 = MemberClaimResponse.builder()
-    			.claimId("22223344")
-    			.contractId("12345678")
-    			.memberID("02")
-    			.serviceLines(member02ServiceLine)
-    			.receivedTs(Timestamp.valueOf("2022-06-25 00:00:00.527"))
-    			.build();
-    	
-    	MemberClaimResponse response = mockMemberClaimUtills.calculateLatestClaim(List.of(memberClaimResponse01, memberClaimResponse02));
-    	assertEquals(response.getClaimId(), "11113344");
-    }
-    
- //   @Test
-    public void testCalculateLatestClaimThathasLatestThruAndOldFromDate() throws Exception {
-    	DateFormat df = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
-    	List<ServiceLine> member01ServiceLine = List.of(getServiceLine(df.parse("03-04-2022"), df.parse("03-04-2022")),
-    			                                        getServiceLine(df.parse("03-05-2022"), df.parse("03-05-2022")),
-    	                                                getServiceLine(df.parse("04-05-2021"), df.parse("04-05-2022")));
-    	
-    	List<ServiceLine> member02ServiceLine = List.of(getServiceLine(df.parse("03-04-2021"), df.parse("03-04-2021")),
-                                                        getServiceLine(df.parse("03-05-2021"), df.parse("03-05-2021")),
-                                                        getServiceLine(df.parse("03-06-2022"), df.parse("03-06-2022")));
-    	
-    	MemberClaimResponse memberClaimResponse01 = MemberClaimResponse.builder()
-    			.claimId("11113344")
-    			.contractId("12345678")
-    			.memberID("01")
-    			.receivedTs(Timestamp.valueOf("2022-06-25 00:00:00.527"))
-    			.serviceLines(member01ServiceLine)
-    			.build();
-    	
-    	MemberClaimResponse memberClaimResponse02 = MemberClaimResponse.builder()
-    			.claimId("22223344")
-    			.contractId("12345678")
-    			.memberID("02")
-    			.serviceLines(member02ServiceLine)
-    			.receivedTs(Timestamp.valueOf("2022-06-06 00:00:00.527"))
-    			.build();
-    	
-    	MemberClaimResponse response = mockMemberClaimUtills.calculateLatestClaim(List.of(memberClaimResponse01, memberClaimResponse02));
-    	assertEquals(response.getClaimId(), "22223344");
-    }
-    
-  //  @Test
-    public void testCalculateLatestClaimWhenTwoMaxDateAreSame() throws Exception {
-    	DateFormat df = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
-    	List<ServiceLine> member01ServiceLine = List.of(getServiceLine(df.parse("03-04-2022"), df.parse("03-04-2022")),
-    			                                        getServiceLine(df.parse("03-05-2022"), df.parse("03-05-2022")),
-    	                                                getServiceLine(df.parse("04-05-2022"), df.parse("04-05-2022")));
-    	
-    	List<ServiceLine> member02ServiceLine = List.of(getServiceLine(df.parse("03-04-2021"), df.parse("03-04-2021")),
-                                                        getServiceLine(df.parse("03-05-2021"), df.parse("03-05-2021")),
-                                                        getServiceLine(df.parse("04-05-2022"), df.parse("04-05-2022")));
-    	
-    	MemberClaimResponse memberClaimResponse01 = MemberClaimResponse.builder()
-    			.claimId("11113344")
-    			.contractId("12345678")
-    			.memberID("01")
-    			.receivedTs(Timestamp.valueOf("2022-06-01 00:00:00.527"))
-    			.serviceLines(member01ServiceLine)
-    			.build();
-    	
-    	MemberClaimResponse memberClaimResponse02 = MemberClaimResponse.builder()
-    			.claimId("22223344")
-    			.contractId("12345678")
-    			.memberID("02")
-    			.serviceLines(member02ServiceLine)
-    			.receivedTs(Timestamp.valueOf("2022-06-05 00:00:00.527"))
-    			.build();
-    	
-    	MemberClaimResponse response = mockMemberClaimUtills.calculateLatestClaim(List.of(memberClaimResponse01, memberClaimResponse02));
-    	assertEquals(response.getClaimId(), "22223344");
-    }
-    
-    
-    private ServiceLine getServiceLine(Date fromDate,Date thruDate) {
-    	ServiceLine serviceLine = ServiceLine.builder()
-    			.fromDate(fromDate)
-    			.thruDate(thruDate)
-    			.build();
-    	return serviceLine;
-    }
-
+   
     private MemberClaimResponse buildMemberClaimResponse() {
         MemberClaimResponse response = new MemberClaimResponse();
         response.setProviderId("PR001");
