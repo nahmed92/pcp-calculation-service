@@ -76,14 +76,12 @@ public class PCPCalculationServiceWorker {
         if (CollectionUtils.isNotEmpty(contractMemberClaimsEntities)) {
             long startTime = System.currentTimeMillis();
             log.info("Processing total {} pcp assignment requests on service instance {} ", contractMemberClaimsEntities.size(), serviceInstanceId);
-         //   contractMemberClaimsEntities.forEach(contractMemberClaimEntity -> {
                 try {
                     log.info("Processing pcp assignment request for contract member claim {}", getClaimIds(contractMemberClaimsEntities));
                     submitTask(contractMemberClaimsEntities);
                 } catch (Exception e) {
                     log.error("Exception processing pcp assignment request for contract member claim {} ", e);
                 }
-          //  });
             long endTime = System.currentTimeMillis();
             long minutes = TimeUnit.MILLISECONDS.toMinutes((endTime - startTime));
             log.info(" Thread Name + {}  taken to complete process :  {} minute[s]", Thread.currentThread().getName(), minutes);
