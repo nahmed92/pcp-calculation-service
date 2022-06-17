@@ -9,8 +9,9 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
-@Data
 @NoArgsConstructor
+@Getter
+@Setter
 @AllArgsConstructor
 @Builder
 @Table(name = "contract_member_claim", schema = "dbo")
@@ -56,7 +57,7 @@ public class ContractMemberClaimEntity implements Serializable {
     @EqualsAndHashCode.Exclude
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    private Timestamp crationAt;
+    private Timestamp creationAt;
 
     @EqualsAndHashCode.Exclude
     @UpdateTimestamp

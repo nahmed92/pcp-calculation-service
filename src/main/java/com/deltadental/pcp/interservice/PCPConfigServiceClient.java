@@ -26,7 +26,7 @@ public class PCPConfigServiceClient {
     @Value("${pcp.config.service.endpoint}")
     private String pcpConfigServiceEndpoint;
 
-    @Autowired(required = true)
+    @Autowired
     private RestTemplate restTemplate;
 
     private static final String LOOK_A_HEAD_DAYS_90 = "90";
@@ -84,7 +84,7 @@ public class PCPConfigServiceClient {
         log.info("START PCPConfigServiceClient.exclusions");
         final String exclusionsProviderUrl = pcpConfigServiceEndpoint.concat(EXCLUSIONS_PROVIDER);
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(exclusionsProviderUrl);
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("providerId", providerId);
         URI exclusionsUri = builder.buildAndExpand(params).toUri();
         log.info("exclusions uri : " + exclusionsUri);
@@ -92,7 +92,7 @@ public class PCPConfigServiceClient {
         headers.setContentType(MediaType.APPLICATION_JSON);
         try {
             ResponseEntity<InclusionExclusion[]> responseEntity = this.restTemplate.exchange(exclusionsUri, HttpMethod.GET, new HttpEntity<>(headers), InclusionExclusion[].class);
-            if (null != responseEntity && responseEntity.getStatusCode() == HttpStatus.OK) {
+            if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 return responseEntity.getBody();
             } else {
                 log.error("Got {} response code from PCP Config API {} ", responseEntity.getStatusCode(), EXCLUSIONS_PROVIDER);
@@ -110,7 +110,7 @@ public class PCPConfigServiceClient {
         log.info("START PCPConfigServiceClient.inclusions");
         final String inclusionsProviderUrl = pcpConfigServiceEndpoint.concat(INCLUSIONS_PROVIDER);
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(inclusionsProviderUrl);
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("providerId", providerId);
         URI inclusionsUri = builder.buildAndExpand(params).toUri();
         log.info("exclusions uri : " + inclusionsUri);
@@ -118,7 +118,7 @@ public class PCPConfigServiceClient {
         headers.setContentType(MediaType.APPLICATION_JSON);
         try {
             ResponseEntity<InclusionExclusion[]> responseEntity = this.restTemplate.exchange(inclusionsUri, HttpMethod.GET, new HttpEntity<>(headers), InclusionExclusion[].class);
-            if (null != responseEntity && responseEntity.getStatusCode() == HttpStatus.OK) {
+            if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 return responseEntity.getBody();
             } else {
                 log.error("Got {} response code from PCP Config API {} ", responseEntity.getStatusCode(), INCLUSIONS_PROVIDER);

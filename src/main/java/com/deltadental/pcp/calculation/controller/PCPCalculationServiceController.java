@@ -43,7 +43,7 @@ public class PCPCalculationServiceController {
     public ResponseEntity<Boolean> stageMembersContractsAndClaims(
             @Valid @RequestBody List<MemberContractClaimRequest> memberContractClaimRequests) {
         log.info("START PCPCalculationServiceController.stageMembersContractsAndClaims");
-        ResponseEntity<Boolean> responseEntity = null;
+        ResponseEntity<Boolean> responseEntity;
         if (CollectionUtils.isNotEmpty(memberContractClaimRequests)) {
             memberContractClaimService.stageMemberContractClaimRecords(memberContractClaimRequests);
             responseEntity = new ResponseEntity<>(Boolean.TRUE, HttpStatus.CREATED);

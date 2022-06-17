@@ -8,7 +8,6 @@ import com.deltadental.pcp.calculation.error.RestTemplateErrorHandler;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +20,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +33,7 @@ public class MTVSyncServiceClient {
     @Value("${pcp.mtv.sync.service.endpoint}")
     private String pcpMtvSyncServiceEndpoint;
 
-    @Autowired(required = true)
+    @Autowired
     private RestTemplate restTemplate;
 
     @Autowired
@@ -54,7 +52,7 @@ public class MTVSyncServiceClient {
 			log.info("Request uri : {} ", exclusionsUri);
 			restTemplate.setErrorHandler(restTemplateErrorHandler);
 			HttpHeaders headers = new HttpHeaders();
-			HttpEntity<Object> requestEntity = new HttpEntity<Object>(headers);
+			HttpEntity<Object> requestEntity = new HttpEntity<>(headers);
 			ResponseEntity<List<MemberClaimResponse>> responseEntity = restTemplate.exchange(
 					exclusionsUri,
 					HttpMethod.GET,
@@ -62,7 +60,7 @@ public class MTVSyncServiceClient {
 					new ParameterizedTypeReference<List<MemberClaimResponse>>(){});
 
 			
-			if(responseEntity != null && responseEntity.getBody() != null) {
+			if(responseEntity.getBody() != null) {
 				memberClaimResponse = responseEntity.getBody();
 				log.info("Response for claim id {} is {} ",claimId, memberClaimResponse);
 			}			
@@ -89,7 +87,7 @@ public class MTVSyncServiceClient {
             restTemplate.setErrorHandler(restTemplateErrorHandler);
             ResponseEntity<ProviderAssignmentResponse> responseEntity = restTemplate.postForEntity(new URI(uriBuilder), request, ProviderAssignmentResponse.class);
             log.info("MTV Sync Service request {} and response {} for provider assignment", providerAssignmentRequest, responseEntity);
-            if (responseEntity != null && responseEntity.getBody() != null) {
+            if (responseEntity.getBody() != null) {
                 providerAssignmentResponse = responseEntity.getBody();
                 log.info("Response for pcp assignment request {} is {} ", providerAssignmentRequest, providerAssignmentResponse);
             }
