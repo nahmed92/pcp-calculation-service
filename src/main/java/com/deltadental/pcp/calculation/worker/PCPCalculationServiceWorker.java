@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -63,9 +64,13 @@ public class PCPCalculationServiceWorker {
     public void submitTask(List<ContractMemberClaimEntity> contractMemberClaimsEntities) {
         log.info("START PCPCalculationServiceWorker.submitTask()");
         if (null != contractMemberClaimsEntities) {
+        	Map<String, List<ContractMemberClaimEntity>> contractMemberClaimEntityMap = contractMemberClaimsEntities.stream().collect
+			        (Collectors.groupingBy(ContractMemberClaimEntity::getContractId));
+        	contractMemberClaimEntityMap.values().forEach(values ->{
             PCPAssignmentTask pcpAssignmentTask = createTask();
-            pcpAssignmentTask.setContractMemberClaimEntities(contractMemberClaimsEntities);
+            pcpAssignmentTask.setContractMemberClaimEntities(values);
             executor.execute(pcpAssignmentTask);
+        	});
         }
         log.info("END PCPCalculationServiceWorker.submitTask()");
     }
