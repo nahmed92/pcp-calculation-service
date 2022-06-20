@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
