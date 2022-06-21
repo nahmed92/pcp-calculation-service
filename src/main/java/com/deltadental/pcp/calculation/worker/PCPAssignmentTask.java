@@ -1,14 +1,5 @@
 package com.deltadental.pcp.calculation.worker;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
 import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
 import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
@@ -25,11 +16,18 @@ import com.deltadental.pcp.search.interservice.PCPSearchServiceClient;
 import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Optional;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -81,7 +79,7 @@ public class PCPAssignmentTask implements Runnable {
 			log.info("Marking as {} for Claim id {} with member claim response is null ",Status.CLAIM_NOT_FOUND, memberClaimIds.toString());
 			setErrorMessageToAllContractAndSave(errorMessageBuilder, Status.CLAIM_NOT_FOUND);
 		}else{
-			log.info("Total Claims Recieved from MTV sync {} out of {}", memberClaimsResponses.size(), memberClaimIds.size());
+			log.info("Total Claims Received from MTV sync {} out of {}", memberClaimsResponses.size(), memberClaimIds.size());
 			Multimap<String, MemberClaimResponse> memberWiseResponseMultiMap = ArrayListMultimap.create();
 		    for(MemberClaimResponse memberClaimResponse : memberClaimsResponses) {
 			  if (null != memberClaimResponse && (StringUtils.isBlank(memberClaimResponse.getErrorCode()) || StringUtils.isBlank(memberClaimResponse.getErrorMessage()))) {
@@ -135,8 +133,8 @@ public class PCPAssignmentTask implements Runnable {
 		}
 		
 		} catch (Exception e) {
-			log.error("Exception occured during retriving member claim information from Metavance Sync Service.", e);
-			errorMessageBuilder.append("Exception occured during retriving member claim information from Metavance Sync Service.");
+			log.error("Exception occurred during retrieving member claim information from Metavance Sync Service.", e);
+			errorMessageBuilder.append("Exception occurred during retrieving member claim information from Metavance Sync Service.");
 			setErrorMessageToAllContractAndSave(errorMessageBuilder,Status.RETRY);
 		}		
 		log.info("END PCPAssignmentTask.processPCPAssignment");

@@ -1,17 +1,14 @@
 package com.deltadental.pcp.calculation.util;
 
+import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
+import org.springframework.stereotype.Component;
+
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
-import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
-import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
 
 
 @Component

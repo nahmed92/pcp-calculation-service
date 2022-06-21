@@ -88,12 +88,13 @@ public class PCPAssignmentService {
                     ProviderAssignmentResponse providerAssignmentResponse = mtvSyncService.providerAssignment(providerAssignmentRequest);
                     if (StringUtils.equals(providerAssignmentResponse.getReturnCode(), PCP_ASSIGNMENT_OK)) {
                         contractMemberClaimEntity.setStatus(Status.PCP_ASSIGNED);
+                        contractMemberClaimEntity.setErrorMessage(null);
                         MemberClaimEntity memberClaimEntity = saveMemberClaimEntity(contractMemberClaimEntity, memberClaimResponse);
                         saveMemberClaimServices(memberClaimEntity, memberClaimResponse.getServiceLines());
                         saveMemberProvider(contractMemberClaimEntity.getContractMemberClaimPK(), providerAssignmentResponse, memberClaimResponse, pcpEffectiveDate);
                         log.info("PCP Assignment status for claim id {} status is {}.", contractMemberClaimEntity.getClaimId(), Status.PCP_ASSIGNED);
                     } else {
-                        if(StringUtils.equals(providerAssignmentResponse.getErrorCode(), "DCM-701") || StringUtils.contains(providerAssignmentResponse.getErrorMessage(), "Member has Prior PCP")) {
+                        if(StringUtils.equals(providerAssignmentResponse.getErrorCode(), "DCM-701") && StringUtils.contains(providerAssignmentResponse.getErrorMessage(), "Member has Prior PCP")) {
                             log.info("PCP Assignment status for claim id {} status is {} and error message is {}.", contractMemberClaimEntity.getClaimId(), Status.PCP_ALREADY_ASSIGNED, String.join(" : ", providerAssignmentResponse.getErrorCode(), providerAssignmentResponse.getErrorMessage()));
                             contractMemberClaimEntity.setStatus(Status.PCP_ALREADY_ASSIGNED);
                         } else {

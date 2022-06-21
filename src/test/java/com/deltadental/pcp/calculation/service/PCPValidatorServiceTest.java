@@ -1,12 +1,14 @@
 package com.deltadental.pcp.calculation.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
+import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
+import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimPK;
+import com.deltadental.pcp.calculation.enums.Status;
+import com.deltadental.pcp.calculation.interservice.PCPConfigData;
+import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
+import com.deltadental.pcp.calculation.util.MemberClaimUtils;
 import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,15 +20,12 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClientException;
 
-import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
-import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
-import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
-import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
-import com.deltadental.pcp.calculation.entities.ContractMemberClaimPK;
-import com.deltadental.pcp.calculation.enums.Status;
-import com.deltadental.pcp.calculation.interservice.PCPConfigData;
-import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
-import com.deltadental.pcp.calculation.util.MemberClaimUtils;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 public class PCPValidatorServiceTest {

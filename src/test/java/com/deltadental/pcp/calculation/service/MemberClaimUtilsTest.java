@@ -1,6 +1,10 @@
 package com.deltadental.pcp.calculation.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
+import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
+import com.deltadental.pcp.calculation.util.MemberClaimUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -9,12 +13,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
-import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
-import com.deltadental.pcp.calculation.util.MemberClaimUtils;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MemberClaimUtilsTest {
 	
