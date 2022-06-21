@@ -25,6 +25,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -66,6 +67,7 @@ public class PCPAssignmentTask implements Runnable {
 
     private List<ContractMemberClaimEntity> contractMemberClaimEntities;
 
+	@Transactional
 	@MethodExecutionTime
 	public void validateAndAssignProvider() {
 		log.info("START PCPAssignmentTask.processPCPAssignment.");
@@ -116,7 +118,7 @@ public class PCPAssignmentTask implements Runnable {
 					}
 				} else {
 					if (!exclusionFlag) {
-						errorMessageBuilder.append(String.format("Provider %s, Group %s, Division %s is listed in exlusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()));
+						errorMessageBuilder.append(String.format("Provider %s, Group %s, Division %s is listed in exclusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()));
 						setErrorMessageAndSave(memberClaimResponse.getClaimId(), errorMessageBuilder, Status.PCP_EXCLUDED);
 					}
 					if (!inclusionFlag) {
@@ -156,10 +158,11 @@ public class PCPAssignmentTask implements Runnable {
 			log.info("END PCPAssignmentTask.pcpAssignmentService");
 		});
     }	    
- 	
+
+	@Transactional
+	@MethodExecutionTime
 	private void setErrorMessageAndSave(String claimId, StringBuilder errorMessageBuilder, Status status) {
-		Optional<ContractMemberClaimEntity> contractMemberClaimEntity = 
-				                                    findContractMemberClaimEntity(claimId);
+		Optional<ContractMemberClaimEntity> contractMemberClaimEntity = 					findContractMemberClaimEntity(claimId);
 			if(contractMemberClaimEntity.isPresent()) {
 				ContractMemberClaimEntity entity = contractMemberClaimEntity.get();
 				entity.setStatus(status);
@@ -167,7 +170,9 @@ public class PCPAssignmentTask implements Runnable {
 				contractMemberClaimRepo.save(entity);
 			}
 	}
-	
+
+	@Transactional
+	@MethodExecutionTime
 	private void setErrorMessageToAllContractAndSave(StringBuilder errorMessageBuilder, Status status) {
 		contractMemberClaimEntities.forEach(entity ->{
 				entity.setStatus(status);
@@ -180,12 +185,8 @@ public class PCPAssignmentTask implements Runnable {
 	private Optional<ContractMemberClaimEntity> findContractMemberClaimEntity(String claimId) {
 		return contractMemberClaimEntities.stream().filter(i -> i.getClaimId().equals(claimId)).findFirst();
 	}
-	
-	public boolean checkMemberResponseForClaim(List<String> claimIds, String responseClaimId) {
-		return claimIds.stream().anyMatch(i -> i.contains(responseClaimId));
-	}
 
-    @Override
+	@Override
     public void run() {
         validateAndAssignProvider();
     }
