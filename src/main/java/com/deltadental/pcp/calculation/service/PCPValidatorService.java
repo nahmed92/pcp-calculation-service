@@ -110,28 +110,6 @@ public class PCPValidatorService {
 	}
 
 	@MethodExecutionTime
-	public MemberClaimResponse calculateLatestClaim(List<MemberClaimResponse> members) {
-		if(members.size()==1) {
-			return members.get(0);
-		}
-		for (MemberClaimResponse memberClaim : members) {
-			Date maxFromDate = memberClaim.getServiceLines().stream().map(ServiceLine::getFromDate).max(Date::compareTo).get();
-			Date maxThruDate = memberClaim.getServiceLines().stream().map(ServiceLine::getThruDate).max(Date::compareTo).get();
-			memberClaim.setFromDate(maxFromDate);
-			memberClaim.setThruDate(maxThruDate);
-		}
-		
-		MemberClaimResponse memberClaimResponse = null;
-		Optional<MemberClaimResponse> collectData = members.stream().max(Comparator
-				.comparing(MemberClaimResponse::getFromDate).thenComparing(MemberClaimResponse::getThruDate)
-				.thenComparing(MemberClaimResponse::getReceivedTs));
-		if (collectData.isPresent()) {
-			memberClaimResponse = collectData.get();
-		}
-		return memberClaimResponse;
-	}
-
-	@MethodExecutionTime
 	@Transactional
 	public void validatePending() {
 		log.info("START PCPValidatorService.validatePending()");

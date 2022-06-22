@@ -159,7 +159,6 @@ public class PCPAssignmentTask implements Runnable {
 		});
     }	    
 
-	@Transactional
 	@MethodExecutionTime
 	private void setErrorMessageAndSave(String claimId, StringBuilder errorMessageBuilder, Status status) {
 		Optional<ContractMemberClaimEntity> contractMemberClaimEntity = 					findContractMemberClaimEntity(claimId);
@@ -171,7 +170,6 @@ public class PCPAssignmentTask implements Runnable {
 			}
 	}
 
-	@Transactional
 	@MethodExecutionTime
 	private void setErrorMessageToAllContractAndSave(StringBuilder errorMessageBuilder, Status status) {
 		contractMemberClaimEntities.forEach(entity ->{

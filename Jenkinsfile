@@ -6,7 +6,7 @@ pipeline {
 		buildDiscarder(logRotator(numToKeepStr: '10'))
   		}
     stages {
-		stage('Load Poperties') {
+		stage('Load Properties') {
 			steps{ script{ globalTemplate.loadVariables() }
 			     }
 			}
