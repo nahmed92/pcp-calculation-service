@@ -1,6 +1,7 @@
 package com.deltadental.pcp.calculation.util;
 
 import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
+import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
 import org.springframework.stereotype.Component;
 
@@ -19,26 +20,25 @@ public class MemberClaimUtils {
 			return members.get(0);
 		}
 		for (MemberClaimResponse memberClaim : members) {
-			Date maxFromDate = memberClaim.getServiceLines().stream().map(u -> u.getFromDate()).max(Date::compareTo)
-					.get();
-			Date maxThruDate = memberClaim.getServiceLines().stream().map(u -> u.getThruDate()).max(Date::compareTo)
-					.get();
-			memberClaim.setFromDate(maxFromDate);
-			memberClaim.setThruDate(maxThruDate);
+			Optional<Date> optionalMaxFromDate = memberClaim.getServiceLines().stream().map(ServiceLine::getFromDate).max(Date::compareTo);
+			Optional<Date> optionalMaxThruDate = memberClaim.getServiceLines().stream().map(ServiceLine::getThruDate).max(Date::compareTo);
+			optionalMaxFromDate.ifPresent(memberClaim::setFromDate);
+			optionalMaxThruDate.ifPresent(memberClaim::setThruDate);
 		}
 		
 		MemberClaimResponse memberClaimResponse = null;
-		Optional<MemberClaimResponse> collectData = members.stream().collect(Collectors.maxBy(Comparator
+		Optional<MemberClaimResponse> optionalMemberClaimResponse = members.stream().max(Comparator
 				.comparing(MemberClaimResponse::getFromDate).thenComparing(MemberClaimResponse::getThruDate)
-				.thenComparing(MemberClaimResponse::getReceivedTs)));
-		if (collectData.isPresent()) {
-			memberClaimResponse = collectData.get();
+				.thenComparing(MemberClaimResponse::getReceivedTs));
+
+		if (optionalMemberClaimResponse.isPresent()) {
+			memberClaimResponse = optionalMemberClaimResponse.get();
 		}
 
 		return memberClaimResponse;
 	}
 
 	public List<String> getClaimIds(List<ContractMemberClaimEntity> contractMemberClaimEntities) {
-		return contractMemberClaimEntities.stream().map(i -> i.getClaimId()).collect(Collectors.toList());
+		return contractMemberClaimEntities.stream().map(ContractMemberClaimEntity::getClaimId).collect(Collectors.toList());
 	}
 }

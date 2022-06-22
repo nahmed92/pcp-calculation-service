@@ -12,7 +12,6 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,6 @@ public class MemberContractClaimService {
     private static final List<Status> SEARCH_STATUS = List.of(Status.RETRY, Status.STAGED, Status.VALIDATED,
             Status.PCP_ASSIGNED, Status.PCP_EXCLUDED, Status.PCP_NOT_INCLUDED, Status.PCP_ALREADY_ASSIGNED);
 
-    @Transactional
     @MethodExecutionTime
     private List<ContractMemberClaimEntity> save(List<MemberContractClaimRequest> requests) {
         log.info("START MemberContractClaimService.save");

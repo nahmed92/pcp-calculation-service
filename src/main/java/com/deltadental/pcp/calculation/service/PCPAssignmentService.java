@@ -23,7 +23,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -72,7 +71,6 @@ public class PCPAssignmentService {
     @Autowired
     private MemberClaimRepo memberClaimRepo;
 
-    @Transactional
     @MethodExecutionTime
     public void process(ContractMemberClaimEntity contractMemberClaimEntity, MemberClaimResponse memberClaimResponse) {
         log.info("START PCPAssignmentService.process()");
@@ -185,7 +183,6 @@ public class PCPAssignmentService {
     }
 
     @MethodExecutionTime
-    @Transactional
     private MemberClaimEntity saveMemberClaimEntity(ContractMemberClaimEntity contractMemberClaimsEntity, MemberClaimResponse memberClaimResponse) {
         log.info("START PCPAssignmentService.saveMemberClaimEntity()");
         MemberClaimEntity memberClaimEntity = MemberClaimEntity.builder()
@@ -216,7 +213,6 @@ public class PCPAssignmentService {
     }
 
     @MethodExecutionTime
-    @Transactional
     private void saveMemberClaimServices(MemberClaimEntity memberClaimEntity, List<ServiceLine> serviceLines) {
         log.info("START PCPAssignmentService.saveMemberClaimServices()");
         if (!serviceLines.isEmpty()) {
@@ -243,7 +239,6 @@ public class PCPAssignmentService {
     }
 
     @MethodExecutionTime
-    @Transactional
     private void saveMemberProvider(ContractMemberClaimPK contractMemberClaimId, ProviderAssignmentResponse providerAssignmentResponse, MemberClaimResponse memberClaimResponse, String pcpEffectiveDate) {
         log.info("START PCPAssignmentService.saveMemberProvider()");
         MemberProviderEntity memberProviderEntity = MemberProviderEntity.builder()

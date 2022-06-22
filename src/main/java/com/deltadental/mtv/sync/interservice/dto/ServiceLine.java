@@ -29,8 +29,8 @@ public class ServiceLine {
     private Timestamp servicePaidTs;
     @JsonDeserialize(using = TimestampDeserializer.class)
     private Timestamp serviceResolutionTs;
-    @JsonFormat(shape = Shape.STRING, pattern = "MM-dd-yyyy", timezone = JsonFormat.DEFAULT_TIMEZONE)
+    @JsonFormat(shape = Shape.STRING, pattern = "MM-dd-yyyy")
     private Date fromDate;
-    @JsonFormat(shape = Shape.STRING, pattern = "MM-dd-yyyy", timezone = JsonFormat.DEFAULT_TIMEZONE)
+    @JsonFormat(shape = Shape.STRING, pattern = "MM-dd-yyyy")
     private Date thruDate;
 }

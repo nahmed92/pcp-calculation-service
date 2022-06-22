@@ -49,7 +49,7 @@ public class PCPConfigData implements InitializingBean {
     private PCPConfigServiceClient pcpConfigServiceClient;
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S", Locale.US);
-    private static final DateFormat MM_DD_YYYY_FORMATTER = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
+    private final DateFormat MM_DD_YYYY_FORMATTER = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
     private static final String ZONE_ID = "America/Los_Angeles";
 
     private List<PcpConfigResponse> claimStatusList = new ArrayList<>();
