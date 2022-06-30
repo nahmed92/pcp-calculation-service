@@ -72,49 +72,20 @@ public class PCPAssignmentTask implements Runnable {
 			if (null != memberClaimResponse && (StringUtils.isBlank(memberClaimResponse.getErrorCode()) || StringUtils.isBlank(memberClaimResponse.getErrorMessage()))) {
 				boolean exclusionFlag = pcpConfigData.isProviderInExclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber());
 				boolean inclusionFlag = pcpConfigData.isProviderInInclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber());
-				if (exclusionFlag || inclusionFlag) {
-					List<ServiceLine> serviceLines = memberClaimResponse.getServiceLines();
-					if (CollectionUtils.isNotEmpty(serviceLines)) {
-						boolean isExplanationCodeValid = pcpConfigData.isExplanationCodeValid(serviceLines);
-						boolean isProcedureCodeValid = pcpConfigData.isProcedureCodeValid(serviceLines);
-						boolean isClaimStatusValid = pcpConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus()));
-						log.info("Claim id {} , isClaimStatusValid {}, isProcedureCodeValid {} and isExplanationCodeValid {} ",memberClaimResponse.getClaimId(),isClaimStatusValid,isProcedureCodeValid,isExplanationCodeValid);
-						if (isClaimStatusValid && isExplanationCodeValid && isProcedureCodeValid) {
-							pcpAssignmentService.process(contractMemberClaimEntity, memberClaimResponse);
-						} else {
-							if (!isClaimStatusValid) {
-								appendColon(errorMessageBuilder);
-								errorMessageBuilder.append(String.format("Claim status %s is not valid for PCP assignment!", StringUtils.trimToNull(memberClaimResponse.getClaimStatus())));
-							}
-							if (!isExplanationCodeValid) {
-								appendColon(errorMessageBuilder);
-								errorMessageBuilder.append("One of the Service Line Explanation Code[s] is not valid for this claim.");
-							}
-							if (!isProcedureCodeValid) {
-								appendColon(errorMessageBuilder);
-								errorMessageBuilder.append(", One of the Service Line Procedure Code[s] is not valid for this claim.");
-							}
-							log.info("PCP Assignment status for claim id {} is {}.", contractMemberClaimEntity.getClaimId(), errorMessageBuilder);
-							contractMemberClaimEntity.setStatus(Status.RETRY);
-							contractMemberClaimEntity.setErrorMessage(errorMessageBuilder.toString());
-						}
-					} else {
-						errorMessageBuilder.append(String.format("Service Line Items are empty for claim# %s ", contractMemberClaimEntity.getClaimId()));
-						contractMemberClaimEntity.setStatus(Status.RETRY);
-						contractMemberClaimEntity.setErrorMessage(errorMessageBuilder.toString());
-					}
+				if (false == exclusionFlag && inclusionFlag) {
+					assignProvider(errorMessageBuilder, memberClaimResponse);
 				} else {
-					if (!exclusionFlag) {
-						errorMessageBuilder.append(String.format("Provider %s, Group %s, Division %s is listed in exlusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()));
+					if(exclusionFlag) {
+						log.info("Provider {} excluded, not assigning for claim id {}", memberClaimResponse.getProviderId(), memberClaimResponse.getClaimId());
+						errorMessageBuilder.append(String.format("Provider %s, Group %s, Division %s is listed in exclusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()));
 						contractMemberClaimEntity.setStatus(Status.PCP_EXCLUDED);
-						contractMemberClaimEntity.setErrorMessage(errorMessageBuilder.toString());
 					}
 					if (!inclusionFlag) {
-						appendColon(errorMessageBuilder);
+						log.info("Provider {} not included, not assigning for claim id {}", memberClaimResponse.getProviderId(), memberClaimResponse.getClaimId());
 						errorMessageBuilder.append(String.format("Provider %s, Group %s, Division %s is not listed in inclusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()));
 						contractMemberClaimEntity.setStatus(Status.PCP_NOT_INCLUDED);
-						contractMemberClaimEntity.setErrorMessage(errorMessageBuilder.toString());
 					}
+					contractMemberClaimEntity.setErrorMessage(errorMessageBuilder.toString());
 				}
 			} else {
 				if (memberClaimResponse == null) {
@@ -139,8 +110,43 @@ public class PCPAssignmentTask implements Runnable {
 		contractMemberClaimRepo.save(contractMemberClaimEntity);
 		log.info("END PCPCalculationService.processPCPAssignment");
 	}
-	
-    private void appendColon(StringBuilder strBuilder) {
+
+	private void assignProvider(StringBuilder errorMessageBuilder, MemberClaimResponse memberClaimResponse) {
+		log.info("START PCPCalculationService.assignProvider.");
+		List<ServiceLine> serviceLines = memberClaimResponse.getServiceLines();
+		if (CollectionUtils.isNotEmpty(serviceLines)) {
+			boolean isExplanationCodeValid = pcpConfigData.isExplanationCodeValid(serviceLines);
+			boolean isProcedureCodeValid = pcpConfigData.isProcedureCodeValid(serviceLines);
+			boolean isClaimStatusValid = pcpConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus()));
+			log.info("Claim id {} , isClaimStatusValid {}, isProcedureCodeValid {} and isExplanationCodeValid {} ", memberClaimResponse.getClaimId(),isClaimStatusValid,isProcedureCodeValid,isExplanationCodeValid);
+			if (isClaimStatusValid && isExplanationCodeValid && isProcedureCodeValid) {
+				pcpAssignmentService.process(contractMemberClaimEntity, memberClaimResponse);
+			} else {
+				if (!isClaimStatusValid) {
+					appendColon(errorMessageBuilder);
+					errorMessageBuilder.append(String.format("Claim status %s is not valid for PCP assignment!", StringUtils.trimToNull(memberClaimResponse.getClaimStatus())));
+				}
+				if (!isExplanationCodeValid) {
+					appendColon(errorMessageBuilder);
+					errorMessageBuilder.append("One of the Service Line Explanation Code[s] is not valid for this claim.");
+				}
+				if (!isProcedureCodeValid) {
+					appendColon(errorMessageBuilder);
+					errorMessageBuilder.append(", One of the Service Line Procedure Code[s] is not valid for this claim.");
+				}
+				log.info("PCP Assignment status for claim id {} is {}.", contractMemberClaimEntity.getClaimId(), errorMessageBuilder);
+				contractMemberClaimEntity.setStatus(Status.RETRY);
+				contractMemberClaimEntity.setErrorMessage(errorMessageBuilder.toString());
+			}
+		} else {
+			errorMessageBuilder.append(String.format("Service Line Items are empty for claim# %s ", contractMemberClaimEntity.getClaimId()));
+			contractMemberClaimEntity.setStatus(Status.RETRY);
+			contractMemberClaimEntity.setErrorMessage(errorMessageBuilder.toString());
+		}
+		log.info("END PCPCalculationService.assignProvider.");
+	}
+
+	private void appendColon(StringBuilder strBuilder) {
         if (strBuilder != null && strBuilder.length() > 0) {
             strBuilder.append(": ");
         }
