@@ -40,7 +40,6 @@ public class ExcelPCPDataUploadController {
             @ApiResponse(code = 404, message = "Unable to upload pcp member claims.", response = ServiceError.class),
             @ApiResponse(code = 500, message = "Internal server error.", response = ServiceError.class)})
     @ResponseBody
-    @MethodExecutionTime
     @PostMapping(value = PCPCalculationServiceConstants.UPLOAD_MEMBERS_CONTRACTS_CLAIMS_URI, produces = {
             MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<String> uploadPCPMemberClaims(
