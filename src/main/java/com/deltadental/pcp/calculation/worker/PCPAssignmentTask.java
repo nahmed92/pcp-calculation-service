@@ -38,34 +38,34 @@ import java.util.Optional;
 @Slf4j
 public class PCPAssignmentTask implements Runnable {
 
-    @Autowired
-    private PCPSearchServiceClient pcpSearchService;
+	@Autowired
+	private PCPSearchServiceClient pcpSearchService;
 
-    @Autowired
-    private MTVSyncServiceClient mtvSyncService;
+	@Autowired
+	private MTVSyncServiceClient mtvSyncService;
 
-    @Autowired
-    private PCPConfigData pcpConfigData;
+	@Autowired
+	private PCPConfigData pcpConfigData;
 
-    @Autowired
-    private MemberProviderRepo memberProviderRepo;
+	@Autowired
+	private MemberProviderRepo memberProviderRepo;
 
-    @Autowired
-    private MemberClaimServicesRepo memberClaimServicesRepo;
+	@Autowired
+	private MemberClaimServicesRepo memberClaimServicesRepo;
 
-    @Autowired
-    private MemberClaimRepo memberClaimRepo;
+	@Autowired
+	private MemberClaimRepo memberClaimRepo;
 
-    @Autowired
-    private ContractMemberClaimRepo contractMemberClaimRepo;
+	@Autowired
+	private ContractMemberClaimRepo contractMemberClaimRepo;
 
-    @Autowired
-    private PCPAssignmentService pcpAssignmentService;
-    
-    @Autowired
+	@Autowired
+	private PCPAssignmentService pcpAssignmentService;
+
+	@Autowired
 	private MemberClaimUtils memberClaimUtills;
 
-    private List<ContractMemberClaimEntity> contractMemberClaimEntities;
+	private List<ContractMemberClaimEntity> contractMemberClaimEntities;
 
 	@Transactional
 	@MethodExecutionTime
@@ -75,126 +75,119 @@ public class PCPAssignmentTask implements Runnable {
 		StringBuilder errorMessageBuilder = new StringBuilder();
 		List<String> memberClaimIds = memberClaimUtills.getClaimIds(contractMemberClaimEntities);
 		try {
-		List<MemberClaimResponse> memberClaimsResponses = mtvSyncService.memberClaim(memberClaimIds);
-		if(CollectionUtils.isEmpty(memberClaimsResponses)) {
-			errorMessageBuilder.append(String.format("Claim information not found for claim # %s", memberClaimIds.toString()));
-			log.info("Marking as {} for Claim id {} with member claim response is null ",Status.CLAIM_NOT_FOUND, memberClaimIds.toString());
-			setErrorMessageToAllContractAndSave(errorMessageBuilder, Status.CLAIM_NOT_FOUND);
-		}else{
-			log.info("Total Claims Received from MTV sync {} out of {}", memberClaimsResponses.size(), memberClaimIds.size());
-			Multimap<String, MemberClaimResponse> memberWiseResponseMultiMap = ArrayListMultimap.create();
-		    for(MemberClaimResponse memberClaimResponse : memberClaimsResponses) {
-			  if (null != memberClaimResponse && (StringUtils.isBlank(memberClaimResponse.getErrorCode()) || StringUtils.isBlank(memberClaimResponse.getErrorMessage()))) {
-				boolean exclusionFlag = pcpConfigData.isProviderInExclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber());
-				boolean inclusionFlag = pcpConfigData.isProviderInInclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber());
-				if (false == exclusionFlag && inclusionFlag) {
-					assignProvider(errorMessageBuilder, memberClaimResponse);
-				} else {
-					if(exclusionFlag) {
-						log.info("Provider {} excluded, not assigning for claim id {}", memberClaimResponse.getProviderId(), memberClaimResponse.getClaimId());
-						errorMessageBuilder.append(String.format("Provider %s, Group %s, Division %s is listed in exclusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()));
-            setErrorMessageAndSave(memberClaimResponse.getClaimId(), errorMessageBuilder, Status.PCP_EXCLUDED);
-					}
-					if (!inclusionFlag) {
-						log.info("Provider {} not included, not assigning for claim id {}", memberClaimResponse.getProviderId(), memberClaimResponse.getClaimId());
-						errorMessageBuilder.append(String.format("Provider %s, Group %s, Division %s is not listed in inclusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()));
-						setErrorMessageAndSave(memberClaimResponse.getClaimId(), errorMessageBuilder, Status.PCP_NOT_INCLUDED);
+			List<MemberClaimResponse> memberClaimsResponses = mtvSyncService.memberClaim(memberClaimIds);
+			if(CollectionUtils.isEmpty(memberClaimsResponses)) {
+				errorMessageBuilder.append(String.format("Claim information not found for claim # %s", memberClaimIds.toString()));
+				log.info("Marking as {} for Claim id {} with member claim response is null ",Status.CLAIM_NOT_FOUND, memberClaimIds.toString());
+				setErrorMessageToAllContractAndSave(errorMessageBuilder, Status.CLAIM_NOT_FOUND);
+			}else{
+				log.info("Total Claims Received from MTV sync {} out of {}", memberClaimsResponses.size(), memberClaimIds.size());
+				Multimap<String, MemberClaimResponse> memberWiseResponseMultiMap = ArrayListMultimap.create();
+				for(MemberClaimResponse memberClaimResponse : memberClaimsResponses) {
+					if (null != memberClaimResponse && (StringUtils.isBlank(memberClaimResponse.getErrorCode()) || StringUtils.isBlank(memberClaimResponse.getErrorMessage()))) {
+						boolean exclusionFlag = pcpConfigData.isProviderInExclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber());
+						boolean inclusionFlag = pcpConfigData.isProviderInInclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber());
+						if (false == exclusionFlag && inclusionFlag) {
+							List<ServiceLine> serviceLines = memberClaimResponse.getServiceLines();
+							if (CollectionUtils.isNotEmpty(serviceLines)) {
+								boolean isExplanationCodeValid = pcpConfigData.isExplanationCodeValid(serviceLines);
+								boolean isProcedureCodeValid = pcpConfigData.isProcedureCodeValid(serviceLines);
+								boolean isClaimStatusValid = pcpConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus()));
+								log.info("Claim id {} , isClaimStatusValid {}, isProcedureCodeValid {} and isExplanationCodeValid {} ",memberClaimResponse.getClaimId(),isClaimStatusValid,isProcedureCodeValid,isExplanationCodeValid);
+								if (isClaimStatusValid && isExplanationCodeValid && isProcedureCodeValid) {
+									memberWiseResponseMultiMap.put(memberClaimResponse.getMemberID(), memberClaimResponse);
+								} else {
+									if (!isClaimStatusValid) {
+										appendColon(errorMessageBuilder);
+										errorMessageBuilder.append(String.format("Claim status %s is not valid for PCP assignment!", StringUtils.trimToNull(memberClaimResponse.getClaimStatus())));
+									}
+									if (!isExplanationCodeValid) {
+										appendColon(errorMessageBuilder);
+										errorMessageBuilder.append("One of the Service Line Explanation Code[s] is not valid for this claim.");
+									}
+									if (!isProcedureCodeValid) {
+										appendColon(errorMessageBuilder);
+										errorMessageBuilder.append(", One of the Service Line Procedure Code[s] is not valid for this claim.");
+									}
+									log.info("PCP Assignment status for claim id {} is {}.", memberClaimResponse.getClaimId(), errorMessageBuilder);
+									setErrorMessageAndSave(memberClaimResponse.getClaimId(), errorMessageBuilder,Status.RETRY);
+								}
+							} else {
+								errorMessageBuilder.append(String.format("Service Line Items are empty for claim# %s ", memberClaimResponse.getClaimId()));
+								setErrorMessageAndSave(memberClaimResponse.getClaimId(), errorMessageBuilder,Status.RETRY);
+							}
+						} else {
+							if(exclusionFlag) {
+								log.info("Provider {} excluded, not assigning for claim id {}", memberClaimResponse.getProviderId(), memberClaimResponse.getClaimId());
+								errorMessageBuilder.append(String.format("Provider %s, Group %s, Division %s is listed in exclusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()));
+								setErrorMessageAndSave(memberClaimResponse.getClaimId(), errorMessageBuilder, Status.PCP_EXCLUDED);
+							}
+							if (!inclusionFlag) {
+								log.info("Provider {} not included, not assigning for claim id {}", memberClaimResponse.getProviderId(), memberClaimResponse.getClaimId());
+								errorMessageBuilder.append(String.format("Provider %s, Group %s, Division %s is not listed in inclusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()));
+								setErrorMessageAndSave(memberClaimResponse.getClaimId(), errorMessageBuilder, Status.PCP_NOT_INCLUDED);
+							}
+						}
 					}
 				}
+				if(!memberWiseResponseMultiMap.isEmpty()) {
+					pcpAssignmentService(contractMemberClaimEntities, memberWiseResponseMultiMap);
+				}
 			}
- 		}
-	    if(!memberWiseResponseMultiMap.isEmpty()) {
-			pcpAssignmentService(contractMemberClaimEntities, memberWiseResponseMultiMap);
-		}
-		}
-		
 		} catch (Exception e) {
 			log.error("Exception occurred during retrieving member claim information from Metavance Sync Service.", e);
 			errorMessageBuilder.append("Exception occurred during retrieving member claim information from Metavance Sync Service.");
 			setErrorMessageToAllContractAndSave(errorMessageBuilder,Status.RETRY);
-		}		
+		}
 		log.info("END PCPAssignmentTask.processPCPAssignment");
 	}
 
-	private void assignProvider(StringBuilder errorMessageBuilder, MemberClaimResponse memberClaimResponse) {
-		log.info("START PCPCalculationService.assignProvider.");
-		List<ServiceLine> serviceLines = memberClaimResponse.getServiceLines();
-		if (CollectionUtils.isNotEmpty(serviceLines)) {
-			boolean isExplanationCodeValid = pcpConfigData.isExplanationCodeValid(serviceLines);
-			boolean isProcedureCodeValid = pcpConfigData.isProcedureCodeValid(serviceLines);
-			boolean isClaimStatusValid = pcpConfigData.isClaimStatusValid(StringUtils.trimToNull(memberClaimResponse.getClaimStatus()));
-			log.info("Claim id {} , isClaimStatusValid {}, isProcedureCodeValid {} and isExplanationCodeValid {} ", memberClaimResponse.getClaimId(),isClaimStatusValid,isProcedureCodeValid,isExplanationCodeValid);
-			if (isClaimStatusValid && isExplanationCodeValid && isProcedureCodeValid) {
-				pcpAssignmentService.process(contractMemberClaimEntity, memberClaimResponse);
-			} else {
-				if (!isClaimStatusValid) {
-					appendColon(errorMessageBuilder);
-					errorMessageBuilder.append(String.format("Claim status %s is not valid for PCP assignment!", StringUtils.trimToNull(memberClaimResponse.getClaimStatus())));
-				}
-				if (!isExplanationCodeValid) {
-					appendColon(errorMessageBuilder);
-					errorMessageBuilder.append("One of the Service Line Explanation Code[s] is not valid for this claim.");
-				}
-				if (!isProcedureCodeValid) {
-					appendColon(errorMessageBuilder);
-					errorMessageBuilder.append(", One of the Service Line Procedure Code[s] is not valid for this claim.");
-				}
-				log.info("PCP Assignment status for claim id {} is {}.", contractMemberClaimEntity.getClaimId(), errorMessageBuilder);
-				contractMemberClaimEntity.setStatus(Status.RETRY);
-				contractMemberClaimEntity.setErrorMessage(errorMessageBuilder.toString());
-			}
-		} else {
-			errorMessageBuilder.append(String.format("Service Line Items are empty for claim# %s ", contractMemberClaimEntity.getClaimId()));
-			contractMemberClaimEntity.setStatus(Status.RETRY);
-			contractMemberClaimEntity.setErrorMessage(errorMessageBuilder.toString());
+	private void appendColon(StringBuilder strBuilder) {
+		if (strBuilder != null && strBuilder.length() > 0) {
+			strBuilder.append(": ");
 		}
-		log.info("END PCPCalculationService.assignProvider.");
 	}
 
-	private void appendColon(StringBuilder strBuilder) {
-        if (strBuilder != null && strBuilder.length() > 0) {
-            strBuilder.append(": ");
-        }
-    }
-    
-    private void pcpAssignmentService(List<ContractMemberClaimEntity> contractMemberClaimEntities,
-			Multimap<String, MemberClaimResponse> memberWiseResponseMap) {
-    	    log.info("Start PCPAssignmentTask.pcpAssignmentService");
- 		    contractMemberClaimEntities.forEach(contractMemberClaim -> {
+	private void pcpAssignmentService(List<ContractMemberClaimEntity> contractMemberClaimEntities,
+									  Multimap<String, MemberClaimResponse> memberWiseResponseMap) {
+		log.info("Start PCPAssignmentTask.pcpAssignmentService");
+		contractMemberClaimEntities.forEach(contractMemberClaim -> {
 			List<MemberClaimResponse> members = (List<MemberClaimResponse>) memberWiseResponseMap.get(contractMemberClaim.getMemberId());
 			MemberClaimResponse memberClaimResponse = memberClaimUtills.calculateLatestClaim(members);
 			pcpAssignmentService.process(contractMemberClaim, memberClaimResponse);
 			log.info("END PCPAssignmentTask.pcpAssignmentService");
 		});
-    }	    
+	}
 
+	@Transactional
 	@MethodExecutionTime
 	private void setErrorMessageAndSave(String claimId, StringBuilder errorMessageBuilder, Status status) {
 		Optional<ContractMemberClaimEntity> contractMemberClaimEntity = 					findContractMemberClaimEntity(claimId);
-			if(contractMemberClaimEntity.isPresent()) {
-				ContractMemberClaimEntity entity = contractMemberClaimEntity.get();
-				entity.setStatus(status);
-				entity.setErrorMessage(errorMessageBuilder.toString());
-				contractMemberClaimRepo.save(entity);
-			}
+		if(contractMemberClaimEntity.isPresent()) {
+			ContractMemberClaimEntity entity = contractMemberClaimEntity.get();
+			entity.setStatus(status);
+			entity.setErrorMessage(errorMessageBuilder.toString());
+			contractMemberClaimRepo.save(entity);
+		}
 	}
 
+	@Transactional
 	@MethodExecutionTime
 	private void setErrorMessageToAllContractAndSave(StringBuilder errorMessageBuilder, Status status) {
 		contractMemberClaimEntities.forEach(entity ->{
-				entity.setStatus(status);
-				entity.setErrorMessage(errorMessageBuilder.toString());
-				contractMemberClaimRepo.save(entity);
-				contractMemberClaimRepo.save(entity);
-			});			
-	}   
-	
+			entity.setStatus(status);
+			entity.setErrorMessage(errorMessageBuilder.toString());
+			contractMemberClaimRepo.save(entity);
+			contractMemberClaimRepo.save(entity);
+		});
+	}
+
 	private Optional<ContractMemberClaimEntity> findContractMemberClaimEntity(String claimId) {
 		return contractMemberClaimEntities.stream().filter(i -> i.getClaimId().equals(claimId)).findFirst();
 	}
 
 	@Override
-    public void run() {
-        validateAndAssignProvider();
-    }
-  }
+	public void run() {
+		validateAndAssignProvider();
+	}
+}

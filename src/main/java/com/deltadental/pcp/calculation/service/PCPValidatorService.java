@@ -52,7 +52,7 @@ public class PCPValidatorService {
 		log.info("START PCPValidatorService.validateContractMemberClaim");
 		Multimap<String, MemberClaimResponse> memberWiseResponseMultiMap = ArrayListMultimap.create();
 		try {
-			List<MemberClaimResponse> memberClaimsResponses = mtvSyncService.memberClaim(getClaimIds(contractMemberClaimsEntities));
+			List<MemberClaimResponse> memberClaimsResponses = mtvSyncService.memberClaim(memberClaimUtils.getClaimIds(contractMemberClaimsEntities));
 			if (CollectionUtils.isNotEmpty(memberClaimsResponses)) {
 				for (MemberClaimResponse memberClaimResponse:memberClaimsResponses) {
 					if (null != memberClaimResponse && (StringUtils.isBlank(memberClaimResponse.getErrorCode())
@@ -99,7 +99,7 @@ public class PCPValidatorService {
 		}
 		if(!memberWiseResponseMultiMap.isEmpty()) {
 			pcpAssignmentService(contractMemberClaimsEntities, memberWiseResponseMultiMap);
-//			repo.saveAll(contractMemberClaimsEntities);
+			repo.saveAll(contractMemberClaimsEntities);
 		}
 		log.info("END PCPValidatorService.validateContractMemberClaim");
 	}
@@ -109,7 +109,7 @@ public class PCPValidatorService {
 			Multimap<String, MemberClaimResponse> memberWiseResponseMap) {
  		    contractMemberClaimEntities.forEach(contractMemberClaimEntity -> {
 			List<MemberClaimResponse> members = (List<MemberClaimResponse>) memberWiseResponseMap.get(contractMemberClaimEntity.getMemberId());
-			MemberClaimResponse memberClaimResponse = calculateLatestClaim(members);
+			MemberClaimResponse memberClaimResponse = memberClaimUtils.calculateLatestClaim(members);
 			pcpAssignmentService.process(contractMemberClaimEntity, memberClaimResponse);
 		});
 	}
