@@ -56,4 +56,5 @@ ENTRYPOINT java $JAVA_OPTS \
 	-Dmanagement.endpoint.health.show-details=${MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS} \
 	-Dpcp.assignment.process.workers.count=${PCP_ASSIGNMENT_PROCESS_WORKERS_COUNT} \
 	-Denvironment=${ENVIRONMENT} \
+	-Djavax.net.ssl.trustStore=/usr/java/latest/jre/lib/security/cacerts \
 	-jar /pcp-calculation-service-1.0.0.jar

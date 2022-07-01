@@ -11,8 +11,11 @@ import com.deltadental.pcp.calculation.repos.MemberClaimRepo;
 import com.deltadental.pcp.calculation.repos.MemberClaimServicesRepo;
 import com.deltadental.pcp.calculation.repos.MemberProviderRepo;
 import com.deltadental.pcp.calculation.service.PCPAssignmentService;
+import com.deltadental.pcp.calculation.util.MemberClaimUtils;
 import com.deltadental.pcp.search.interservice.PCPSearchServiceClient;
 import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,8 +25,10 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -56,20 +61,30 @@ public class PCPAssignmentTask implements Runnable {
 
     @Autowired
     private PCPAssignmentService pcpAssignmentService;
+    
+    @Autowired
+	private MemberClaimUtils memberClaimUtills;
 
-    private ContractMemberClaimEntity contractMemberClaimEntity;
+    private List<ContractMemberClaimEntity> contractMemberClaimEntities;
 
+	@Transactional
 	@MethodExecutionTime
 	public void validateAndAssignProvider() {
-		log.info("START PCPCalculationService.processPCPAssignment.");
-		log.info("Processing {} ", contractMemberClaimEntity);
+		log.info("START PCPAssignmentTask.processPCPAssignment.");
+		log.info("Processing {} ", contractMemberClaimEntities);
 		StringBuilder errorMessageBuilder = new StringBuilder();
-		List<String> memberClaimResponseList = List.of(contractMemberClaimEntity.getClaimId());
+		List<String> memberClaimIds = memberClaimUtills.getClaimIds(contractMemberClaimEntities);
 		try {
-			List<MemberClaimResponse> memberClaimsResponse = mtvSyncService.memberClaim(memberClaimResponseList);
-			if(CollectionUtils.isNotEmpty(memberClaimsResponse)) {
-			MemberClaimResponse memberClaimResponse = memberClaimsResponse.get(0);
-			if (null != memberClaimResponse && (StringUtils.isBlank(memberClaimResponse.getErrorCode()) || StringUtils.isBlank(memberClaimResponse.getErrorMessage()))) {
+		List<MemberClaimResponse> memberClaimsResponses = mtvSyncService.memberClaim(memberClaimIds);
+		if(CollectionUtils.isEmpty(memberClaimsResponses)) {
+			errorMessageBuilder.append(String.format("Claim information not found for claim # %s", memberClaimIds.toString()));
+			log.info("Marking as {} for Claim id {} with member claim response is null ",Status.CLAIM_NOT_FOUND, memberClaimIds.toString());
+			setErrorMessageToAllContractAndSave(errorMessageBuilder, Status.CLAIM_NOT_FOUND);
+		}else{
+			log.info("Total Claims Received from MTV sync {} out of {}", memberClaimsResponses.size(), memberClaimIds.size());
+			Multimap<String, MemberClaimResponse> memberWiseResponseMultiMap = ArrayListMultimap.create();
+		    for(MemberClaimResponse memberClaimResponse : memberClaimsResponses) {
+			  if (null != memberClaimResponse && (StringUtils.isBlank(memberClaimResponse.getErrorCode()) || StringUtils.isBlank(memberClaimResponse.getErrorMessage()))) {
 				boolean exclusionFlag = pcpConfigData.isProviderInExclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber());
 				boolean inclusionFlag = pcpConfigData.isProviderInInclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber());
 				if (false == exclusionFlag && inclusionFlag) {
@@ -78,37 +93,27 @@ public class PCPAssignmentTask implements Runnable {
 					if(exclusionFlag) {
 						log.info("Provider {} excluded, not assigning for claim id {}", memberClaimResponse.getProviderId(), memberClaimResponse.getClaimId());
 						errorMessageBuilder.append(String.format("Provider %s, Group %s, Division %s is listed in exclusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()));
-						contractMemberClaimEntity.setStatus(Status.PCP_EXCLUDED);
+            setErrorMessageAndSave(memberClaimResponse.getClaimId(), errorMessageBuilder, Status.PCP_EXCLUDED);
 					}
 					if (!inclusionFlag) {
 						log.info("Provider {} not included, not assigning for claim id {}", memberClaimResponse.getProviderId(), memberClaimResponse.getClaimId());
 						errorMessageBuilder.append(String.format("Provider %s, Group %s, Division %s is not listed in inclusion list.", memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber()));
-						contractMemberClaimEntity.setStatus(Status.PCP_NOT_INCLUDED);
+						setErrorMessageAndSave(memberClaimResponse.getClaimId(), errorMessageBuilder, Status.PCP_NOT_INCLUDED);
 					}
-					contractMemberClaimEntity.setErrorMessage(errorMessageBuilder.toString());
-				}
-			} else {
-				if (memberClaimResponse == null) {
-					errorMessageBuilder.append(String.format("Claim information not found for claim # %s", contractMemberClaimEntity.getClaimId()));
-					log.info("Marking as {} for Claim id {} with member claim response is null ",Status.CLAIM_NOT_FOUND,contractMemberClaimEntity.getClaimId());
-					contractMemberClaimEntity.setStatus(Status.CLAIM_NOT_FOUND);
-					contractMemberClaimEntity.setErrorMessage(errorMessageBuilder.toString());
-				} else {
-					errorMessageBuilder.append(String.join(" : ", memberClaimResponse.getErrorCode(), memberClaimResponse.getErrorMessage()));
-					contractMemberClaimEntity.setStatus(Status.FAILED);
-					log.info("Marking as {} for Claim id {} with member claim response {} ",Status.FAILED,contractMemberClaimEntity.getClaimId(),  errorMessageBuilder);
-					contractMemberClaimEntity.setErrorMessage(errorMessageBuilder.toString());
 				}
 			}
-			}
+ 		}
+	    if(!memberWiseResponseMultiMap.isEmpty()) {
+			pcpAssignmentService(contractMemberClaimEntities, memberWiseResponseMultiMap);
+		}
+		}
+		
 		} catch (Exception e) {
-			log.error("Exception occured during retriving member claim information from Metavance Sync Service.", e);
-			errorMessageBuilder.append("Exception occured during retriving member claim information from Metavance Sync Service.");
-			contractMemberClaimEntity.setStatus(Status.RETRY);
-			contractMemberClaimEntity.setErrorMessage(errorMessageBuilder.toString());
+			log.error("Exception occurred during retrieving member claim information from Metavance Sync Service.", e);
+			errorMessageBuilder.append("Exception occurred during retrieving member claim information from Metavance Sync Service.");
+			setErrorMessageToAllContractAndSave(errorMessageBuilder,Status.RETRY);
 		}		
-		contractMemberClaimRepo.save(contractMemberClaimEntity);
-		log.info("END PCPCalculationService.processPCPAssignment");
+		log.info("END PCPAssignmentTask.processPCPAssignment");
 	}
 
 	private void assignProvider(StringBuilder errorMessageBuilder, MemberClaimResponse memberClaimResponse) {
@@ -151,9 +156,45 @@ public class PCPAssignmentTask implements Runnable {
             strBuilder.append(": ");
         }
     }
+    
+    private void pcpAssignmentService(List<ContractMemberClaimEntity> contractMemberClaimEntities,
+			Multimap<String, MemberClaimResponse> memberWiseResponseMap) {
+    	    log.info("Start PCPAssignmentTask.pcpAssignmentService");
+ 		    contractMemberClaimEntities.forEach(contractMemberClaim -> {
+			List<MemberClaimResponse> members = (List<MemberClaimResponse>) memberWiseResponseMap.get(contractMemberClaim.getMemberId());
+			MemberClaimResponse memberClaimResponse = memberClaimUtills.calculateLatestClaim(members);
+			pcpAssignmentService.process(contractMemberClaim, memberClaimResponse);
+			log.info("END PCPAssignmentTask.pcpAssignmentService");
+		});
+    }	    
 
-    @Override
+	@MethodExecutionTime
+	private void setErrorMessageAndSave(String claimId, StringBuilder errorMessageBuilder, Status status) {
+		Optional<ContractMemberClaimEntity> contractMemberClaimEntity = 					findContractMemberClaimEntity(claimId);
+			if(contractMemberClaimEntity.isPresent()) {
+				ContractMemberClaimEntity entity = contractMemberClaimEntity.get();
+				entity.setStatus(status);
+				entity.setErrorMessage(errorMessageBuilder.toString());
+				contractMemberClaimRepo.save(entity);
+			}
+	}
+
+	@MethodExecutionTime
+	private void setErrorMessageToAllContractAndSave(StringBuilder errorMessageBuilder, Status status) {
+		contractMemberClaimEntities.forEach(entity ->{
+				entity.setStatus(status);
+				entity.setErrorMessage(errorMessageBuilder.toString());
+				contractMemberClaimRepo.save(entity);
+				contractMemberClaimRepo.save(entity);
+			});			
+	}   
+	
+	private Optional<ContractMemberClaimEntity> findContractMemberClaimEntity(String claimId) {
+		return contractMemberClaimEntities.stream().filter(i -> i.getClaimId().equals(claimId)).findFirst();
+	}
+
+	@Override
     public void run() {
         validateAndAssignProvider();
     }
-}
+  }

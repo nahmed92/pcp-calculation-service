@@ -46,7 +46,7 @@ public class ExcelPCPDataUploadController {
     public ResponseEntity<String> uploadPCPMemberClaims(
             @RequestParam(name = "pcpMemberClaimsDataFile", required = true) MultipartFile pcpMemberClaimsDataFile) {
         log.info("START PCPCalculationServiceController.uploadPCPMemberClaims");
-        ResponseEntity<String> responseEntity = null;
+        ResponseEntity<String> responseEntity;
         if (excelService.isExcelFormat(pcpMemberClaimsDataFile)) {
             List<MemberContractClaimRequest> memberContractClaimRequests = excelService.extractPCPMemberClaimsData(pcpMemberClaimsDataFile);
             if (CollectionUtils.isNotEmpty(memberContractClaimRequests)) {

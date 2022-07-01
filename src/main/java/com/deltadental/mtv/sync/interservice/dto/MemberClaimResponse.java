@@ -39,20 +39,14 @@ public class MemberClaimResponse {
     private String memberLastName;
     private Date fromDate;
     private Date thruDate;
-
-//    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss.SSSXXX")
-
     @JsonDeserialize(using = TimestampDeserializer.class)
     private Timestamp paidTs;
     private String personId;
     private String providerId;
-
     @JsonDeserialize(using = TimestampDeserializer.class)
     private Timestamp receivedTs;
-
     @JsonDeserialize(using = TimestampDeserializer.class)
     private Timestamp resolvedTs;
-
     private String returnCode;
     private List<ServiceLine> serviceLines;
     private String servicesNumber;

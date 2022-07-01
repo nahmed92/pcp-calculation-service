@@ -8,17 +8,14 @@ import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Component
 public class Mapper {
-	
-	SimpleDateFormat df = new SimpleDateFormat("MM-dd-yyyy");
 
-  @MethodExecutionTime
+	@MethodExecutionTime
 	public List<ContractMemberClaimEntity> map(List<MemberContractClaimRequest> requests, String serviceInstanceId) {
 		List<ContractMemberClaimEntity> response = new ArrayList<>();
 		String id = UUID.randomUUID().toString();
@@ -36,7 +33,7 @@ public class Mapper {
 	}
 
 	private ContractMemberClaimEntity map(MemberContractClaimRequest request, String serviceInstanceId) {
-		ContractMemberClaimEntity entity = ContractMemberClaimEntity.builder()
+		return ContractMemberClaimEntity.builder()
 				.claimId(StringUtils.trimToNull(request.getClaimId()))
 				.contractId(StringUtils.trimToNull(request.getContractId()))
 				.memberId(StringUtils.trimToNull(request.getMemberId()))
@@ -44,6 +41,5 @@ public class Mapper {
 				.state(StringUtils.trimToNull(request.getState()))
 				.operatorId(StringUtils.trimToNull(request.getOperatorId()))
 				.instanceId(StringUtils.trimToNull(serviceInstanceId)).status(Status.STAGED).build();
-		return entity;
 	}
 }
