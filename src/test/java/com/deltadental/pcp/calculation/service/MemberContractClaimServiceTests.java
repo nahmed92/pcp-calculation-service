@@ -1,24 +1,20 @@
 package com.deltadental.pcp.calculation.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimPK;
+import com.deltadental.pcp.calculation.enums.Status;
+import com.deltadental.pcp.calculation.mapper.Mapper;
+import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
+import org.apache.commons.lang.StringUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-
-import com.deltadental.pcp.calculation.domain.MemberContractClaimRequest;
-import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
-import com.deltadental.pcp.calculation.enums.Status;
-import com.deltadental.pcp.calculation.mapper.Mapper;
-import com.deltadental.pcp.calculation.repos.ContractMemberClaimRepo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MemberContractClaimServiceTests {
 
@@ -39,12 +35,12 @@ public class MemberContractClaimServiceTests {
     private static final List<Status> SEARCH_STATUS = List.of(Status.RETRY, Status.STAGED, Status.VALIDATED, Status.PCP_ASSIGNED, Status.PCP_EXCLUDED, Status.PCP_NOT_INCLUDED);
 
     @BeforeEach
-    public void init(){
+    public void init() {
         MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    public void testStageMemberContractClaimRecords_success(){
+    public void testStageMemberContractClaimRecords_success() {
 
         List<MemberContractClaimRequest> requestList = new ArrayList<>();
         MemberContractClaimRequest request = buildRequest();
@@ -57,19 +53,21 @@ public class MemberContractClaimServiceTests {
         Mockito.when(mockRepo
                 .findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
                         StringUtils.trimToNull(request.getClaimId()), // check this and remove
-                        StringUtils.trimToNull(request.getContractId()), StringUtils.trimToNull(request.getMemberId()),
-                        StringUtils.trimToNull(request.getProviderId()), StringUtils.trimToNull(request.getState()),
+                        StringUtils.trimToNull(request.getContractId()), //
+                        StringUtils.trimToNull(request.getMemberId()), //
+                        StringUtils.trimToNull(request.getProviderId()),
+                        StringUtils.trimToNull(request.getState()),
                         SEARCH_STATUS
                 )).thenReturn(memberClaimsEntities);
         mockMemberContractClaimService.stageMemberContractClaimRecords(requestList);
         Mockito.verify(mockRepo).
                 findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
-                        ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(),ArgumentMatchers.any(), ArgumentMatchers.any());
+                        ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
         assertEquals(memberClaimsEntities.size(), 1);
     }
 
     @Test
-    public void testStageMemberContractClaimRecords_duplicateRecord(){
+    public void testStageMemberContractClaimRecords_duplicateRecord() {
 
         List<MemberContractClaimRequest> requestList = new ArrayList<>();
         MemberContractClaimRequest request = buildRequest();
@@ -82,8 +80,10 @@ public class MemberContractClaimServiceTests {
         Mockito.when(mockRepo
                         .findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
                                 StringUtils.trimToNull(request.getClaimId()), // check this and remove
-                                StringUtils.trimToNull(request.getContractId()), StringUtils.trimToNull(request.getMemberId()),
-                                StringUtils.trimToNull(request.getProviderId()), StringUtils.trimToNull(request.getState()),
+                                StringUtils.trimToNull(request.getContractId()), //
+                                StringUtils.trimToNull(request.getMemberId()), //
+                                StringUtils.trimToNull(request.getProviderId()), //
+                                StringUtils.trimToNull(request.getState()),
                                 SEARCH_STATUS
                         ))
                 .thenReturn(memberClaimsEntities);
@@ -93,7 +93,10 @@ public class MemberContractClaimServiceTests {
 
     private ContractMemberClaimEntity buildContractMemberClaimEntity() {
         ContractMemberClaimEntity entity = new ContractMemberClaimEntity();
-        entity.setId("ID0011");
+        ContractMemberClaimPK id= new ContractMemberClaimPK();
+        id.setId("ID0011");
+        id.setSequenceId(2);
+        entity.setContractMemberClaimPK(id);
         entity.setContractId("C001");
         entity.setClaimId("CL001");
         entity.setProviderId("PR001");

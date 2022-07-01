@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MemberContractClaimResponse {
 
-	private String claimId;
-	private String contractId;
-	private String memberId;
-	private String providerId;
-	private String status;
-	private String pcpEffectiveDate;
+    private String claimId;
+    private String contractId;
+    private String memberId;
+    private String providerId;
+    private String status;
+    private String pcpEffectiveDate;
 }

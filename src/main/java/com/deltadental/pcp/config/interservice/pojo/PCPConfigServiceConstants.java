@@ -2,7 +2,7 @@ package com.deltadental.pcp.config.interservice.pojo;
 
 public class PCPConfigServiceConstants {
 
-	public static String CLAIM_LOOKBACK_DAYS = "/claim-lookback-days";
+  public static String CLAIM_LOOKBACK_DAYS = "/claim-lookback-days";
 	public static String CLAIM_STATUS = "/claim-status";
 	public static String CLAIMS_CONFIG = "/claims-config";
 	public static String EXPLANATION_CODE = "/explanation-code";

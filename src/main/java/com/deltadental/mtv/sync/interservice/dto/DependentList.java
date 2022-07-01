@@ -1,14 +1,13 @@
 package com.deltadental.mtv.sync.interservice.dto;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -17,7 +16,7 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DependentList {
-	private List<Eligibility> eligibility;
+    private List<Eligibility> eligibility;
     private String ethinicityCode;
     private String individualRelationshipCode;
     private String languageCode;

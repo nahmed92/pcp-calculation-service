@@ -1,6 +1,7 @@
 
 CREATE TABLE dbo.member_claim_service (
 	id varchar(200) not null,
+	sequence_id int,
 	claim_type varchar(2),
 	encounter_flag varchar(1),
 	expln_code varchar(10),
@@ -13,5 +14,13 @@ CREATE TABLE dbo.member_claim_service (
 	last_update_at datetime null,
 	operator_id varchar(255),
 	member_claim_id varchar(200) null,
+	[received_timestamp] datetime,
+	
+	
 	constraint pk_member_claim_service_id primary key (id)
 );
+
+
+
+
+ 
