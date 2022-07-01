@@ -9,11 +9,11 @@ import org.springframework.context.annotation.Configuration;
 public class ServiceFilters {
 
     @Bean
-    public FilterRegistrationBean loggerFilterRegistrationBean() {
-        FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+    public FilterRegistrationBean<LoggerFilter> loggerFilterRegistrationBean() {
+        FilterRegistrationBean<LoggerFilter> registrationBean = new FilterRegistrationBean<LoggerFilter>();
         registrationBean.setName("Logger");
         registrationBean.setFilter(new LoggerFilter());
-        registrationBean.setOrder(4);
+        registrationBean.setOrder(1);
         return registrationBean;
     }
 }

@@ -57,7 +57,7 @@ public class ApplicationConfig implements AsyncConfigurer {
 		return securedRestClient.createRestTemplate(deltaKeyStoreLocation, deltaKeyStorePassword);
 	}
 
-	// @Bean
+	@Bean
 	public RestTemplate restTemplate() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
 		TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
 		SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy)
