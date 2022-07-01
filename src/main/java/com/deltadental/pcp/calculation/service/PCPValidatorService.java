@@ -52,18 +52,22 @@ public class PCPValidatorService {
 		log.info("START PCPValidatorService.validateContractMemberClaim");
 		Multimap<String, MemberClaimResponse> memberWiseResponseMultiMap = ArrayListMultimap.create();
 		try {
-			List<MemberClaimResponse> memberClaimsResponse = mtvSyncService.memberClaim(memberClaimUtils.getClaimIds(contractMemberClaimsEntities));
-			if (CollectionUtils.isNotEmpty(memberClaimsResponse)) {
-				memberClaimsResponse.forEach(memberClaimResponse -> {
+			List<MemberClaimResponse> memberClaimsResponses = mtvSyncService.memberClaim(getClaimIds(contractMemberClaimsEntities));
+			if (CollectionUtils.isNotEmpty(memberClaimsResponses)) {
+				for (MemberClaimResponse memberClaimResponse:memberClaimsResponses) {
 					if (null != memberClaimResponse && (StringUtils.isBlank(memberClaimResponse.getErrorCode())
 							|| StringUtils.isBlank(memberClaimResponse.getErrorMessage()))) {
 						boolean exclusionFlag = pcpConfigData.isProviderInExclusionList(
 								memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(),
 								memberClaimResponse.getDivisionNumber());
+						if(exclusionFlag) {
+							log.info("Provider {} excluded, not assigning for claim id {}", memberClaimResponse.getProviderId(), memberClaimResponse.getClaimId());
+							continue;
+						}
 						boolean inclusionFlag = pcpConfigData.isProviderInInclusionList(
 								memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(),
 								memberClaimResponse.getDivisionNumber());
-						if (exclusionFlag || inclusionFlag) {
+						if (inclusionFlag) {
 							List<ServiceLine> serviceLines = memberClaimResponse.getServiceLines();
 							if (CollectionUtils.isNotEmpty(serviceLines)) {
 								boolean isClaimStatusValid = pcpConfigData.isClaimStatusValid(
@@ -78,11 +82,12 @@ public class PCPValidatorService {
 									memberWiseResponseMultiMap.put(memberClaimResponse.getMemberID(), memberClaimResponse);
 								}
 							}
+						} else {
+							log.info("Provider {} not included, not assigning for claim id {}", memberClaimResponse.getProviderId(), memberClaimResponse.getClaimId());
 						}
 					}
-				});
+				}
 			}
-
 		} catch (Exception e) {
 			log.error("Exception occurred during retrieving member claim information from Metavance Sync Service.", e);
 			contractMemberClaimsEntities.forEach(entity -> {
@@ -93,8 +98,8 @@ public class PCPValidatorService {
 			});
 		}
 		if(!memberWiseResponseMultiMap.isEmpty()) {
-		repo.saveAll(contractMemberClaimsEntities);
-		pcpAssignmentService(contractMemberClaimsEntities, memberWiseResponseMultiMap);
+			pcpAssignmentService(contractMemberClaimsEntities, memberWiseResponseMultiMap);
+//			repo.saveAll(contractMemberClaimsEntities);
 		}
 		log.info("END PCPValidatorService.validateContractMemberClaim");
 	}
@@ -102,10 +107,10 @@ public class PCPValidatorService {
 	@MethodExecutionTime
 	private void pcpAssignmentService(List<ContractMemberClaimEntity> contractMemberClaimEntities,
 			Multimap<String, MemberClaimResponse> memberWiseResponseMap) {
- 		    contractMemberClaimEntities.forEach(contractMemberClaim -> {
-			List<MemberClaimResponse> members = (List<MemberClaimResponse>) memberWiseResponseMap.get(contractMemberClaim.getMemberId());
-			MemberClaimResponse memberClaimResponse = memberClaimUtils.calculateLatestClaim(members);
-			pcpAssignmentService.process(contractMemberClaim, memberClaimResponse);
+ 		    contractMemberClaimEntities.forEach(contractMemberClaimEntity -> {
+			List<MemberClaimResponse> members = (List<MemberClaimResponse>) memberWiseResponseMap.get(contractMemberClaimEntity.getMemberId());
+			MemberClaimResponse memberClaimResponse = calculateLatestClaim(members);
+			pcpAssignmentService.process(contractMemberClaimEntity, memberClaimResponse);
 		});
 	}
 

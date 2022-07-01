@@ -213,39 +213,27 @@ public class PCPConfigData implements InitializingBean {
             List<InclusionExclusion> inclusionList = Arrays.asList(inclusions);
             if (CollectionUtils.isNotEmpty(inclusionList)) {
                 inclusionFlag = inclusionList.stream().anyMatch(inclusion -> matchInclusion(inclusion, providerId, group, division));
-                if (inclusionFlag) {
-                    log.info("Provider {}, Group {}, Division {} is listed in inclusion list, inclusion flag {}.", providerId, group, division, true);
-                } else {
-                    log.info("Provider {}, Group {}, Division {} is not listed in inclusion list, inclusion flag {}.", providerId, group, division, false);
-                }
-            } else {
-                log.info("Provider {}, Group {}, Division {} is not listed in inclusion list, inclusion flag {}.", providerId, group, division, true);
             }
         }
+        log.info("Provider {}, Group {}, Division {}, inclusion flag {}.", providerId, group, division, inclusionFlag);
         log.info("END PCPConfigData.isProviderInInclusionList()");
         return inclusionFlag;
     }
 
     @MethodExecutionTime
     public boolean isProviderInExclusionList(String providerId, String group, String division) {
-        log.info("START PCPConfigData.isProviderInExclusionList {}, {}, {}", providerId, group, division);
-        boolean providerNotExclusionFlag = true;
+        log.info("START PCPConfigData.isProviderInExclusionList");
+        boolean exclusionFlag = false;
         if (StringUtils.isNotBlank(providerId) && StringUtils.isNotBlank(group) && StringUtils.isNotBlank(division)) {
             InclusionExclusion[] exclusions = pcpConfigServiceClient.exclusions(providerId);
             List<InclusionExclusion> exclusionList = Arrays.asList(exclusions);
             if (CollectionUtils.isNotEmpty(exclusionList)) {
-                providerNotExclusionFlag = exclusionList.stream().anyMatch(exclusion -> matchExclusion(exclusion, providerId, group, division));
-                if (providerNotExclusionFlag) {
-                    log.info("Provider {}, Group {}, Division {} is not listed in exclusion list, exclusion flag {}", providerId, group, division, true);
-                } else {
-                    log.info("Provider {}, Group {}, Division {} is listed in exclusion list, exclusion flag {}", providerId, group, division, false);
-                }
-            } else {
-                log.info("Provider {}, Group {}, Division {} is not listed in exclusion list, exclusion flag {}", providerId, group, division, true);
+                exclusionFlag = exclusionList.stream().anyMatch(exclusion -> matchExclusion(exclusion, providerId, group, division));
             }
         }
-        log.info("END PCPConfigData.isProviderInExclusionList {}, {}, {}", providerId, group, division);
-        return providerNotExclusionFlag;
+        log.info("Provider {}, Group {}, Division {}, exclusion flag {}", providerId, group, division, exclusionFlag);
+        log.info("END PCPConfigData.isProviderInExclusionList");
+        return exclusionFlag;
     }
 
     @MethodExecutionTime
@@ -282,7 +270,7 @@ public class PCPConfigData implements InitializingBean {
     private boolean matchExclusion(InclusionExclusion inclusionExclusion, String providerId, String group, String division) {
         log.info("START : PCPConfigData.matchExclusion");
         GroupRestrictions groupRestrictions = inclusionExclusion.getGroupRestrictions();
-        boolean returnValue = !(StringUtils.equals(groupRestrictions.getMasterContractId(), providerId) && StringUtils.equals(groupRestrictions.getGroupId(), group) && StringUtils.equals(groupRestrictions.getDivisionId(), division));
+        boolean returnValue = (StringUtils.equals(groupRestrictions.getMasterContractId(), providerId) && StringUtils.equals(groupRestrictions.getGroupId(), group) && StringUtils.equals(groupRestrictions.getDivisionId(), division));
         log.info("Returning {} for provider id {}, group {}, division {} for exclusion.", returnValue, providerId, group, division);
         log.info("END : PCPConfigData.matchExclusion");
         return returnValue;
