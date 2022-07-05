@@ -40,7 +40,7 @@
 		<!-- Delta Dental's Platform common library with frequently needed utilities -->
 		<services-common-library-version>1.0.12</services-common-library-version>
 
-		<pcp-common-library-version>1.0.0</pcp-common-library-version>
+		<pcp-common-library-version>1.0.1</pcp-common-library-version>
 
 		<!-- Code Quality modules -->
 		<maven-check-style-plugin-version>2.17</maven-check-style-plugin-version>
