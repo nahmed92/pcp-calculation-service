@@ -39,6 +39,6 @@ public class MemberClaimUtils {
 	}
 
 	public List<String> getClaimIds(List<ContractMemberClaimEntity> contractMemberClaimEntities) {
-		return contractMemberClaimEntities.stream().map(ContractMemberClaimEntity::getClaimId).collect(Collectors.toList());
+		return contractMemberClaimEntities.stream().map(ContractMemberClaimEntity::getClaimId).distinct().collect(Collectors.toList());
 	}
 }
