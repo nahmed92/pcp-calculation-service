@@ -1,5 +1,6 @@
 package com.deltadental.pcp.calculation.config;
 
+import com.deltadental.platform.common.rest.SecuredRestClient;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -21,9 +22,6 @@ import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
-
-
-import com.deltadental.platform.common.rest.SecuredRestClient;
 
 import javax.net.ssl.SSLContext;
 import java.security.KeyManagementException;
