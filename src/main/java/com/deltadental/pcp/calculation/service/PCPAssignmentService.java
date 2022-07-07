@@ -75,6 +75,7 @@ public class PCPAssignmentService {
     public void process(ContractMemberClaimEntity contractMemberClaimEntity, MemberClaimResponse memberClaimResponse) {
         log.info("START PCPAssignmentService.process()");
         try {
+            log.info("Processing for {} ",contractMemberClaimEntity);
             String pcpEffectiveDate = pcpConfigData.calculatePCPEffectiveDate();
             PCPValidateResponse pcpValidateResponse = callPCPValidate(memberClaimResponse, pcpEffectiveDate);
             String pcpValidationMessage = getPCPValidationMessage(pcpValidateResponse);
