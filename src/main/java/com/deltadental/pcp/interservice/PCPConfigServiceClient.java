@@ -34,13 +34,13 @@ public class PCPConfigServiceClient {
 	private String pcpConfigServiceEndpoint;
 	
 	@Autowired
-	@Qualifier("securedRestTemplate")
+	//@Qualifier("securedRestTemplate")
 	private RestTemplate restTemplate;
 	
 	private static final String LOOK_A_HEAD_DAYS_90 = "90";
 	
-	@Autowired
-	private HttpHeaderBuilder httpHeaderBuilder;
+	//@Autowired
+	//private HttpHeaderBuilder httpHeaderBuilder;
 
 	public String getPCPConfigData(String serviceEndPoint) {
 		log.info("START PCPConfigServiceClient.pcpConfigData {} ", serviceEndPoint);
@@ -64,7 +64,7 @@ public class PCPConfigServiceClient {
 	}
 
 	private HttpHeaders createHttpHeaders() {
-		HttpHeaders headers = httpHeaderBuilder.createHttpSecurityHeaders();
+		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		return headers;
 	}
