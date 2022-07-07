@@ -45,10 +45,10 @@ public class ApplicationConfig implements AsyncConfigurer {
 	@Autowired
 	private SecuredRestClient securedRestClient;
 
-	@Value("${service.cert.file}")
+	@Value("${server.ssl.key-store}")
 	String deltaKeyStoreLocation;
 
-	@Value("${service.cert.password}")
+	@Value("${server.ssl.key-store-password}")
 	String deltaKeyStorePassword;
 
 	@Bean
