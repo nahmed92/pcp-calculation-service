@@ -234,13 +234,13 @@
 			<version>${services-common-library-version}</version>
 		</dependency>
 		
-		
+		<!--
 		<dependency>
 			<groupId>com.deltadental.gmmo</groupId>
 			<artifactId>pcp-common</artifactId>
 			<version>${pcp-common-library-version}</version>
 		</dependency>
-		
+		-->
 
 		<dependency>
 			<groupId>org.json</groupId>

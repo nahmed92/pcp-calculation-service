@@ -2,11 +2,9 @@ package com.deltadental.pcp.interservice;
 
 import com.deltadental.pcp.calculation.error.PCPCalculationServiceErrors;
 import com.deltadental.pcp.config.interservice.pojo.InclusionExclusion;
-import com.deltadental.pcp.security.HttpHeaderBuilder;
 import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -14,11 +12,6 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
- 
-
-import com.deltadental.pcp.security.HttpHeaderBuilder;
-
- 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -34,13 +27,13 @@ public class PCPConfigServiceClient {
 	private String pcpConfigServiceEndpoint;
 	
 	@Autowired
-	@Qualifier("securedRestTemplate")
+	//@Qualifier("securedRestTemplate")
 	private RestTemplate restTemplate;
 	
 	private static final String LOOK_A_HEAD_DAYS_90 = "90";
 	
-	@Autowired
-	private HttpHeaderBuilder httpHeaderBuilder;
+	//@Autowired
+	//private HttpHeaderBuilder httpHeaderBuilder;
 
 	public String getPCPConfigData(String serviceEndPoint) {
 		log.info("START PCPConfigServiceClient.pcpConfigData {} ", serviceEndPoint);
@@ -64,7 +57,7 @@ public class PCPConfigServiceClient {
 	}
 
 	private HttpHeaders createHttpHeaders() {
-		HttpHeaders headers = httpHeaderBuilder.createHttpSecurityHeaders();
+		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		return headers;
 	}
