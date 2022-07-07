@@ -48,22 +48,12 @@ import java.util.concurrent.Executor;
 @ComponentScan(basePackages = {"com.deltadental.pcp.config","com.deltadental.pcp.security"})
 public class ApplicationConfig implements AsyncConfigurer {
  
- 
-	@Autowired
-	private SecuredRestClient securedRestClient;
-
 	@Value("${server.ssl.key-store}")
 	String deltaKeyStoreLocation;
 
 	@Value("${server.ssl.key-store-password}")
 	String deltaKeyStorePassword;
-
-	@Bean
-	@Qualifier("securedRestTemplate")
-	public RestTemplate serviceRestTemplate() {
-		return securedRestClient.createRestTemplate(deltaKeyStoreLocation, deltaKeyStorePassword);
-	}
-
+ 
 	@Bean
 	public RestTemplate restTemplate() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
 		TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
