@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @Builder
 @Table(name = "contract_member_claim", schema = "dbo")

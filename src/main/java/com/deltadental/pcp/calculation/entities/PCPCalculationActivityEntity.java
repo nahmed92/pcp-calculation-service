@@ -18,6 +18,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 @Builder
 @Transactional
 @EnableJpaAuditing
