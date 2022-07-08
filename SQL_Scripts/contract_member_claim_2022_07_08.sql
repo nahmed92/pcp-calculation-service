@@ -1,0 +1,1 @@
+ALTER TABLE contract_member_claim  ALTER COLUMN status varchar(25);

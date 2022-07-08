@@ -162,7 +162,7 @@ public class PCPAssignmentTask implements Runnable {
 	@Transactional
 	@MethodExecutionTime
 	private void setErrorMessageAndSave(String claimId, StringBuilder errorMessageBuilder, Status status) {
-		Optional<ContractMemberClaimEntity> contractMemberClaimEntity = 					findContractMemberClaimEntity(claimId);
+		Optional<ContractMemberClaimEntity> contractMemberClaimEntity = findContractMemberClaimEntity(claimId);
 		if(contractMemberClaimEntity.isPresent()) {
 			ContractMemberClaimEntity entity = contractMemberClaimEntity.get();
 			entity.setStatus(status);
@@ -183,7 +183,7 @@ public class PCPAssignmentTask implements Runnable {
 	}
 
 	private Optional<ContractMemberClaimEntity> findContractMemberClaimEntity(String claimId) {
-		return contractMemberClaimEntities.stream().filter(i -> i.getClaimId().equals(claimId)).findFirst();
+		return contractMemberClaimEntities.stream().distinct().filter(i -> i.getClaimId().equals(claimId)).findFirst();
 	}
 
 	@Override
