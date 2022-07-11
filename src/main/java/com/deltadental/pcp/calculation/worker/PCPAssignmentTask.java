@@ -21,13 +21,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @NoArgsConstructor
@@ -61,10 +64,10 @@ public class PCPAssignmentTask implements Runnable {
 
 	@Autowired
 	private PCPAssignmentService pcpAssignmentService;
-
+	
 	@Autowired
-	private MemberClaimUtils memberClaimUtills;
-
+	private MemberClaimUtils memberClaimUtils;
+	
 	private List<ContractMemberClaimEntity> contractMemberClaimEntities;
 
 	@Transactional
@@ -73,16 +76,13 @@ public class PCPAssignmentTask implements Runnable {
 		log.info("START PCPAssignmentTask.processPCPAssignment.");
 		log.info("Processing {} ", contractMemberClaimEntities);
 		StringBuilder errorMessageBuilder = new StringBuilder();
-		List<String> memberClaimIds = memberClaimUtills.getClaimIds(contractMemberClaimEntities);
+		boolean isErrorFlag = false;
+		Multimap<String, MemberClaimResponse> memberWiseResponseMultiMap = ArrayListMultimap.create();
+		List<String> memberClaimIds = memberClaimUtils.getClaimIds(contractMemberClaimEntities);
 		try {
 			List<MemberClaimResponse> memberClaimsResponses = mtvSyncService.memberClaim(memberClaimIds);
-			if(CollectionUtils.isEmpty(memberClaimsResponses)) {
-				errorMessageBuilder.append(String.format("Claim information not found for claim # %s", memberClaimIds.toString()));
-				log.info("Marking as {} for Claim id {} with member claim response is null ",Status.CLAIM_NOT_FOUND, memberClaimIds.toString());
-				setErrorMessageToAllContractAndSave(errorMessageBuilder, Status.CLAIM_NOT_FOUND);
-			}else{
-				log.info("Total Claims Received from MTV sync {} out of {}", memberClaimsResponses.size(), memberClaimIds.size());
-				Multimap<String, MemberClaimResponse> memberWiseResponseMultiMap = ArrayListMultimap.create();
+			if(CollectionUtils.isNotEmpty(memberClaimsResponses)) {
+				log.info("Total Claims Received from MTV sync {} out of {}", memberClaimsResponses.size(), memberClaimIds.size());				
 				for(MemberClaimResponse memberClaimResponse : memberClaimsResponses) {
 					if (null != memberClaimResponse && (StringUtils.isBlank(memberClaimResponse.getErrorCode()) || StringUtils.isBlank(memberClaimResponse.getErrorMessage()))) {
 						boolean exclusionFlag = pcpConfigData.isProviderInExclusionList(memberClaimResponse.getProviderId(), memberClaimResponse.getGroupNumber(), memberClaimResponse.getDivisionNumber());
@@ -130,14 +130,24 @@ public class PCPAssignmentTask implements Runnable {
 						}
 					}
 				}
-				if(!memberWiseResponseMultiMap.isEmpty()) {
-					pcpAssignmentService(contractMemberClaimEntities, memberWiseResponseMultiMap);
-				}
+			} else {
+				errorMessageBuilder.append(String.format("Claim information not found for claim # %s", memberClaimIds.toString()));
+				log.info("Marking as {} for Claim id {} with member claim response is null ",Status.CLAIM_NOT_FOUND, memberClaimIds.toString());
+				setErrorMessageToAllContractAndSave(errorMessageBuilder, Status.CLAIM_NOT_FOUND);
 			}
 		} catch (Exception e) {
+			isErrorFlag = true;
 			log.error("Exception occurred during retrieving member claim information from Metavance Sync Service.", e);
-			errorMessageBuilder.append("Exception occurred during retrieving member claim information from Metavance Sync Service.");
-			setErrorMessageToAllContractAndSave(errorMessageBuilder,Status.RETRY);
+			contractMemberClaimEntities.forEach(entity -> {
+				entity.setErrorMessage("Exception occurred during retrieving member claim information from Metavance Sync Service." + StringUtils.defaultIfBlank(e.getMessage(), "PCP Assignment Task"));
+				entity.setStatus(Status.RETRY);
+			});
+		}
+		if(!memberWiseResponseMultiMap.isEmpty()) {
+			if(!isErrorFlag) {
+				pcpAssignmentService(contractMemberClaimEntities, memberWiseResponseMultiMap);
+			}			
+			contractMemberClaimRepo.saveAll(contractMemberClaimEntities);
 		}
 		log.info("END PCPAssignmentTask.processPCPAssignment");
 	}
@@ -147,19 +157,42 @@ public class PCPAssignmentTask implements Runnable {
 			strBuilder.append(": ");
 		}
 	}
-
-	private void pcpAssignmentService(List<ContractMemberClaimEntity> contractMemberClaimEntities,
-									  Multimap<String, MemberClaimResponse> memberWiseResponseMap) {
-		log.info("Start PCPAssignmentTask.pcpAssignmentService");
-		contractMemberClaimEntities.forEach(contractMemberClaim -> {
-			List<MemberClaimResponse> members = (List<MemberClaimResponse>) memberWiseResponseMap.get(contractMemberClaim.getMemberId());
-			MemberClaimResponse memberClaimResponse = memberClaimUtills.calculateLatestClaim(members);
-			pcpAssignmentService.process(contractMemberClaim, memberClaimResponse);
-			log.info("END PCPAssignmentTask.pcpAssignmentService");
+	
+	@MethodExecutionTime
+	private void pcpAssignmentService(List<ContractMemberClaimEntity> contractMemberClaimEntities, Multimap<String, MemberClaimResponse> memberWiseResponseMap) {
+		log.info("START PCPValidatorService.pcpAssignmentService");
+		Map<String, MemberClaimResponse> claimsMap = new HashedMap<>();
+		memberWiseResponseMap.asMap().forEach((memberId, memberClaimResponses) -> {			
+			MemberClaimResponse memberClaimResponse = memberClaimUtils.calculateLatestClaim(new ArrayList<>(memberClaimResponses));				
+			claimsMap.put(memberClaimResponse.getClaimId(), memberClaimResponse);
 		});
+		contractMemberClaimEntities.forEach(entity -> {
+			if(claimsMap.containsKey(entity.getClaimId())) {
+				log.info("Sending entity uuid {} for pcp assignment ",entity.getContractMemberClaimPK());
+				pcpAssignmentService.process(entity, claimsMap.get(entity.getClaimId()));
+			} else {
+				log.warn("Skipping entity {} for pcp assignment ",entity);
+				entity.setStatus(Status.PCP_SKIPPED);
+				entity.setErrorMessage("Claim is skipped for pcp assignment.");
+			}
+		});
+		log.info("END PCPValidatorService.pcpAssignmentService");
 	}
 
-	@Transactional
+//	private void pcpAssignmentService(List<ContractMemberClaimEntity> contractMemberClaimEntities,  Multimap<String, MemberClaimResponse> memberWiseResponseMap) {
+//		log.info("Start PCPAssignmentTask.pcpAssignmentService");
+//		contractMemberClaimEntities.forEach(contractMemberClaim -> {
+//			List<MemberClaimResponse> members = (List<MemberClaimResponse>) memberWiseResponseMap.get(contractMemberClaim.getMemberId());
+//			MemberClaimResponse memberClaimResponse = memberClaimUtills.calculateLatestClaim(members);			
+//			// TODO: Try to understand the logic
+//			if(StringUtils.equals(memberClaimResponse.getClaimId(), contractMemberClaim.getClaimId())) {
+//				pcpAssignmentService.process(contractMemberClaim, memberClaimResponse);
+//				contractMemberClaimRepo.save(contractMemberClaim);
+//			}			
+//			log.info("END PCPAssignmentTask.pcpAssignmentService");
+//		});
+//	}
+
 	@MethodExecutionTime
 	private void setErrorMessageAndSave(String claimId, StringBuilder errorMessageBuilder, Status status) {
 		Optional<ContractMemberClaimEntity> contractMemberClaimEntity = findContractMemberClaimEntity(claimId);
@@ -171,13 +204,11 @@ public class PCPAssignmentTask implements Runnable {
 		}
 	}
 
-	@Transactional
 	@MethodExecutionTime
 	private void setErrorMessageToAllContractAndSave(StringBuilder errorMessageBuilder, Status status) {
 		contractMemberClaimEntities.forEach(entity ->{
 			entity.setStatus(status);
 			entity.setErrorMessage(errorMessageBuilder.toString());
-			contractMemberClaimRepo.save(entity);
 			contractMemberClaimRepo.save(entity);
 		});
 	}

@@ -3,6 +3,7 @@ package com.deltadental.pcp.calculation.service;
 import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
 import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
 import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
+import com.deltadental.pcp.calculation.constants.PCPCalculationServiceConstants;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
 import com.deltadental.pcp.calculation.enums.Status;
 import com.deltadental.pcp.calculation.interservice.PCPConfigData;
@@ -14,12 +15,14 @@ import com.google.common.collect.Multimap;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,12 +49,13 @@ public class PCPValidatorService {
 
 	@Value("${service.instance.id}")
 	private String serviceInstanceId;
-	private static final List<Status> SEARCH_STATUS_VALIDATE = List.of(Status.RETRY, Status.STAGED, Status.VALIDATED, Status.PCP_EXCLUDED, Status.PCP_NOT_INCLUDED);
 
 	@MethodExecutionTime
+	@Transactional
 	public void validateAndAssignPCP(List<ContractMemberClaimEntity> contractMemberClaimsEntities) {
 		log.info("START PCPValidatorService.validateContractMemberClaim");
 		Multimap<String, MemberClaimResponse> memberWiseResponseMultiMap = ArrayListMultimap.create();
+		boolean isErrorFlag = false;
 		try {
 			List<MemberClaimResponse> memberClaimsResponses = mtvSyncService.memberClaim(memberClaimUtils.getClaimIds(contractMemberClaimsEntities));
 			if (CollectionUtils.isNotEmpty(memberClaimsResponses)) {
@@ -82,52 +86,66 @@ public class PCPValidatorService {
 								if (isClaimStatusValid && isExplanationCodeValid && isProcedureCodeValid) {
 									memberWiseResponseMultiMap.put(memberClaimResponse.getMemberID(), memberClaimResponse);
 								}
-							}
+							}							
 						} else {
 							log.info("Provider {} not included, not assigning for claim id {}", memberClaimResponse.getProviderId(), memberClaimResponse.getClaimId());
 						}
 					}
 				}
+				
 			}
-		} catch (Exception e) {
+		} catch (Exception e) {			
+			isErrorFlag = true;
 			log.error("Exception occurred during retrieving member claim information from Metavance Sync Service.", e);
 			contractMemberClaimsEntities.forEach(entity -> {
-				entity.setErrorMessage(
-						"Exception occurred during retrieving member claim information from Metavance Sync Service. "
-								+ e.getMessage());
+				entity.setErrorMessage("Exception occurred during retrieving member claim information from Metavance Sync Service. "+ e.getMessage());
 				entity.setStatus(Status.RETRY);
 			});
 		}
-		if(!memberWiseResponseMultiMap.isEmpty()) {
-			pcpAssignmentService(contractMemberClaimsEntities, memberWiseResponseMultiMap);
+		if(! memberWiseResponseMultiMap.isEmpty()) {
+			if(!isErrorFlag) {
+				pcpAssignmentService(contractMemberClaimsEntities, memberWiseResponseMultiMap);	
+			}			
 			repo.saveAll(contractMemberClaimsEntities);
 		}
 		log.info("END PCPValidatorService.validateContractMemberClaim");
 	}
 
 	@MethodExecutionTime
-	private void pcpAssignmentService(List<ContractMemberClaimEntity> contractMemberClaimEntities,
-			Multimap<String, MemberClaimResponse> memberWiseResponseMap) {
- 		    contractMemberClaimEntities.forEach(contractMemberClaimEntity -> {
-			List<MemberClaimResponse> members = (List<MemberClaimResponse>) memberWiseResponseMap.get(contractMemberClaimEntity.getMemberId());
-			MemberClaimResponse memberClaimResponse = memberClaimUtils.calculateLatestClaim(members);
-			pcpAssignmentService.process(contractMemberClaimEntity, memberClaimResponse);
+	private void pcpAssignmentService(List<ContractMemberClaimEntity> contractMemberClaimEntities, Multimap<String, MemberClaimResponse> memberWiseResponseMap) {
+		log.info("START PCPValidatorService.pcpAssignmentService");
+		Map<String, MemberClaimResponse> claimsMap = new HashedMap<>();
+		memberWiseResponseMap.asMap().forEach((memberId, memberClaimResponses) -> {			
+			MemberClaimResponse memberClaimResponse = memberClaimUtils.calculateLatestClaim(new ArrayList<>(memberClaimResponses));				
+			claimsMap.put(memberClaimResponse.getClaimId(), memberClaimResponse);
 		});
+		contractMemberClaimEntities.forEach(entity -> {
+			if(claimsMap.containsKey(entity.getClaimId())) {
+				log.info("Sending entity uuid {} for pcp assignment ",entity.getContractMemberClaimPK());
+				pcpAssignmentService.process(entity, claimsMap.get(entity.getClaimId()));
+			} else {
+				log.warn("Skipping entity {} for pcp assignment ",entity);
+				entity.setStatus(Status.PCP_SKIPPED);
+				entity.setErrorMessage("Claim is skipped for pcp assignment.");
+			}
+		});
+		log.info("END PCPValidatorService.pcpAssignmentService");
+		// Code commented to restructure
+// 		contractMemberClaimEntities.forEach(contractMemberClaimEntity -> {
+//			List<MemberClaimResponse> members = (List<MemberClaimResponse>) memberWiseResponseMap.get(contractMemberClaimEntity.getMemberId());
+//			MemberClaimResponse memberClaimResponse = memberClaimUtils.calculateLatestClaim(members);			
+//			pcpAssignmentService.process(contractMemberClaimEntity, memberClaimResponse);
+//		});
 	}
 
 	@MethodExecutionTime
-	@Transactional
 	public void validatePending() {
 		log.info("START PCPValidatorService.validatePending()");
-		List<ContractMemberClaimEntity> recordsToValidate = repo.findByInstanceIdWhereStatusInList(serviceInstanceId,
-				SEARCH_STATUS_VALIDATE);
-			if(CollectionUtils.isNotEmpty(recordsToValidate)) {
-				Map<String, List<ContractMemberClaimEntity>> contractMemberClaimEntityMap = recordsToValidate.stream().collect
-				        (Collectors.groupingBy(ContractMemberClaimEntity::getContractId));
-				contractMemberClaimEntityMap.values().forEach(value -> {
-				validateAndAssignPCP(value);
-			});
-	    }
+		List<ContractMemberClaimEntity> recordsToValidate = repo.findByInstanceIdWhereStatusInList(serviceInstanceId, PCPCalculationServiceConstants.SEARCH_STATUS_VALIDATE_PENDING);
+		if (CollectionUtils.isNotEmpty(recordsToValidate)) {
+			Map<String, List<ContractMemberClaimEntity>> contractMemberClaimEntityMap = recordsToValidate.stream().distinct().collect(Collectors.groupingBy(ContractMemberClaimEntity::getContractIdAndMemberId));
+			contractMemberClaimEntityMap.values().forEach(this::validateAndAssignPCP);
+		}
 		log.info("END PCPValidatorService.validatePending()");
 	}
 }

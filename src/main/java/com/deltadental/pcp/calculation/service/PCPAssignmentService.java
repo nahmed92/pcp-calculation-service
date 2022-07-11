@@ -1,11 +1,27 @@
 package com.deltadental.pcp.calculation.service;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.deltadental.mtv.sync.interservice.MTVSyncServiceClient;
 import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
 import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentRequest;
 import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentResponse;
 import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
-import com.deltadental.pcp.calculation.entities.*;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
+import com.deltadental.pcp.calculation.entities.ContractMemberClaimPK;
+import com.deltadental.pcp.calculation.entities.MemberClaimEntity;
+import com.deltadental.pcp.calculation.entities.MemberClaimServicesEntity;
+import com.deltadental.pcp.calculation.entities.MemberProviderEntity;
 import com.deltadental.pcp.calculation.enums.Status;
 import com.deltadental.pcp.calculation.interservice.PCPConfigData;
 import com.deltadental.pcp.calculation.repos.MemberClaimRepo;
@@ -18,18 +34,8 @@ import com.deltadental.pcp.search.interservice.pojo.EnrolleeDetail;
 import com.deltadental.pcp.search.interservice.pojo.PCPResponse;
 import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 import com.deltadental.platform.common.exception.ServiceException;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -72,10 +78,10 @@ public class PCPAssignmentService {
     private MemberClaimRepo memberClaimRepo;
 
     @MethodExecutionTime
-    public void process(ContractMemberClaimEntity contractMemberClaimEntity, MemberClaimResponse memberClaimResponse) {
+    public void process(ContractMemberClaimEntity entity, MemberClaimResponse memberClaimResponse) {
         log.info("START PCPAssignmentService.process()");
         try {
-            log.info("Processing for {} ",contractMemberClaimEntity);
+            log.info("Processing for {} ",entity);
             String pcpEffectiveDate = pcpConfigData.calculatePCPEffectiveDate();
             PCPValidateResponse pcpValidateResponse = callPCPValidate(memberClaimResponse, pcpEffectiveDate);
             String pcpValidationMessage = getPCPValidationMessage(pcpValidateResponse);
@@ -86,35 +92,35 @@ public class PCPAssignmentService {
                 try {
                     ProviderAssignmentResponse providerAssignmentResponse = mtvSyncService.providerAssignment(providerAssignmentRequest);
                     if (StringUtils.equals(providerAssignmentResponse.getReturnCode(), PCP_ASSIGNMENT_OK)) {
-                        contractMemberClaimEntity.setStatus(Status.PCP_ASSIGNED);
-                        contractMemberClaimEntity.setErrorMessage(null);
-                        MemberClaimEntity memberClaimEntity = saveMemberClaimEntity(contractMemberClaimEntity, memberClaimResponse);
+                        entity.setStatus(Status.PCP_ASSIGNED);
+                        entity.setErrorMessage(null);
+                        MemberClaimEntity memberClaimEntity = saveMemberClaimEntity(entity, memberClaimResponse);
                         saveMemberClaimServices(memberClaimEntity, memberClaimResponse.getServiceLines());
-                        saveMemberProvider(contractMemberClaimEntity.getContractMemberClaimPK(), providerAssignmentResponse, memberClaimResponse, pcpEffectiveDate);
-                        log.info("PCP Assignment status for claim id {} status is {}.", contractMemberClaimEntity.getClaimId(), Status.PCP_ASSIGNED);
+                        saveMemberProvider(entity.getContractMemberClaimPK(), providerAssignmentResponse, memberClaimResponse, pcpEffectiveDate);
+                        log.info("PCP Assignment status for claim id {} status is {}.", entity.getClaimId(), Status.PCP_ASSIGNED);
                     } else {
                         if(StringUtils.equals(providerAssignmentResponse.getErrorCode(), "DCM-701") && StringUtils.contains(providerAssignmentResponse.getErrorMessage(), "Member has Prior PCP")) {
-                            log.info("PCP Assignment status for claim id {} status is {} and error message is {}.", contractMemberClaimEntity.getClaimId(), Status.PCP_ALREADY_ASSIGNED, String.join(" : ", providerAssignmentResponse.getErrorCode(), providerAssignmentResponse.getErrorMessage()));
-                            contractMemberClaimEntity.setStatus(Status.PCP_ALREADY_ASSIGNED);
+                            log.info("PCP Assignment status for claim id {} status is {} and error message is {}.", entity.getClaimId(), Status.PCP_ALREADY_ASSIGNED, String.join(" : ", providerAssignmentResponse.getErrorCode(), providerAssignmentResponse.getErrorMessage()));
+                            entity.setStatus(Status.PCP_ALREADY_ASSIGNED);
                         } else {
-                            log.info("PCP Assignment status for claim id {} status is {} and error message is {}.", contractMemberClaimEntity.getClaimId(), Status.FAILED, String.join(" : ", providerAssignmentResponse.getErrorCode(), providerAssignmentResponse.getErrorMessage()));
-                            contractMemberClaimEntity.setStatus(Status.FAILED);
+                            log.info("PCP Assignment status for claim id {} status is {} and error message is {}.", entity.getClaimId(), Status.FAILED, String.join(" : ", providerAssignmentResponse.getErrorCode(), providerAssignmentResponse.getErrorMessage()));
+                            entity.setStatus(Status.FAILED);
                         }
-                        contractMemberClaimEntity.setErrorMessage(String.join(" : ", providerAssignmentResponse.getErrorCode(), providerAssignmentResponse.getErrorMessage()));
+                        entity.setErrorMessage(String.join(" : ", providerAssignmentResponse.getErrorCode(), providerAssignmentResponse.getErrorMessage()));
                     }
                 } catch (Exception e) {
                     log.error("Exception occurred during provider assignment from metavance sync Service.", e);
-                    contractMemberClaimEntity.setStatus(Status.RETRY);
-                    contractMemberClaimEntity.setErrorMessage("Exception occurred during provider assignment from metavance sync Service.");
+                    entity.setStatus(Status.RETRY);
+                    entity.setErrorMessage("Exception occurred during provider assignment from metavance sync Service.");
                 }
             } else {
-                contractMemberClaimEntity.setStatus(Status.FAILED);
-                contractMemberClaimEntity.setErrorMessage(pcpValidationMessage);
+                entity.setStatus(Status.FAILED);
+                entity.setErrorMessage(pcpValidationMessage);
             }
         } catch (Exception e) {
             log.error("Exception occurred during pcp validation from pcp search Service.", e);
-            contractMemberClaimEntity.setStatus(Status.RETRY);
-            contractMemberClaimEntity.setErrorMessage("Exception occurred during pcp validation from pcp search Service.");
+            entity.setStatus(Status.RETRY);
+            entity.setErrorMessage("Exception occurred during pcp validation from pcp search Service.");
         }
         log.info("END PCPAssignmentService.process()");
     }
