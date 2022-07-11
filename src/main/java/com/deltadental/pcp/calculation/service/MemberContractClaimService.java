@@ -61,8 +61,8 @@ public class MemberContractClaimService {
             List<ContractMemberClaimEntity> memberClaimsEntities = repo.findByClaimIdAndContractIdAndMemberIdAndProviderIdAndStateAndStatusInList(
                     StringUtils.trimToNull(request.getClaimId()), // check this and remove
                     StringUtils.trimToNull(request.getContractId()),
-                    StringUtils.trimToNull(request.getProviderId()),
                     StringUtils.trimToNull(request.getMemberId()),
+                    StringUtils.trimToNull(request.getProviderId()),                    
                     StringUtils.trimToNull(request.getState()), SEARCH_STATUS);
             if (CollectionUtils.isEmpty(memberClaimsEntities)) {
                 memberClaimsRequests.add(request);
