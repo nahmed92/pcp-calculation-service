@@ -1,2 +1,6 @@
-contract_member_claim_2022_07_08.sql
+contract_member_claim.sql
+member_claim.sql
+member_claim_service.sql
+member_provider.sql
+pcp_calculation_activity.sql
 
