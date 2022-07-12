@@ -1,3 +1,4 @@
+ALTER TABLE dbo.member_claim_service DROP CONSTRAINT member_claim_service_pk_id;
 
 EXEC sp_rename 'member_claim_service', 'member_claim_service_07122022';
 
@@ -18,5 +19,5 @@ CREATE TABLE dbo.member_claim_service (
 	from_date date NULL,
 	thru_date date NULL,
 	received_timestamp datetime NULL,
-	CONSTRAINT member_claim_service_pk_id PRIMARY KEY (id)
+	CONSTRAINT pk_member_claim_service_id PRIMARY KEY (id)
 );

@@ -1,3 +1,4 @@
+ALTER TABLE dbo.contract_member_claim DROP CONSTRAINT pk_contract_member_claim_id_sequence_id;
 
 EXEC sp_rename 'contract_member_claim', 'contract_member_claim_07122022';
 

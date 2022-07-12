@@ -1,4 +1,3 @@
-
 EXEC sp_rename 'member_provider', 'member_provider_07122022';
 
 CREATE TABLE dbo.member_provider (
@@ -28,6 +27,7 @@ CREATE TABLE dbo.member_provider (
 	pcp_identifier varchar(255) NULL,
 	reason_cd varchar(255) NULL,
 	zip_code varchar(255) NULL
+	CONSTRAINT pk_member_provider_id PRIMARY KEY (id)
 );
 
 

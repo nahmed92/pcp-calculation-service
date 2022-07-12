@@ -1,3 +1,4 @@
+ALTER TABLE dbo.pcp_calculation_activity DROP CONSTRAINT PK__pcp_calculation_activity;
 
 EXEC sp_rename 'pcp_calculation_activity', 'pcp_calculation_activity_07122022';
 
@@ -12,5 +13,5 @@ CREATE TABLE dbo.pcp_calculation_activity (
 	time_to_process bigint NULL,
 	created_at datetime2 NULL,
 	last_updated_at datetime2 NULL,
-	CONSTRAINT PK__pcp_calculation_activity PRIMARY KEY (id)
+	CONSTRAINT pk_pcp_calculation_activity_id PRIMARY KEY (id)
 );
