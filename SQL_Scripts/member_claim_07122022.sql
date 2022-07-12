@@ -1,5 +1,3 @@
-EXEC sp_rename 'member_claim', 'member_claim_07122022';
-
 CREATE TABLE dbo.member_claim (
 	id varchar(200)  NOT NULL,
 	billing_provider_id varchar(15)  NULL,
@@ -33,7 +31,7 @@ CREATE TABLE dbo.member_claim (
 	provider_id varchar(255)  NULL,
 	received_ts datetime2 NULL,
 	resolved_ts datetime2 NULL,
-	CONSTRAINT pk_member_claim_id PRIMARY KEY (id)
+	CONSTRAINT primarykey_member_claim_id PRIMARY KEY (id)
 );
 
 -- dbo.member_claim foreign keys
