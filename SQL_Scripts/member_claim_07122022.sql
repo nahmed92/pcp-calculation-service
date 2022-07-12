@@ -1,5 +1,5 @@
 
-EXEC sp_rename 'member_claim', 'member_claim_old';
+EXEC sp_rename 'member_claim', 'member_claim_07122022';
 
 
 CREATE TABLE dbo.member_claim (

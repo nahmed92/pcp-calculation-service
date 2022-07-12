@@ -1,5 +1,5 @@
 
-EXEC sp_rename 'contract_member_claim', 'contract_member_claim_old';
+EXEC sp_rename 'contract_member_claim', 'contract_member_claim_07122022';
 
 CREATE TABLE dbo.contract_member_claim (
 	id varchar(200) NOT NULL,

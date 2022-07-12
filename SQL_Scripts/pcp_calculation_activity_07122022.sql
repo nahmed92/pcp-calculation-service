@@ -1,5 +1,5 @@
 
-EXEC sp_rename 'pcp_calculation_activity', 'pcp_calculation_activity_old';
+EXEC sp_rename 'pcp_calculation_activity', 'pcp_calculation_activity_07122022';
 
 CREATE TABLE dbo.pcp_calculation_activity (
 	id varchar(200) NOT NULL,

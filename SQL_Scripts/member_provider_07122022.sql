@@ -1,5 +1,5 @@
 
-EXEC sp_rename 'member_provider', 'member_provider_old';
+EXEC sp_rename 'member_provider', 'member_provider_07122022';
 
 CREATE TABLE dbo.member_provider (
 	id varchar(200) NOT NULL,
