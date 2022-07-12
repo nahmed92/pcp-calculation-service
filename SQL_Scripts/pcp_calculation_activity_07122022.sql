@@ -11,5 +11,5 @@ CREATE TABLE dbo.pcp_calculation_activity (
 	time_to_process bigint NULL,
 	created_at datetime2 NULL,
 	last_updated_at datetime2 NULL,
-	CONSTRAINT pk_pcp_calculation_activity_id PRIMARY KEY (id)
+	CONSTRAINT primarykey_pcp_calculation_activity_id PRIMARY KEY (id)
 );
