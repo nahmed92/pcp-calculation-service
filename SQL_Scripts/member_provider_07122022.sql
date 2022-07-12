@@ -32,4 +32,4 @@ CREATE TABLE dbo.member_provider (
 
 
 -- dbo.member_provider foreign keys
-ALTER TABLE dbo.member_provider ADD CONSTRAINT FK__member_provider FOREIGN KEY (contract_member_claim_id,contract_member_claim_sequence_id) REFERENCES dbo.contract_member_claim(id,sequence_id);
+ALTER TABLE dbo.member_provider ADD CONSTRAINT fk__member_provider FOREIGN KEY (contract_member_claim_id,contract_member_claim_sequence_id) REFERENCES dbo.contract_member_claim(id,sequence_id);

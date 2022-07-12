@@ -1,5 +1,3 @@
-ALTER TABLE dbo.member_claim DROP CONSTRAINT member_claim_pk_id;
-
 EXEC sp_rename 'member_claim', 'member_claim_07122022';
 
 CREATE TABLE dbo.member_claim (
@@ -39,4 +37,4 @@ CREATE TABLE dbo.member_claim (
 );
 
 -- dbo.member_claim foreign keys
-ALTER TABLE dbo.member_claim ADD CONSTRAINT FK__member_claim FOREIGN KEY (contract_member_claim_id,contract_member_claim_sequence_id) REFERENCES dbo.contract_member_claim(id,sequence_id);
+ALTER TABLE dbo.member_claim ADD CONSTRAINT fk__member_claim FOREIGN KEY (contract_member_claim_id,contract_member_claim_sequence_id) REFERENCES dbo.contract_member_claim(id,sequence_id);

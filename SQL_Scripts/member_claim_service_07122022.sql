@@ -1,5 +1,3 @@
-ALTER TABLE dbo.member_claim_service DROP CONSTRAINT member_claim_service_pk_id;
-
 EXEC sp_rename 'member_claim_service', 'member_claim_service_07122022';
 
 CREATE TABLE dbo.member_claim_service (

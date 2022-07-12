@@ -1,5 +1,3 @@
-ALTER TABLE dbo.pcp_calculation_activity DROP CONSTRAINT PK__pcp_calculation_activity;
-
 EXEC sp_rename 'pcp_calculation_activity', 'pcp_calculation_activity_07122022';
 
 CREATE TABLE dbo.pcp_calculation_activity (
