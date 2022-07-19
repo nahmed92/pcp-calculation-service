@@ -3,6 +3,7 @@ package com.deltadental.pcp.calculation.util;
 import com.deltadental.mtv.sync.interservice.dto.MemberClaimResponse;
 import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
 import com.deltadental.pcp.calculation.entities.ContractMemberClaimEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
@@ -13,9 +14,12 @@ import java.util.stream.Collectors;
 
 
 @Component
+@Slf4j
 public class MemberClaimUtils {
 	
 	public MemberClaimResponse calculateLatestClaim(List<MemberClaimResponse> members) {
+		log.info("START MemberClaimUtils.calculateLatestClaim()");
+		log.info("Members claims response size {}", members.size());
 		if(members.size()==1) {
 			return members.get(0);
 		}
@@ -33,8 +37,11 @@ public class MemberClaimUtils {
 
 		if (optionalMemberClaimResponse.isPresent()) {
 			memberClaimResponse = optionalMemberClaimResponse.get();
+		} else {
+			log.warn("Returning null for member claim responses {} ", members);
 		}
-
+		log.info("Returning latest claim {} ",memberClaimResponse);
+		log.info("END MemberClaimUtils.calculateLatestClaim()");
 		return memberClaimResponse;
 	}
 

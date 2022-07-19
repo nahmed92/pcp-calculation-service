@@ -1,27 +1,25 @@
 package com.deltadental.pcp.calculation.config;
 
 
-import com.deltadental.platform.common.rest.SecuredRestClient;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-
-import java.util.concurrent.Executor;
-
-
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
 import org.springframework.web.client.RestTemplate;
 
 import javax.net.ssl.SSLContext;
@@ -42,22 +40,12 @@ import java.util.concurrent.Executor;
 @ComponentScan(basePackages = {"com.deltadental.pcp.config","com.deltadental.pcp.security"})
 public class ApplicationConfig implements AsyncConfigurer {
  
- 
-	@Autowired
-	private SecuredRestClient securedRestClient;
-
 	@Value("${server.ssl.key-store}")
 	String deltaKeyStoreLocation;
 
 	@Value("${server.ssl.key-store-password}")
 	String deltaKeyStorePassword;
-
-	@Bean
-	@Qualifier("securedRestTemplate")
-	public RestTemplate serviceRestTemplate() {
-		return securedRestClient.createRestTemplate(deltaKeyStoreLocation, deltaKeyStorePassword);
-	}
-
+ 
 	@Bean
 	public RestTemplate restTemplate() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
 		TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;

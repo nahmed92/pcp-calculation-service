@@ -1,17 +1,32 @@
 package com.deltadental.pcp.calculation.entities;
 
-import com.deltadental.pcp.calculation.enums.Status;
-import lombok.*;
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Table;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.sql.Timestamp;
+import com.deltadental.pcp.calculation.enums.Status;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @Builder
 @Table(name = "contract_member_claim", schema = "dbo")
@@ -64,4 +79,7 @@ public class ContractMemberClaimEntity implements Serializable {
     @Column(name = "last_updated_at")
     private Timestamp lastUpdatedAt;
 
+    public String getContractIdAndMemberId() {
+    	return this.contractId+"-"+this.memberId;
+    }
 }
