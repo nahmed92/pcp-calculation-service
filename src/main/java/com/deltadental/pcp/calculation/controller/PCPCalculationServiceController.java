@@ -39,6 +39,7 @@ public class PCPCalculationServiceController {
             @ApiResponse(code = 500, message = "Internal server error.", response = ServiceError.class)})
     @ResponseBody
     @PostMapping(value = "/members-contracts-and-claims", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Deprecated
     public ResponseEntity<Boolean> stageMembersContractsAndClaims(
             @Valid @RequestBody List<MemberContractClaimRequest> memberContractClaimRequests) {
         log.info("START PCPCalculationServiceController.stageMembersContractsAndClaims");

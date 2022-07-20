@@ -21,8 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/pcp-calculation")
-@Api(value = "/pcp-calculation")
+@RequestMapping(value = "/pcp/calculation")
+@Api(value = "/pcp/calculation")
 @Slf4j
 public class ExcelPCPDataUploadController {
 
