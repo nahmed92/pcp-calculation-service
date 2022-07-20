@@ -1,6 +1,17 @@
 package com.deltadental.pcp.calculation.config;
 
 
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.Executor;
+
+import javax.net.ssl.SSLContext;
+
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -22,22 +33,12 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 
-import javax.net.ssl.SSLContext;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.Executor;
-
 
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = {"com.deltadental.pcp.calculation.repos"})
 @EntityScan(basePackages = {"com.deltadental.pcp.calculation.entities"})
-@ComponentScan(basePackages = {"com.deltadental.pcp.config","com.deltadental.pcp.security"})
+@ComponentScan(basePackages = {"com.deltadental.*", "com.deltadental.pcp.config","com.deltadental.pcp.security"})
 public class ApplicationConfig implements AsyncConfigurer {
  
 	@Value("${server.ssl.key-store}")
