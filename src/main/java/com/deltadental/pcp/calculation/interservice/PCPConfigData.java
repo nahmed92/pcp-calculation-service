@@ -1,5 +1,31 @@
 package com.deltadental.pcp.calculation.interservice;
 
+import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.CLAIM_STATUS;
+import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.EXPLANATION_CODE;
+import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.PROCEDURE_CODE;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
 import com.deltadental.mtv.sync.interservice.dto.ServiceLine;
 import com.deltadental.pcp.config.interservice.pojo.GroupRestrictions;
 import com.deltadental.pcp.config.interservice.pojo.InclusionExclusion;
@@ -9,35 +35,19 @@ import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
-import java.util.*;
-
-import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Component("pcpConfigData")
 @Slf4j
-public class PCPConfigData implements InitializingBean {
+public class PCPConfigData {
 
     @Value("${pcp.wash.rule.cutoff.day}")
     private Integer washRuleCutoffDay;
@@ -48,7 +58,6 @@ public class PCPConfigData implements InitializingBean {
     @Autowired
     private PCPConfigServiceClient pcpConfigServiceClient;
 
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S", Locale.US);
     private final DateFormat MM_DD_YYYY_FORMATTER = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
     private static final String ZONE_ID = "America/Los_Angeles";
 
@@ -58,7 +67,7 @@ public class PCPConfigData implements InitializingBean {
     private String providerLookAHeadDays = "90";
 
     @MethodExecutionTime
-    @Override
+    @PostConstruct
     public void afterPropertiesSet() {
         log.info("START PCPConfigData.afterPropertiesSet");
         claimStatusList.clear();
@@ -78,9 +87,8 @@ public class PCPConfigData implements InitializingBean {
         log.info("END PCPConfigData.afterPropertiesSet");
     }
 
-    //	@Scheduled(cron = "${pcp.config.data.refresh.corn.expression}", zone = ZONE_ID)
     @MethodExecutionTime
-    @Scheduled(cron = "*/59 * * * * *", zone = ZONE_ID)
+    @Scheduled(initialDelayString = "${scheduling.job.pcp.config.delay}", fixedDelayString = "${scheduling.job.pcp.config.delay}")
     @Synchronized
     public void refreshPCPConfigData() {
         log.info("START PCPConfigData.refreshPCPConfigData");
