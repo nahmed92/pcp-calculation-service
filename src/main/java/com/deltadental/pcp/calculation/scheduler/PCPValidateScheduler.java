@@ -5,6 +5,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.deltadental.pcp.calculation.worker.PCPCalculationServiceWorker;
+import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,14 +18,11 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 public class PCPValidateScheduler {
 
-//    @Autowired
-//    private PCPValidatorService pcpValidatorService;
-
 	@Autowired
 	private PCPCalculationServiceWorker worker;
 
-	@Scheduled(cron = "* */5 * * * *", zone = "America/Los_Angeles")
-    // FIXME: move to properties
+	@Scheduled(initialDelayString = "${scheduling.job.pcp.validation.delay}", fixedDelayString = "${scheduling.job.pcp.validation.delay}")
+	@MethodExecutionTime
     @Synchronized
     public void process() {
         log.info("START PCPValidateScheduler.process()");

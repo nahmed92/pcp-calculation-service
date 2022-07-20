@@ -1,6 +1,8 @@
 package com.deltadental.pcp.calculation.scheduler;
 
 import com.deltadental.pcp.calculation.worker.PCPCalculationServiceWorker;
+import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Synchronized;
@@ -18,9 +20,8 @@ public class PendingPCPAssignmentScheduler {
     @Autowired
     private PCPCalculationServiceWorker worker;
 
-    //	@Scheduled(cron = "${pcp.calculation.corn.job.scheduler}", zone = "${pcp.calculation.job.scheduler.zone}")
-//    @Scheduled(cron = "* */30 * * * *", zone = "America/Los_Angeles")
-    // FIXME: move to properties
+    @Scheduled(initialDelayString = "${scheduling.job.pcp.assignment.delay}", fixedDelayString = "${scheduling.job.pcp.assignment.delay}")
+	@MethodExecutionTime
     @Synchronized
     public void process() {
         log.info("START PCPCalculationServiceScheduler.process()");
