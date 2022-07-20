@@ -60,5 +60,7 @@ ENTRYPOINT java $JAVA_OPTS \
      -Denvironment=${ENVIRONMENT} \
      -Dscheduling.job.pcp.validation.delay=${SCHEDULING_JOB_PCP_VALIDATION_DELAY} \
      -Dscheduling.job.pcp.assignment.delay=${SCHEDULING_JOB_PCP_ASSIGNMENT_DELAY} \
+     -Dscheduling.job.pcp.config.delay=${SCHEDULING_JOB_PCP_CONFIG_DELAY} \
+     -Dpcp.calculation.workers=${PCP_CALCULATION_WORKERS} \
      -Djavax.net.ssl.trustStore=/usr/java/latest/jre/lib/security/cacerts \
      -jar /pcp-calculation-service-1.0.0.jar

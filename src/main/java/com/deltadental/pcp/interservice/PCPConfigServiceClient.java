@@ -1,23 +1,33 @@
 package com.deltadental.pcp.interservice;
 
-import com.deltadental.pcp.calculation.error.PCPCalculationServiceErrors;
-import com.deltadental.pcp.config.interservice.pojo.InclusionExclusion;
-import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
+import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.EXCLUSIONS_PROVIDER;
+import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.INCLUSIONS_PROVIDER;
+import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.PROVIDER_LOOKAHEAD_DAYS;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.deltadental.pcp.config.interservice.pojo.PCPConfigServiceConstants.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import com.deltadental.pcp.calculation.error.PCPCalculationServiceErrors;
+import com.deltadental.pcp.config.interservice.pojo.InclusionExclusion;
+import com.deltadental.pcp.security.HttpHeaderBuilder;
+import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service("pcpConfigService")
 @Slf4j
@@ -27,13 +37,13 @@ public class PCPConfigServiceClient {
 	private String pcpConfigServiceEndpoint;
 	
 	@Autowired
-	//@Qualifier("securedRestTemplate")
+	@Qualifier("securedRestTemplate")
 	private RestTemplate restTemplate;
 	
 	private static final String LOOK_A_HEAD_DAYS_90 = "90";
 	
-	//@Autowired
-	//private HttpHeaderBuilder httpHeaderBuilder;
+	@Autowired
+	private HttpHeaderBuilder httpHeaderBuilder;
 
 	public String getPCPConfigData(String serviceEndPoint) {
 		log.info("START PCPConfigServiceClient.pcpConfigData {} ", serviceEndPoint);
@@ -57,9 +67,7 @@ public class PCPConfigServiceClient {
 	}
 
 	private HttpHeaders createHttpHeaders() {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		return headers;
+		return httpHeaderBuilder.createHttpSecurityHeaders();		
 	}
 	
 	public String providerLookaheadDays() {
@@ -78,76 +86,12 @@ public class PCPConfigServiceClient {
 			} 
 		} catch (Exception e) {
 			log.error("Unable to call PCP Config for API {} ", PROVIDER_LOOKAHEAD_DAYS, e);
-//			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(e);
 		}
 		log.info("Returning provider Look a head days {}", returnValue);
 		log.info("END PCPConfigServiceClient.providerLookaheadDays");
 		return returnValue;
 	}
-	
-//	public String explanationCode() {
-//		log.info("START PCPConfigServiceClient.explanationcode");
-//		final String explanationCode = pcpConfigServiceEndpoint.concat(EXPLANATION_CODE);
-//		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(explanationCode);
-//		String uriBuilder = builder.build().encode().toUriString();
-//		HttpHeaders headers = createHttpHeaders();
-//		try {
-//			ResponseEntity<String> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
-//			if(responseEntity.getStatusCode() == HttpStatus.OK) {
-//				return responseEntity.getBody();
-//			}else {
-//				log.error("Got {} response code from PCP Config API {} ",responseEntity.getStatusCode(),EXPLANATION_CODE);
-//			}
-//		} catch (RestClientException | URISyntaxException e) {
-//			log.error("Unable to call PCP Config for API {} ",EXPLANATION_CODE,e);
-//			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException(e);
-//		}
-//		log.info("END PCPConfigServiceClient.explanationcode");
-//		return null;
-//	}
-//	
-//	public String procedureCode() {
-//		log.info("START PCPConfigServiceClient.explanationcode");
-//		final String procedureCode = pcpConfigServiceEndpoint.concat(PROCEDURE_CODE);
-//		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(procedureCode);
-//		String uriBuilder = builder.build().encode().toUriString();
-//		HttpHeaders headers = createHttpHeaders();
-//		try {
-//			ResponseEntity<String> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
-//			if(responseEntity.getStatusCode() == HttpStatus.OK) {
-//				return responseEntity.getBody();
-//			}else {
-//				log.error("Got {} response code from PCP Config API {} ",responseEntity.getStatusCode(),PROCEDURE_CODE);
-//			}
-//		} catch (RestClientException | URISyntaxException e) {
-//			log.error("Unable to call PCP Config for API {} ",PROCEDURE_CODE,e);
-//			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException();
-//		}
-//		log.info("END PCPConfigServiceClient.explanationcode");
-//		return null;
-//	}
-//	
-//	public String claimStatus() {
-//		log.info("START PCPConfigServiceClient.claimStatus");
-//		final String claimStatusUrl = pcpConfigServiceEndpoint.concat(CLAIM_STATUS);
-//		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(claimStatusUrl);
-//		String uriBuilder = builder.build().encode().toUriString();
-//		HttpHeaders headers = createHttpHeaders();
-//		try {
-//			ResponseEntity<String> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.GET,  new HttpEntity<>(headers), String.class);
-//			if(responseEntity.getStatusCode() == HttpStatus.OK) {
-//				return responseEntity.getBody();
-//			} else {
-//				log.error("Got {} response code from PCP Config API {} ",responseEntity.getStatusCode(),CLAIM_STATUS);
-//			}
-//		} catch (RestClientException | URISyntaxException e) {
-//			log.error("Unable to call PCP Config for API {} ",CLAIM_STATUS,e);
-//			throw PCPCalculationServiceErrors.PCP_CONFIG_ERROR.createException();
-//		}
-//		log.info("END PCPConfigServiceClient.claimStatus");
-//		return null;
-//	}
-	
+
 	@MethodExecutionTime
 	public InclusionExclusion[] exclusions(String providerId) {
 		log.info("START PCPConfigServiceClient.exclusions");

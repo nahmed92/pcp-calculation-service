@@ -87,7 +87,6 @@
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
 		</dependency>
-		<!-- Spring boot Web starter -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -234,14 +233,12 @@
 			<version>${services-common-library-version}</version>
 		</dependency>
 		
-		<!--
 		<dependency>
 			<groupId>com.deltadental.gmmo</groupId>
 			<artifactId>pcp-common</artifactId>
 			<version>${pcp-common-library-version}</version>
 		</dependency>
-		-->
-
+		
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
