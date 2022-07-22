@@ -5,11 +5,14 @@ import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentRequest;
 import com.deltadental.mtv.sync.interservice.dto.ProviderAssignmentResponse;
 import com.deltadental.pcp.calculation.error.PCPCalculationServiceErrors;
 import com.deltadental.pcp.calculation.error.RestTemplateErrorHandler;
+import com.deltadental.pcp.security.HttpHeaderBuilder;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -30,31 +33,39 @@ import java.util.Map;
 @Slf4j
 public class MTVSyncServiceClient {
 
-    @Value("${pcp.mtv.sync.service.endpoint}")
-    private String pcpMtvSyncServiceEndpoint;
-
-    @Autowired
-    private RestTemplate restTemplate;
-
+    @Value("${pcp.mtv.sync.service.url}")
+    private String pcpMtvSyncServiceUrl;
+    
+    private static final String MEMBER_CLAIM = "/claims/{claim-ids}";
+    
+	private static final String PROVIDER_ASSIGNMENT = "/provider-assignment";
+	
     @Autowired
     private RestTemplateErrorHandler restTemplateErrorHandler;
+    
+    @Autowired
+	@Qualifier("securedRestTemplate")
+	private RestTemplate restTemplate;
+
+    @Autowired
+	private HttpHeaderBuilder httpHeaderBuilder;
 
 	public List<MemberClaimResponse> memberClaim(List<String> claimId) {
 		log.info("START MTVSyncServiceClient.memberClaim");
 		List<MemberClaimResponse> memberClaimResponse = List.of();
 		if(CollectionUtils.isNotEmpty(claimId)) {
 		try {
-			String updatePCPMemberEndPoint = pcpMtvSyncServiceEndpoint.concat(MTVSyncServiceConstants.MEMBER_CLAIM);
+			String updatePCPMemberEndPoint = pcpMtvSyncServiceUrl.concat(MEMBER_CLAIM);
 			UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(updatePCPMemberEndPoint);
 			final Map<String, String> params = new HashMap<>();
 			params.put("claim-ids", String.join(",",claimId));
-			URI exclusionsUri = builder.buildAndExpand(params).toUri();
-			log.info("Request uri : {} ", exclusionsUri);
+			URI memberClaimUrl = builder.buildAndExpand(params).toUri();
+			log.info("Member Claim Request uri : {} ", memberClaimUrl);
 			restTemplate.setErrorHandler(restTemplateErrorHandler);
-			HttpHeaders headers = new HttpHeaders();
+			HttpHeaders headers = httpHeaderBuilder.createHttpSecurityHeaders();
 			HttpEntity<Object> requestEntity = new HttpEntity<>(headers);
 			ResponseEntity<List<MemberClaimResponse>> responseEntity = restTemplate.exchange(
-					exclusionsUri,
+					memberClaimUrl,
 					HttpMethod.GET,
 					requestEntity,
 					new ParameterizedTypeReference<List<MemberClaimResponse>>(){});
@@ -77,14 +88,14 @@ public class MTVSyncServiceClient {
         log.info("START MTVSyncServiceClient.providerAssignment()");
         ProviderAssignmentResponse providerAssignmentResponse = null;
         try {
-            String updatePCPMemberEndPoint = pcpMtvSyncServiceEndpoint.concat(MTVSyncServiceConstants.PROVIDER_ASSIGNMENT);
+            String updatePCPMemberEndPoint = pcpMtvSyncServiceUrl.concat(PROVIDER_ASSIGNMENT);
             UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(updatePCPMemberEndPoint);
             String uriBuilder = builder.build().encode().toUriString();
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpHeaders headers = httpHeaderBuilder.createHttpSecurityHeaders();
             HttpEntity<ProviderAssignmentRequest> request = new HttpEntity<>(providerAssignmentRequest, headers);
             // set custom error handler
             restTemplate.setErrorHandler(restTemplateErrorHandler);
+            log.info("Provider Assignment Request uri : {} ", uriBuilder);
             ResponseEntity<ProviderAssignmentResponse> responseEntity = restTemplate.postForEntity(new URI(uriBuilder), request, ProviderAssignmentResponse.class);
             log.info("MTV Sync Service request {} and response {} for provider assignment", providerAssignmentRequest, responseEntity);
             if (responseEntity.getBody() != null) {

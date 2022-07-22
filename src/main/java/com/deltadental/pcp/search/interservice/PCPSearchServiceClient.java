@@ -2,11 +2,13 @@ package com.deltadental.pcp.search.interservice;
 
 import com.deltadental.pcp.calculation.error.PCPCalculationServiceErrors;
 import com.deltadental.pcp.calculation.error.RestTemplateErrorHandler;
+import com.deltadental.pcp.security.HttpHeaderBuilder;
 import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -23,8 +25,8 @@ import java.net.URISyntaxException;
 @Slf4j
 public class PCPSearchServiceClient {
 
-    @Value("${pcp.search.service.endpoint}")
-    private String pcpSearchServiceEndpoint;
+    @Value("${pcp.search.service.url}")
+    private String pcpSearchServiceUrl;
 
     public static String PCP_VALIDATION = "/pcp/validate";
 
@@ -32,17 +34,21 @@ public class PCPSearchServiceClient {
     private RestTemplateErrorHandler restTemplateErrorHandler;
 
     @Autowired
-    private RestTemplate restTemplate;
+	@Qualifier("securedRestTemplate")
+	private RestTemplate restTemplate;
+
+    @Autowired
+	private HttpHeaderBuilder httpHeaderBuilder;
 
     @MethodExecutionTime
     public PCPValidateResponse pcpValidate(PCPValidateRequest pcpValidateRequest) {
         log.info("START PCPSearchServiceClient.validateProvider");
         PCPValidateResponse pcpValidateResponse = null;
-        String providerValidateEndPoint = pcpSearchServiceEndpoint.concat(PCP_VALIDATION);
+        String providerValidateEndPoint = pcpSearchServiceUrl.concat(PCP_VALIDATION);
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(providerValidateEndPoint);
         String uriBuilder = builder.build().encode().toUriString();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        log.info("PCP validate url {}",uriBuilder);
+        HttpHeaders headers = httpHeaderBuilder.createHttpSecurityHeaders();
         try {
             restTemplate.setErrorHandler(restTemplateErrorHandler);
             ResponseEntity<PCPValidateResponse> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.POST, new HttpEntity<>(pcpValidateRequest, headers), PCPValidateResponse.class);

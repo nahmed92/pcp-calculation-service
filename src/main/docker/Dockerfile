@@ -50,7 +50,8 @@ ENTRYPOINT java $JAVA_OPTS \
      -Dservice.instance.id=${SERVICE_INSTANCE_ID} \
      -Dpcp.wash.rule.cutoff.day=${WASH_RULE_CUTOFF_DAY} \
      -Dpcp.config.service.url=${PCP_CONFIG_SERVICE_URL} \
-     -Dpcp.mtv.sync.service.endpoint=${PCP_MTV_SYNC_SERVICE_ENDPOINT} \
+     -Dpcp.mtv.sync.service.url=${PCP_MTV_SYNC_SERVICE_URL} \
+     -Dpcp.search.service.url=${PCP_SEARCH_SERVICE_URL} \
      -Dpcp.config.data.refresh.corn.expression=${PCP_CONFIG_DATA_REFRESH_CORN_EXPRESSION} \
      -Dmanagement.endpoints.enabled-by-default=${MANAGEMENT_ENDPOINTS_ENABLED_BY_DEFAULT} \
      -Dmanagement.endpoints.web.path-mapping.health=${MANAGEMENT_ENDPOINTS_WEB_PATH_MAPPING_HEALTH} \
