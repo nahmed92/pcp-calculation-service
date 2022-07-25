@@ -1,23 +1,37 @@
 package com.deltadental.pcp.search.interservice;
 
-import com.deltadental.pcp.calculation.error.PCPCalculationServiceErrors;
-import com.deltadental.pcp.calculation.error.RestTemplateErrorHandler;
-import com.deltadental.pcp.security.HttpHeaderBuilder;
-import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import com.deltadental.pcp.calculation.error.PCPCalculationServiceErrors;
+import com.deltadental.pcp.calculation.error.RestTemplateErrorHandler;
+import com.deltadental.pcp.security.HttpHeaderBuilder;
+import com.deltadental.platform.common.annotation.aop.MethodExecutionTime;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @NoArgsConstructor
 @Data
@@ -28,7 +42,7 @@ public class PCPSearchServiceClient {
     @Value("${pcp.search.service.url}")
     private String pcpSearchServiceUrl;
 
-    public static String PCP_VALIDATION = "/pcp/validate";
+    public static String PCP_VALIDATION = "/validate";
 
     @Autowired
     private RestTemplateErrorHandler restTemplateErrorHandler;
@@ -49,7 +63,8 @@ public class PCPSearchServiceClient {
         String uriBuilder = builder.build().encode().toUriString();
         log.info("PCP validate url {}",uriBuilder);
         HttpHeaders headers = httpHeaderBuilder.createHttpSecurityHeaders();
-        try {
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        try {    
             restTemplate.setErrorHandler(restTemplateErrorHandler);
             ResponseEntity<PCPValidateResponse> responseEntity = restTemplate.exchange(new URI(uriBuilder), HttpMethod.POST, new HttpEntity<>(pcpValidateRequest, headers), PCPValidateResponse.class);
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
@@ -66,4 +81,5 @@ public class PCPSearchServiceClient {
         log.info("END PCPSearchServiceClient.validateProvider");
         return pcpValidateResponse;
     }
+    
 }
