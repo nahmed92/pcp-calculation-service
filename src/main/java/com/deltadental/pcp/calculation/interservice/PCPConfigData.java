@@ -114,30 +114,33 @@ public class PCPConfigData {
     }
 
     @MethodExecutionTime
-    @Cacheable(value = "claimStatusListCache", key = "#p0")
+    @Cacheable(value = "claimStatusListCache")
     private List<PcpConfigResponse> getClaimStatusList() {
-        log.info("START PCPConfigData.claimStatuses");
+        log.info("START PCPConfigData.getClaimStatusList()");
         String jsonClaimStatusStr = pcpConfigServiceClient.getPCPConfigData(CLAIM_STATUS);
-        log.info("END PCPConfigData.claimStatuses");
-        return getPcpConfigResponseList(jsonClaimStatusStr);  
+        List<PcpConfigResponse> pcpConfigResponses = getPcpConfigResponseList(jsonClaimStatusStr); 
+        log.info("END PCPConfigData.getClaimStatusList()");
+        return pcpConfigResponses;
     }
 
     @MethodExecutionTime  
-    @Cacheable(value = "explanationCodesCache", key = "#p1")
+    @Cacheable(value = "explanationCodesCache")
     private List<PcpConfigResponse> getExplanationCodes() {
-        log.info("START PCPConfigData.explanationCodes");
+        log.info("START PCPConfigData.getExplanationCodes()");
         String jsonExplanationCodeStr = pcpConfigServiceClient.getPCPConfigData(EXPLANATION_CODE);
-        log.info("END PCPConfigData.explanationCodes");
-        return getPcpConfigResponseList(jsonExplanationCodeStr);               
+        List<PcpConfigResponse> pcpConfigResponses = getPcpConfigResponseList(jsonExplanationCodeStr);
+        log.info("END PCPConfigData.getExplanationCodes()");
+        return pcpConfigResponses;               
     }
 
     @MethodExecutionTime
-    @Cacheable(value = "procedureCodesCache", key = "#p2")
+    @Cacheable(value = "procedureCodesCache")
     private List<PcpConfigResponse> getProcedureCodes() {
-        log.info("START PCPConfigData.procedureCodes");
+        log.info("START PCPConfigData.getProcedureCodes()");
         String jsonProcedureCodeStr = pcpConfigServiceClient.getPCPConfigData(PROCEDURE_CODE);
-        log.info("END PCPConfigData.procedureCodes");
-        return getPcpConfigResponseList(jsonProcedureCodeStr);       
+        List<PcpConfigResponse> pcpConfigResponses = getPcpConfigResponseList(jsonProcedureCodeStr);
+        log.info("END PCPConfigData.getProcedureCodes()");
+        return pcpConfigResponses;       
     }
 
     public void setProviderLookAHeadDays(String providerLookAHeadDays) {
