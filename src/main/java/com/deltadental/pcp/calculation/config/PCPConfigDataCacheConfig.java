@@ -29,7 +29,7 @@ public class PCPConfigDataCacheConfig {
 	@Bean
 	public net.sf.ehcache.CacheManager pcpConfigDataCacheManager() {
 
-		log.info("START FineGrainAuthzCacheConfig.accessTokensEhCacheManager()");
+		log.info("START PCPConfigDataCacheConfig.pcpConfigDataCacheManager()");
 		if (null == cacheEntries) {
 			cacheEntries = "1000";
 		}
