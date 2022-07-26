@@ -8,7 +8,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +19,6 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
@@ -38,7 +36,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
@@ -61,25 +58,12 @@ public class PCPConfigData {
     private final DateFormat MM_DD_YYYY_FORMATTER = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
     private static final String ZONE_ID = "America/Los_Angeles";
 
-    private List<PcpConfigResponse> claimStatusList = new ArrayList<>();
-    private List<PcpConfigResponse> procedureCodes = new ArrayList<>();
-    private List<PcpConfigResponse> explanationCodes = new ArrayList<>();
     private String providerLookAHeadDays = "90";
-
+    
     @MethodExecutionTime
     @PostConstruct
     public void afterPropertiesSet() {
         log.info("START PCPConfigData.afterPropertiesSet");
-        claimStatusList.clear();
-        procedureCodes.clear();
-        explanationCodes.clear();
-        log.info("Cleared all the pcp config data!");
-        claimStatusList = getClaimStatusList();
-        log.info("Claim status  : {} ", claimStatusList);
-        explanationCodes = getExplanationCodes();
-        log.info("Explanation codes : {} ", explanationCodes);
-        procedureCodes= getProcedureCodes();
-        log.info("Procedure codes : {} ", procedureCodes);
         log.info("Wash rule cutoff day {} ", washRuleCutoffDay);
         log.info("PCP Effective Date {} ", calculatePCPEffectiveDate());
         setProviderLookAHeadDays(fetchProviderLookAHeadDays());
@@ -109,6 +93,7 @@ public class PCPConfigData {
                     new TypeReference<List<PcpConfigResponse>>() {
                     });
         } catch (Exception e) {
+        	log.error("Unable to convert pcpconfig response", e );
             return new ArrayList<>();
         }
     }
@@ -143,10 +128,11 @@ public class PCPConfigData {
         return pcpConfigResponses;       
     }
 
-    public void setProviderLookAHeadDays(String providerLookAHeadDays) {
+
+    private void setProviderLookAHeadDays(String providerLookAHeadDays) {
         this.providerLookAHeadDays = providerLookAHeadDays;
     }
-
+    
     public String providerLookAHeadDays() {
         return providerLookAHeadDays;
     }

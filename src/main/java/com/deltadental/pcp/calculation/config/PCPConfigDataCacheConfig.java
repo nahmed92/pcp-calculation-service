@@ -46,13 +46,12 @@ public class PCPConfigDataCacheConfig {
 		config.addCache(explanationCodesCatcheConfig);
 		log.info("Adding Cache to CacheManager for cache {}", PROCEDURE_CODES_CACHE);
 		config.addCache(procedureCodesCacheConfig);
-
 		log.info("END PCPConfigDataCacheConfig.pcpConfigDataCacheManager()");
 		return net.sf.ehcache.CacheManager.newInstance(config);
 	}
 
 	private CacheConfiguration createCacheConfig(String cacheName) {
-		CacheConfiguration accessTokensEhCacheConfig = // cache name -- reference in service call
+		CacheConfiguration cacheConfig = // cache name -- reference in service call
 				new CacheConfiguration().eternal(false) // if true, timeouts are
 						.timeToIdleSeconds(0) // time since last accessed before item is marked for removal
 						.timeToLiveSeconds(Integer.parseInt(cacheTimeToLiveInSeconds)) // time since inserted before
@@ -63,11 +62,10 @@ public class PCPConfigDataCacheConfig {
 						.maxEntriesLocalHeap(Integer.parseInt(cacheEntries)) // max entries
 						.transactionalMode("off") // transactional mode
 						.name(cacheName);
-		return accessTokensEhCacheConfig;
+		return cacheConfig;
 	}
 
 	@Bean
-	// @Override
 	public CacheManager cacheManager() {
 		return new EhCacheCacheManager(pcpConfigDataCacheManager());
 	}
