@@ -8,7 +8,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,9 +19,9 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -37,12 +36,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Component("pcpConfigData")
@@ -61,25 +58,12 @@ public class PCPConfigData {
     private final DateFormat MM_DD_YYYY_FORMATTER = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
     private static final String ZONE_ID = "America/Los_Angeles";
 
-    private List<PcpConfigResponse> claimStatusList = new ArrayList<>();
-    private List<PcpConfigResponse> procedureCodes = new ArrayList<>();
-    private List<PcpConfigResponse> explanationCodes = new ArrayList<>();
     private String providerLookAHeadDays = "90";
-
+    
     @MethodExecutionTime
     @PostConstruct
     public void afterPropertiesSet() {
         log.info("START PCPConfigData.afterPropertiesSet");
-        claimStatusList.clear();
-        procedureCodes.clear();
-        explanationCodes.clear();
-        log.info("Cleared all the pcp config data!");
-        claimStatuses();
-        log.info("Claim status  : {} ", claimStatusList);
-        explanationCodes();
-        log.info("Explanation codes : {} ", explanationCodes);
-        procedureCodes();
-        log.info("Procedure codes : {} ", procedureCodes);
         log.info("Wash rule cutoff day {} ", washRuleCutoffDay);
         log.info("PCP Effective Date {} ", calculatePCPEffectiveDate());
         setProviderLookAHeadDays(fetchProviderLookAHeadDays());
@@ -109,41 +93,46 @@ public class PCPConfigData {
                     new TypeReference<List<PcpConfigResponse>>() {
                     });
         } catch (Exception e) {
+        	log.error("Unable to convert pcpconfig response", e );
             return new ArrayList<>();
         }
     }
 
     @MethodExecutionTime
-    private void claimStatuses() {
-        log.info("START PCPConfigData.claimStatuses");
+    @Cacheable(value = "claimStatusListCache")
+    private List<PcpConfigResponse> getClaimStatusList() {
+        log.info("START PCPConfigData.getClaimStatusList()");
         String jsonClaimStatusStr = pcpConfigServiceClient.getPCPConfigData(CLAIM_STATUS);
-        List<PcpConfigResponse> pcpConfigResponses = getPcpConfigResponseList(jsonClaimStatusStr);
-        setClaimStatusList(pcpConfigResponses);
-        log.info("END PCPConfigData.claimStatuses");
+        List<PcpConfigResponse> pcpConfigResponses = getPcpConfigResponseList(jsonClaimStatusStr); 
+        log.info("END PCPConfigData.getClaimStatusList()");
+        return pcpConfigResponses;
     }
 
-    @MethodExecutionTime
-    private void explanationCodes() {
-        log.info("START PCPConfigData.explanationCodes");
+    @MethodExecutionTime  
+    @Cacheable(value = "explanationCodesCache")
+    private List<PcpConfigResponse> getExplanationCodes() {
+        log.info("START PCPConfigData.getExplanationCodes()");
         String jsonExplanationCodeStr = pcpConfigServiceClient.getPCPConfigData(EXPLANATION_CODE);
         List<PcpConfigResponse> pcpConfigResponses = getPcpConfigResponseList(jsonExplanationCodeStr);
-        setExplanationCodes(pcpConfigResponses);
-        log.info("END PCPConfigData.explanationCodes");
+        log.info("END PCPConfigData.getExplanationCodes()");
+        return pcpConfigResponses;               
     }
 
     @MethodExecutionTime
-    private void procedureCodes() {
-        log.info("START PCPConfigData.procedureCodes");
+    @Cacheable(value = "procedureCodesCache")
+    private List<PcpConfigResponse> getProcedureCodes() {
+        log.info("START PCPConfigData.getProcedureCodes()");
         String jsonProcedureCodeStr = pcpConfigServiceClient.getPCPConfigData(PROCEDURE_CODE);
         List<PcpConfigResponse> pcpConfigResponses = getPcpConfigResponseList(jsonProcedureCodeStr);
-        setProcedureCodes(pcpConfigResponses);
-        log.info("END PCPConfigData.procedureCodes");
+        log.info("END PCPConfigData.getProcedureCodes()");
+        return pcpConfigResponses;       
     }
 
-    public void setProviderLookAHeadDays(String providerLookAHeadDays) {
+
+    private void setProviderLookAHeadDays(String providerLookAHeadDays) {
         this.providerLookAHeadDays = providerLookAHeadDays;
     }
-
+    
     public String providerLookAHeadDays() {
         return providerLookAHeadDays;
     }
